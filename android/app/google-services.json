@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "54498536294",
+    "project_id": "moneylans-5246e",
+    "storage_bucket": "moneylans-5246e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:54498536294:android:b154c49a1c7bcebafbf6a7",
+        "android_client_info": {
+          "package_name": "com.example.money_lans"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "54498536294-a5avs6mn1tg60vf0v989b0hatfslms3i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.money_lans",
+            "certificate_hash": "36ba7a07fce4d71f00b731456ca9eed707720370"
+          }
+        },
+        {
+          "client_id": "54498536294-0j2o06j5q0552pvsapoacmrp8ud5177b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAu_WaC_vWzP4WxUR8Olz0Tq7ahUB-3iT8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "54498536294-0j2o06j5q0552pvsapoacmrp8ud5177b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
