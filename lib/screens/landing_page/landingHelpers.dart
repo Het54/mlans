@@ -2,7 +2,10 @@
 
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:money_lans/screens/home_page/homePage.dart';
 import 'package:money_lans/screens/landing_page/landingServices.dart';
+import 'package:money_lans/screens/landing_page/landingUtils.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 
 class LandingHelpers with ChangeNotifier {
@@ -102,8 +105,8 @@ class LandingHelpers with ChangeNotifier {
         child: InkWell(
           splashColor: Colors.black,
           onTap: () {
-            Provider.of<LandingServices>(context, listen: false)
-                .signInSheet(context);
+            Provider.of<LandingUtils>(context, listen: false)
+                .selectUserImageOptionSheet(context);
           },
           child: Container(
             decoration: BoxDecoration(

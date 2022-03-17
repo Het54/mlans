@@ -14,7 +14,9 @@ class Authentication with ChangeNotifier {
     User? user = userCredential.user;
     userUid = user!.uid;
     print(userUid);
+    
     notifyListeners();
+    
   }
 
   Future createNewAccount(String email, String password) async {
@@ -23,7 +25,7 @@ class Authentication with ChangeNotifier {
 
     User? user = userCredential.user;
     userUid = user!.uid;
-    print(userUid);
+    print('Created account : $userUid');
     notifyListeners();
   }
 

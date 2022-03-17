@@ -2,8 +2,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:money_lans/screens/landing_page/landingHelpers.dart';
 import 'package:money_lans/screens/landing_page/landingServices.dart';
+import 'package:money_lans/screens/landing_page/landingUtils.dart';
 import 'package:money_lans/screens/splash_screen/splashScreen.dart';
 import 'package:money_lans/services/Authentication.dart';
+import 'package:money_lans/services/FirebaseOperations.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -32,6 +34,8 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => LandingHelpers()),
           ChangeNotifierProvider(create: (_) => Authentication()),
           ChangeNotifierProvider(create: (_) => LandingServices()),
+          ChangeNotifierProvider(create: (_) => FirebaseOperations()),
+          ChangeNotifierProvider(create: (_) => LandingUtils()),
         ]);
   }
 }
