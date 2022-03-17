@@ -2,6 +2,8 @@
 
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:money_lans/screens/landing_page/landingServices.dart';
+import 'package:provider/provider.dart';
 
 class LandingHelpers with ChangeNotifier {
   Widget bodyImage(BuildContext context) {
@@ -66,7 +68,10 @@ class LandingHelpers with ChangeNotifier {
         height: 44,
         child: InkWell(
           splashColor: Colors.black,
-          onTap: () {},
+          onTap: () {
+            Provider.of<LandingServices>(context, listen: false)
+                .loginSheet(context);
+          },
           child: Container(
             decoration: BoxDecoration(
               border: Border.all(color: Colors.white, width: 2),
@@ -97,7 +102,8 @@ class LandingHelpers with ChangeNotifier {
         child: InkWell(
           splashColor: Colors.black,
           onTap: () {
-            emailAuthSheet(context);
+            Provider.of<LandingServices>(context, listen: false)
+                .signInSheet(context);
           },
           child: Container(
             decoration: BoxDecoration(
