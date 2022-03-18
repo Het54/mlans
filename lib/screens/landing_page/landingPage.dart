@@ -9,20 +9,22 @@ class LandingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          bodyColor(),
-          Provider.of<LandingHelpers>(context, listen: false)
-              .bodyImage(context),
-          Provider.of<LandingHelpers>(context, listen: false)
-              .tagLineText(context),
-          Provider.of<LandingHelpers>(context, listen: false)
-              .loginButton(context),
-          Provider.of<LandingHelpers>(context, listen: false)
-              .signinButton(context),
-          Provider.of<LandingHelpers>(context, listen: false)
-              .privacyText(context),
-        ],
+      body: SingleChildScrollView(
+        child: Stack(
+          children: [
+            // bodyColor(),
+            Provider.of<LandingHelpers>(context, listen: false)
+                .bodyImage(context),
+            Provider.of<LandingHelpers>(context, listen: false)
+                .tagLineText(context),
+            Provider.of<LandingHelpers>(context, listen: false)
+                .loginButton(context),
+            Provider.of<LandingHelpers>(context, listen: false)
+                .signinButton(context),
+            Provider.of<LandingHelpers>(context, listen: false)
+                .privacyText(context),
+          ],
+        ),
       ),
     );
   }

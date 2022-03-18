@@ -23,8 +23,8 @@ class LandingHelpers with ChangeNotifier {
 
   Widget tagLineText(BuildContext context) {
     return Positioned(
-      top: 450.0,
-      left: 10.0,
+      top: 400.0,
+      left: 70.0,
       child: Container(
         // ignore: prefer_const_constructors
         constraints: BoxConstraints(
@@ -32,7 +32,7 @@ class LandingHelpers with ChangeNotifier {
         ),
         child: RichText(
           text: TextSpan(
-              text: "Welcome ",
+              text: "  Welcome ",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
@@ -51,7 +51,7 @@ class LandingHelpers with ChangeNotifier {
                 TextSpan(
                   text: " MoneyLans💸",
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Colors.grey,
                     fontSize: 37,
                     fontWeight: FontWeight.bold,
                   ),
@@ -64,7 +64,7 @@ class LandingHelpers with ChangeNotifier {
 
   Widget loginButton(BuildContext context) {
     return Positioned(
-      top: 650,
+      top: 580,
       left: MediaQuery.of(context).size.width * 0.25,
       child: Container(
         width: MediaQuery.of(context).size.width * 0.5,
@@ -97,7 +97,7 @@ class LandingHelpers with ChangeNotifier {
 
   Widget signinButton(BuildContext context) {
     return Positioned(
-      top: 590,
+      top: 530,
       left: MediaQuery.of(context).size.width * 0.25,
       child: Container(
         width: MediaQuery.of(context).size.width * 0.5,
@@ -129,7 +129,7 @@ class LandingHelpers with ChangeNotifier {
 
   Widget privacyText(BuildContext context) {
     return Positioned(
-      top: 740,
+      top: 650,
       left: 20,
       right: 20,
       child: Container(
@@ -137,11 +137,11 @@ class LandingHelpers with ChangeNotifier {
         children: [
           Text(
             "By continuing to this you agree to MoneyLans's Terms of",
-            style: TextStyle(color: Colors.grey, fontSize: 12),
+            style: TextStyle(color: Colors.grey, fontSize: 10),
           ),
           Text(
             "Services and Privacy Policies",
-            style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
+            style: TextStyle(color: Colors.grey.shade400, fontSize: 10),
           ),
         ],
       )),

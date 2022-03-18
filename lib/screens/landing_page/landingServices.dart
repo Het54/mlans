@@ -16,10 +16,12 @@ import '../home_page/homePage.dart';
 
 class LandingServices with ChangeNotifier {
   TextEditingController emailController = TextEditingController();
+  TextEditingController loginemailController = TextEditingController();
   final _key = GlobalKey<FormState>();
   final _loginkey = GlobalKey<FormState>();
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController loginpasswordController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
 
   // Widget passwordLessSignin(BuildContext context) {
@@ -331,7 +333,7 @@ class LandingServices with ChangeNotifier {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       child: TextFormField(
-                        controller: emailController,
+                        controller: loginemailController,
                         keyboardType: TextInputType.emailAddress,
                         validator: (value) {
                           if (value!.isEmpty) {
@@ -383,14 +385,15 @@ class LandingServices with ChangeNotifier {
                       onPressed: () {
                         if (_loginkey.currentState!.validate()) {
                           Provider.of<Authentication>(context, listen: false)
-                              .logIntoAccount(emailController.text,
-                                  passwordController.text);
-
-                          Navigator.pushReplacement(
-                              context,
-                              PageTransition(
-                                  child: HomePage(),
-                                  type: PageTransitionType.bottomToTop));
+                              .logIntoAccount(
+                                  emailController.text, passwordController.text)
+                              .whenComplete(() {
+                            Navigator.pushReplacement(
+                                context,
+                                PageTransition(
+                                    child: HomePage(),
+                                    type: PageTransitionType.bottomToTop));
+                          });
                         }
                       },
                       child: Icon(
