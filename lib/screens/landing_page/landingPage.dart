@@ -12,7 +12,7 @@ class LandingPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Stack(
           children: [
-            // bodyColor(),
+            bodyColor(context),
             Provider.of<LandingHelpers>(context, listen: false)
                 .bodyImage(context),
             Provider.of<LandingHelpers>(context, listen: false)
@@ -29,8 +29,10 @@ class LandingPage extends StatelessWidget {
     );
   }
 
-  bodyColor() {
+  bodyColor(BuildContext context) {
     return Container(
+      height: MediaQuery.of(context).size.height,
+      width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
           gradient: LinearGradient(
         begin: Alignment.topCenter,

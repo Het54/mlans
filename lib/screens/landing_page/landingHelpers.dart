@@ -2,6 +2,7 @@
 
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:money_lans/screens/home_page/homePage.dart';
 import 'package:money_lans/screens/landing_page/landingServices.dart';
 import 'package:money_lans/screens/landing_page/landingUtils.dart';
@@ -51,7 +52,7 @@ class LandingHelpers with ChangeNotifier {
                 TextSpan(
                   text: " MoneyLans💸",
                   style: TextStyle(
-                    color: Colors.grey,
+                    color: Colors.white,
                     fontSize: 37,
                     fontWeight: FontWeight.bold,
                   ),
@@ -105,8 +106,8 @@ class LandingHelpers with ChangeNotifier {
         child: InkWell(
           splashColor: Colors.black,
           onTap: () {
-            Provider.of<LandingUtils>(context, listen: false)
-                .selectUserImageOptionSheet(context);
+            Provider.of<LandingServices>(context, listen: false)
+                .signInSheet(context);
           },
           child: Container(
             decoration: BoxDecoration(
@@ -175,5 +176,9 @@ class LandingHelpers with ChangeNotifier {
             ),
           );
         });
+  }
+
+  displayToast(String msg , BuildContext context) {
+    Fluttertoast.showToast(msg: msg); 
   }
 }

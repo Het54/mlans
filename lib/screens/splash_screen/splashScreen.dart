@@ -15,11 +15,10 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     Timer(
-        Duration(seconds: 3),
-        () => Navigator.pushReplacement(
-            context,
-            PageTransition(
-                child: LandingPage(), type: PageTransitionType.fade)));
+      Duration(seconds: 3),
+      () => Navigator.pushNamedAndRemoveUntil(
+          context, '/auth', (Route<dynamic> route) => false),
+    );
     super.initState();
   }
 
@@ -28,7 +27,9 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-        child: Image.asset("assets/images/moneyLans.jpg"),
+        child: Image.asset(
+          "assets/images/mlans.jpg",
+        ),
       ),
     );
   }

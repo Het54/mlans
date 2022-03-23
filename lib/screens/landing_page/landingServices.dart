@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:money_lans/screens/landing_page/landingHelpers.dart';
 import 'package:money_lans/screens/landing_page/landingUtils.dart';
 import 'package:money_lans/services/Authentication.dart';
 import 'package:money_lans/services/FirebaseOperations.dart';
@@ -113,7 +114,7 @@ class LandingServices with ChangeNotifier {
             padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom),
             child: Container(
-              height: MediaQuery.of(context).size.height * 0.55,
+              height: MediaQuery.of(context).size.height * 0.39,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -133,13 +134,13 @@ class LandingServices with ChangeNotifier {
                           color: Colors.black,
                         ),
                       ),
-                      CircleAvatar(
-                        backgroundColor: Colors.red,
-                        backgroundImage: FileImage(
-                            Provider.of<LandingUtils>(context, listen: false)
-                                .getUserImage),
-                        radius: 70,
-                      ),
+                      // CircleAvatar(
+                      //   backgroundColor: Colors.red,
+                      //   backgroundImage: FileImage(
+                      //       Provider.of<LandingUtils>(context, listen: false)
+                      //           .getUserImage),
+                      //   radius: 70,
+                      // ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
                         child: TextFormField(
@@ -152,8 +153,7 @@ class LandingServices with ChangeNotifier {
                             }
                           },
                           decoration: InputDecoration(
-                            hintText:
-                                "Enter your username (try to keep hidden)..",
+                            hintText: "Enter your name....",
                             hintStyle: TextStyle(
                               color: Colors.black54,
                               fontSize: 15,
@@ -243,48 +243,16 @@ class LandingServices with ChangeNotifier {
                       ),
                       SizedBox(height: 15),
                       FloatingActionButton(
+                        backgroundColor: Colors.deepPurple,
                         onPressed: () {
                           if (_key.currentState!.validate()) {
                             Provider.of<Authentication>(context, listen: false)
-                                .createNewAccount(emailController.text,
-                                    passwordController.text)
-                                .whenComplete(() {
-                              print("Creating Collection...");
-                              Provider.of<FirebaseOperations>(context,
-                                      listen: false)
-                                  .createUserCollection(context, {
-                                'useruid': Provider.of<Authentication>(context,
-                                        listen: false)
-                                    .getUserUid,
-                                'userEmail': emailController.text,
-                                'username': usernameController.text,
-                                'userPhone': phoneController.text,
-                                'userImage': Provider.of<LandingUtils>(context,
-                                        listen: false)
-                                    .getUserImageUrl,
-                              });
-                            }).whenComplete(() {
-                              Provider.of<FirebaseOperations>(context,
-                                      listen: false)
-                                  .addUser(context, {
-                                'useruid': Provider.of<Authentication>(context,
-                                        listen: false)
-                                    .getUserUid,
-                                'userEmail': emailController.text,
-                                'username': usernameController.text,
-                                'userPhone': phoneController.text,
-                                'userImage': Provider.of<LandingUtils>(context,
-                                        listen: false)
-                                    .getUserImageUrl,
-                              });
-                              Fluttertoast.showToast(
-                                msg: "User Registered Succesfully!", // message
-                                toastLength: Toast.LENGTH_SHORT, // length
-                                gravity: ToastGravity.CENTER, // duration
-                                timeInSecForIosWeb: 1,
-                              );
-                              Navigator.pop(context);
-                            });
+                                .createNewAccount(
+                                    usernameController.text,
+                                    phoneController.text,
+                                    emailController.text,
+                                    passwordController.text,
+                                    context);
                           }
                         },
                         child: Icon(
@@ -358,7 +326,7 @@ class LandingServices with ChangeNotifier {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       child: TextFormField(
-                        controller: passwordController,
+                        controller: loginpasswordController,
                         obscureText: true,
                         validator: (value) {
                           if (value!.isEmpty) {
@@ -385,14 +353,24 @@ class LandingServices with ChangeNotifier {
                       onPressed: () {
                         if (_loginkey.currentState!.validate()) {
                           Provider.of<Authentication>(context, listen: false)
-                              .logIntoAccount(
-                                  emailController.text, passwordController.text)
-                              .whenComplete(() {
-                            Navigator.pushReplacement(
-                                context,
-                                PageTransition(
-                                    child: HomePage(),
-                                    type: PageTransitionType.bottomToTop));
+                              .logIntoAccount(loginemailController.text.trim(),
+                                  loginpasswordController.text.trim(), context)
+                              .then((res) {
+                            if (res == "Signed in") {
+                              Provider.of<LandingHelpers>(context,
+                                      listen: false)
+                                  .displayToast(res, context);
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  PageTransition(
+                                      child: HomePage(),
+                                      type: PageTransitionType.bottomToTop),
+                                  (Route<dynamic> route) => false);
+                            } else {
+                              Provider.of<LandingHelpers>(context,
+                                      listen: false)
+                                  .displayToast(res, context);
+                            }
                           });
                         }
                       },
