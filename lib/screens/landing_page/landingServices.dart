@@ -2,6 +2,7 @@
 
 // ignore_for_file: file_names, duplicate_ignore, prefer_const_constructors
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -147,7 +148,7 @@ class LandingServices with ChangeNotifier {
                           controller: usernameController,
                           validator: (value) {
                             if (value!.isEmpty) {
-                              return "You can't leave empty";
+                              return "Fill it up to sign in!";
                             } else {
                               return null;
                             }
@@ -172,7 +173,7 @@ class LandingServices with ChangeNotifier {
                           keyboardType: TextInputType.emailAddress,
                           validator: (value) {
                             if (value!.isEmpty) {
-                              return "You can't leave empty";
+                              return "Fill it up to sign in!";
                             } else {
                               return null;
                             }
@@ -284,7 +285,7 @@ class LandingServices with ChangeNotifier {
                   borderRadius: BorderRadius.only(
                       topRight: Radius.circular(15),
                       topLeft: Radius.circular(15))),
-              height: MediaQuery.of(context).size.height * 0.25,
+              height: MediaQuery.of(context).size.height * 0.3,
               width: MediaQuery.of(context).size.width,
               // ignore: prefer_const_literals_to_create_immutables
               child: Form(
@@ -349,35 +350,50 @@ class LandingServices with ChangeNotifier {
                       ),
                     ),
                     SizedBox(height: 15),
-                    FloatingActionButton(
-                      onPressed: () {
-                        if (_loginkey.currentState!.validate()) {
-                          Provider.of<Authentication>(context, listen: false)
-                              .logIntoAccount(loginemailController.text.trim(),
-                                  loginpasswordController.text.trim(), context)
-                              .then((res) {
-                            if (res == "Signed in") {
-                              Provider.of<LandingHelpers>(context,
-                                      listen: false)
-                                  .displayToast(res, context);
-                              Navigator.pushAndRemoveUntil(
-                                  context,
-                                  PageTransition(
-                                      child: HomePage(),
-                                      type: PageTransitionType.bottomToTop),
-                                  (Route<dynamic> route) => false);
-                            } else {
-                              Provider.of<LandingHelpers>(context,
-                                      listen: false)
-                                  .displayToast(res, context);
-                            }
-                          });
-                        }
-                      },
-                      child: Icon(
-                        FontAwesomeIcons.check,
-                        color: Colors.white,
-                      ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                            onPressed: () {
+                              if (_loginkey.currentState!.validate()) {
+                                Provider.of<Authentication>(context,
+                                        listen: false)
+                                    .logIntoAccount(
+                                        loginemailController.text.trim(),
+                                        loginpasswordController.text.trim(),
+                                        context)
+                                    .then((res) {
+                                  if (res == "Signed in") {
+                                    Provider.of<LandingHelpers>(context,
+                                            listen: false)
+                                        .displayToast(res, context);
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        PageTransition(
+                                            child: HomePage(),
+                                            type:
+                                                PageTransitionType.bottomToTop),
+                                        (Route<dynamic> route) => false);
+                                  } else {
+                                    Provider.of<LandingHelpers>(context,
+                                            listen: false)
+                                        .displayToast(res, context);
+                                  }
+                                });
+                              }
+                            },
+                            child: Text("Sign In")),
+                        TextButton(
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) =>
+                                    resetPasswordSheet(context,
+                                        loginemailController.text.trim()));
+                          },
+                          child: Text("Forgot Password?"),
+                        ),
+                      ],
                     ),
                     SizedBox(height: 15),
                   ]),
@@ -386,5 +402,34 @@ class LandingServices with ChangeNotifier {
             ),
           );
         });
+  }
+
+  resetPasswordSheet(BuildContext context, String email) {
+    TextEditingController resetEmailController = TextEditingController();
+    resetEmailController.text = email;
+    return Dialog(
+      child: Container(
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(30)),
+        margin: EdgeInsets.all(15.0),
+        width: double.infinity,
+        height: MediaQuery.of(context).size.height * 0.2,
+        child: Column(children: [
+          Text("Are you sure to reset your password?",
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          SizedBox(height: 15),
+          TextField(controller: resetEmailController),
+          SizedBox(height: 15),
+          ElevatedButton(
+              onPressed: () {
+                Provider.of<Authentication>(context, listen: false)
+                    .resetPassword(context, resetEmailController.text.trim())
+                    .whenComplete(() => Navigator.pop(context));
+              },
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [Icon(Icons.mail), Text("  Reset Password")]))
+        ]),
+      ),
+    );
   }
 }

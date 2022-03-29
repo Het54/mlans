@@ -1,5 +1,8 @@
+// ignore_for_file: dead_code, unused_local_variable
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:money_lans/main.dart';
 import 'package:money_lans/screens/landing_page/landingHelpers.dart';
@@ -14,24 +17,42 @@ class Authentication with ChangeNotifier {
   String? userUid;
   String? get getUserUid => userUid;
 
-  Stream<User?> get authStateChanges => firebaseAuth.authStateChanges();
+  // Stream<User?> get authStateChanges => firebaseAuth.authStateChanges();
 
   Future logIntoAccount(
       String email, String password, BuildContext context) async {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Provider.of<LandingHelpers>(context, listen: false)
+              .progressDialog(context, "Authenticating, please wait......");
+        });
+
     try {
       await firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password);
       return "Signed in";
     } on FirebaseAuthException catch (e) {
+      Navigator.pop(context);
       return e.message;
     }
   }
 
   Future createNewAccount(String name, String phone, String email,
       String password, BuildContext context) async {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Provider.of<LandingHelpers>(context, listen: false)
+              .progressDialog(context, "Registering, please wait......");
+        });
+
     final User? firebaseUser = (await firebaseAuth
             .createUserWithEmailAndPassword(email: email, password: password)
             .catchError((errMsg) {
+      Navigator.pop(context);
       Provider.of<LandingHelpers>(context, listen: false)
           .displayToast("Error: " + errMsg.toString(), context);
     }))
@@ -56,13 +77,17 @@ class Authentication with ChangeNotifier {
               child: HomePage(), type: PageTransitionType.bottomToTop),
           (Route<dynamic> route) => false);
     } else {
+      Navigator.pop(context);
       Provider.of<LandingHelpers>(context, listen: false)
           .displayToast("New user account has not been created!", context);
     }
   }
 
-  Future logOutAccount() {
-    return firebaseAuth.signOut();
+  Future logOutAccount(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+
+    Navigator.pushNamedAndRemoveUntil(
+        context, '/landingpage', (route) => false);
   }
 
   User? getUser() {
@@ -70,6 +95,18 @@ class Authentication with ChangeNotifier {
       return firebaseAuth.currentUser;
     } on FirebaseAuthException {
       return null;
+    }
+  }
+
+  Future resetPassword(BuildContext context, String email) async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+
+      Provider.of<LandingHelpers>(context, listen: false)
+          .displayToast("Reset Password link sent!", context);
+    } on FirebaseAuthException catch (e) {
+      Provider.of<LandingHelpers>(context, listen: false)
+          .displayToast("${e.message}", context);
     }
   }
 }

@@ -3,7 +3,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:money_lans/profile/ProfileHelpers.dart';
 import 'package:money_lans/screens/home_page/homePage.dart';
+import 'package:money_lans/screens/home_page/homePageHelpers.dart';
 import 'package:money_lans/screens/landing_page/landingHelpers.dart';
 import 'package:money_lans/screens/landing_page/landingPage.dart';
 import 'package:money_lans/screens/landing_page/landingServices.dart';
@@ -11,7 +13,10 @@ import 'package:money_lans/screens/landing_page/landingUtils.dart';
 import 'package:money_lans/screens/splash_screen/splashScreen.dart';
 import 'package:money_lans/services/Authentication.dart';
 import 'package:money_lans/services/FirebaseOperations.dart';
+import 'package:money_lans/utils/PostOptions.dart';
 import 'package:provider/provider.dart';
+
+import 'feed/FeedHelpers.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,32 +45,19 @@ class MyApp extends StatelessWidget {
             '/splash': (context) => SplashScreen(),
             '/landingpage': (context) => LandingPage(),
             '/home': (context) => HomePage(),
-            '/auth': (context) => AuthenticationWrapper(),
           },
           home: const SplashScreen(),
         ),
         providers: [
+          ChangeNotifierProvider(create: (_) => PostOptions()),
+          ChangeNotifierProvider(create: (_) => FeedHelpers()),
           ChangeNotifierProvider(create: (_) => LandingHelpers()),
+          ChangeNotifierProvider(create: (_) => ProfileHelpers()),
+          ChangeNotifierProvider(create: (_) => homePageHelpers()),
           ChangeNotifierProvider(create: (_) => Authentication()),
           ChangeNotifierProvider(create: (_) => LandingServices()),
           ChangeNotifierProvider(create: (_) => FirebaseOperations()),
           ChangeNotifierProvider(create: (_) => LandingUtils()),
-          StreamProvider(
-            create: (context) =>
-                context.read<Authentication>().authStateChanges,
-            initialData: null,
-          )
         ]);
-  }
-}
-
-class AuthenticationWrapper extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final firebaseuser = context.watch<Authentication>();
-    if (firebaseuser != null) {
-      return HomePage();
-    }
-    return LandingPage();
   }
 }

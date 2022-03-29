@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:money_lans/screens/landing_page/landingPage.dart';
 import 'package:page_transition/page_transition.dart';
@@ -17,7 +18,9 @@ class _SplashScreenState extends State<SplashScreen> {
     Timer(
       Duration(seconds: 3),
       () => Navigator.pushNamedAndRemoveUntil(
-          context, '/auth', (Route<dynamic> route) => false),
+          context,
+          FirebaseAuth.instance.currentUser == null ? '/landingpage' : '/home',
+          (Route<dynamic> route) => false),
     );
     super.initState();
   }
