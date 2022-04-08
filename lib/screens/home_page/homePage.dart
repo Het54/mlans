@@ -2,11 +2,11 @@ import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:money_lans/profile/Profile.dart';
 import 'package:money_lans/screens/home_page/homePageHelpers.dart';
 
 import '../../services/Authentication.dart';
 import '../feed/Feed.dart';
+import '../profile/Profile.dart';
 
 class HomePage extends StatefulWidget {
   String name;

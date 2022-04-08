@@ -5,13 +5,12 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_list.dart';
 import 'package:flutter/material.dart';
+import 'package:money_lans/screens/profile/ProfileHelpers.dart';
 import 'package:provider/provider.dart';
 
-import 'package:money_lans/profile/ProfileHelpers.dart';
 import 'package:money_lans/services/Authentication.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../main.dart';
 
 class Profile extends StatelessWidget {
   String name;

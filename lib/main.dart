@@ -3,7 +3,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:money_lans/profile/ProfileHelpers.dart';
 import 'package:money_lans/screens/feed/FeedHelpers.dart';
 import 'package:money_lans/screens/home_page/homePage.dart';
 import 'package:money_lans/screens/home_page/homePageHelpers.dart';
@@ -11,12 +10,12 @@ import 'package:money_lans/screens/landing_page/landingHelpers.dart';
 import 'package:money_lans/screens/landing_page/landingPage.dart';
 import 'package:money_lans/screens/landing_page/landingServices.dart';
 import 'package:money_lans/screens/landing_page/landingUtils.dart';
+import 'package:money_lans/screens/profile/ProfileHelpers.dart';
 import 'package:money_lans/screens/splash_screen/splashScreen.dart';
 import 'package:money_lans/services/Authentication.dart';
 import 'package:money_lans/services/FirebaseOperations.dart';
 import 'package:money_lans/utils/PostOptions.dart';
 import 'package:provider/provider.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
