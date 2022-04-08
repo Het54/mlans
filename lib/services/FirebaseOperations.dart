@@ -31,8 +31,8 @@ class FirebaseOperations with ChangeNotifier {
 
   Future createUserCollection(BuildContext context, dynamic data) async {
     return FirebaseFirestore.instance
-        .collection('users')
-        .doc(Provider.of<Authentication>(context, listen: false).getUserUid)
+        .collection('userData')
+        .doc(Provider.of<Authentication>(context, listen: false).getUser()?.uid)
         .set(data);
   }
 
@@ -42,5 +42,12 @@ class FirebaseOperations with ChangeNotifier {
 
   Future uploadPostData(String postId, dynamic data) async {
     return FirebaseFirestore.instance.collection('posts').doc(postId).set(data);
+  }
+
+  Future updatePostData(String postId, dynamic data) async {
+    return FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postId)
+        .update(data);
   }
 }

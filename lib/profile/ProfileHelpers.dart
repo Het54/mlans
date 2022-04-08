@@ -1,6 +1,12 @@
+// ignore_for_file: deprecated_member_use
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../main.dart';
 import '../services/Authentication.dart';
 
 class ProfileHelpers with ChangeNotifier {
@@ -40,5 +46,16 @@ class ProfileHelpers with ChangeNotifier {
         ),
       ),
     );
+  }
+
+  Future<DatabaseEvent> getData(BuildContext context) async {
+    String uid =
+        '${Provider.of<Authentication>(context, listen: false).getUser()?.uid}';
+    final dbRef = FirebaseDatabase.instance
+        .reference()
+        .child('user')
+        .child(uid)
+        .child('name');
+    return await dbRef.once();
   }
 }

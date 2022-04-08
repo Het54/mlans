@@ -1,18 +1,24 @@
-// ignore_for_file: unnecessary_brace_in_string_interps, prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: unnecessary_brace_in_string_interps, prefer_const_constructors, prefer_const_literals_to_create_immutables, deprecated_member_use
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_list.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:money_lans/profile/ProfileHelpers.dart';
 import 'package:money_lans/services/Authentication.dart';
-import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../main.dart';
 
 class Profile extends StatelessWidget {
-  Profile({Key? key}) : super(key: key);
+  String name;
+  Profile({
+    Key? key,
+    required this.name,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -51,11 +57,14 @@ class Profile extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            profileBio(),
+            profileBio(name: name),
             StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(Provider.of<Authentication>(context, listen: false)
+                        .getUser()
+                        ?.uid)
                     .collection('posts')
-                    .orderBy('time')
                     .snapshots(),
                 builder: ((context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -63,7 +72,75 @@ class Profile extends StatelessWidget {
                       child: CircularProgressIndicator(),
                     );
                   } else {
-                    return Container(child: profilePosts(context, snapshot));
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SingleChildScrollView(
+                        child: GridView(
+                          shrinkWrap: true,
+                          physics: ScrollPhysics(),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                  mainAxisSpacing: 15,
+                                  crossAxisSpacing: 25,
+                                  crossAxisCount: 2),
+                          children: snapshot.data!.docs
+                              .map((DocumentSnapshot documentSnapshot) {
+                            Map<String, dynamic> data = documentSnapshot.data()!
+                                as Map<String, dynamic>;
+                            return InkWell(
+                              onTap: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return profilePostSheet(
+                                        context,
+                                        data['debt'],
+                                        data['content'],
+                                      );
+                                    });
+                              },
+                              child: Container(
+                                height: 10,
+                                decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color:
+                                            Color.fromARGB(255, 223, 222, 222),
+                                        borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(15)),
+                                      ),
+                                      width: double.infinity,
+                                      child: Center(
+                                        child: Text(
+                                          "Debt:",
+                                          style: TextStyle(
+                                              color: Colors.blue,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 29),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 25),
+                                    Text(
+                                      "₹${data['debt']}",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          fontSize: 25),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    );
                   }
                 }))
           ],
@@ -73,20 +150,34 @@ class Profile extends StatelessWidget {
   }
 }
 
-Widget profilePosts(
-    BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-  return ListView(
-      shrinkWrap: true,
-      children: snapshot.data!.docs.map((DocumentSnapshot documentSnapshot) {
-        Map<String, dynamic> data =
-            documentSnapshot.data()! as Map<String, dynamic>;
-        return Column();
-      }).toList());
+profilePostSheet(BuildContext context, String debt, String content) {
+  return Dialog(
+    child: Container(
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(35)),
+      height: MediaQuery.of(context).size.height * 0.35,
+      width: MediaQuery.of(context).size.width * 0.7,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text("₹${debt}",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            SizedBox(height: 15),
+            Text(content),
+          ],
+        ),
+      ),
+    ),
+  );
 }
 
 class profileBio extends StatelessWidget {
-  const profileBio({
+  String name;
+  profileBio({
     Key? key,
+    required this.name,
   }) : super(key: key);
 
   @override
@@ -105,28 +196,38 @@ class profileBio extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 15),
-                RichText(
-                  text: TextSpan(
-                    text: '',
-                    style: DefaultTextStyle.of(context).style,
-                    children: <TextSpan>[
-                      TextSpan(
-                        text: '    Hello',
-                        style: TextStyle(
-                            fontWeight: FontWeight.normal, fontSize: 20),
-                      ),
-                      TextSpan(
-                        text: " User",
-                        style: TextStyle(
-                            fontWeight: FontWeight.normal, fontSize: 20),
-                      ),
-                      TextSpan(
-                        text: ',',
-                        style: TextStyle(
-                            fontWeight: FontWeight.normal, fontSize: 20),
-                      ),
-                    ],
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      '   Hey ',
+                      style: TextStyle(
+                          fontWeight: FontWeight.normal, fontSize: 20),
+                    ),
+                    StreamBuilder<DocumentSnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('userData')
+                          .doc(
+                              "${Provider.of<Authentication>(context, listen: false).getUser()?.uid}")
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else {
+                          return Text(snapshot.data!.get('name'),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.normal, fontSize: 20));
+                        }
+                      },
+                    ),
+                    Text(
+                      ',',
+                      style: TextStyle(
+                          fontWeight: FontWeight.normal, fontSize: 20),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 15),
                 RichText(
@@ -160,7 +261,9 @@ class profileBio extends StatelessWidget {
                         text:
                             '${Provider.of<Authentication>(context, listen: false).getUser()?.uid}',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.blue),
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue,
+                            fontSize: 13),
                       ),
                     ],
                   ),
@@ -186,7 +289,7 @@ class profileBio extends StatelessWidget {
           ),
         ),
         Text(
-          "Your Recent Posts..",
+          "Your Post History...",
           style: TextStyle(
             color: Colors.black38,
             fontSize: 25,
@@ -196,20 +299,3 @@ class profileBio extends StatelessWidget {
     );
   }
 }
-
-// Future name(BuildContext context, String uid) async {
-//   DatabaseEvent event = await userRef.once();
-//   dynamic data = event.snapshot.value;
-//   return userRef.orderByKey().equalTo(uid).once();
-//   // return data.key;
-// }
-
-// Future<FirebaseList?> name(BuildContext context, String uid) async {
-//   query:
-//   userRef;
-//   itemBuilder:
-//   (context, DataSnapshot snapshot) async {
-//     return await Text('${userRef.orderByKey().equalTo(uid).once()}');
-//   };
-//   return null;
-// }

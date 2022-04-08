@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:money_lans/screens/landing_page/landingServices.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LandingUtils with ChangeNotifier {
   final picker = ImagePicker();
@@ -81,4 +82,6 @@ class LandingUtils with ChangeNotifier {
           );
         });
   }
+
+  
 }

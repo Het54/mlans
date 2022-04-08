@@ -8,6 +8,8 @@ import 'package:money_lans/screens/landing_page/landingServices.dart';
 import 'package:money_lans/screens/landing_page/landingUtils.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/link.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LandingHelpers with ChangeNotifier {
   Widget bodyImage(BuildContext context) {
@@ -25,15 +27,15 @@ class LandingHelpers with ChangeNotifier {
   Widget tagLineText(BuildContext context) {
     return Positioned(
       top: 400.0,
-      left: 70.0,
+      left: 90.0,
       child: Container(
         // ignore: prefer_const_constructors
         constraints: BoxConstraints(
-          maxWidth: 240,
+          maxWidth: MediaQuery.of(context).size.width,
         ),
         child: RichText(
           text: TextSpan(
-              text: "  Welcome ",
+              text: "   Welcome ",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
@@ -42,7 +44,7 @@ class LandingHelpers with ChangeNotifier {
               // ignore: prefer_const_literals_to_create_immutables
               children: <TextSpan>[
                 TextSpan(
-                  text: "to ",
+                  text: "to \n",
                   style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
@@ -50,7 +52,7 @@ class LandingHelpers with ChangeNotifier {
                   ),
                 ),
                 TextSpan(
-                  text: " Moneylans",
+                  text: "  Moneylans",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 37,
@@ -84,7 +86,7 @@ class LandingHelpers with ChangeNotifier {
             ),
             child: Center(
               child: Text(
-                "Log in to MoneyLans",
+                "Log in to Moneylans",
                 style: TextStyle(
                   color: Colors.white,
                 ),
@@ -116,7 +118,7 @@ class LandingHelpers with ChangeNotifier {
                 color: Colors.transparent),
             child: Center(
               child: Text(
-                "Sign in to MoneyLans",
+                "Sign in to Moneylans",
                 style: TextStyle(
                   color: Colors.white,
                 ),
@@ -137,12 +139,25 @@ class LandingHelpers with ChangeNotifier {
           child: Column(
         children: [
           Text(
-            "By continuing to this you agree to MoneyLans's Terms of",
+            "By continuing to this you agree to Moneylans's Terms of",
             style: TextStyle(color: Colors.grey, fontSize: 10),
           ),
-          Text(
-            "Services and Privacy Policies",
-            style: TextStyle(color: Colors.grey.shade400, fontSize: 10),
+          Link(
+            target: LinkTarget.blank,
+            uri:
+                Uri.parse("https://pages.flycricket.io/moneylans/privacy.html"),
+            builder: (context, followLink) => TextButton(
+              child: Text(
+                "Services and Privacy Policies",
+                style: TextStyle(color: Colors.grey.shade400, fontSize: 10),
+              ),
+              onPressed: followLink,
+              style: TextButton.styleFrom(
+                minimumSize: Size.zero,
+                padding: EdgeInsets.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+            ),
           ),
         ],
       )),

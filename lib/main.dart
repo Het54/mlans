@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:money_lans/profile/ProfileHelpers.dart';
+import 'package:money_lans/screens/feed/FeedHelpers.dart';
 import 'package:money_lans/screens/home_page/homePage.dart';
 import 'package:money_lans/screens/home_page/homePageHelpers.dart';
 import 'package:money_lans/screens/landing_page/landingHelpers.dart';
@@ -16,7 +17,6 @@ import 'package:money_lans/services/FirebaseOperations.dart';
 import 'package:money_lans/utils/PostOptions.dart';
 import 'package:provider/provider.dart';
 
-import 'feed/FeedHelpers.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +24,8 @@ void main() async {
   runApp(const MyApp());
 }
 
-DatabaseReference userRef = FirebaseDatabase.instance.reference().child("user");
+final userReference = FirebaseDatabase.instance;
+final userRef = userReference.reference().child("user");
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -44,7 +45,9 @@ class MyApp extends StatelessWidget {
           routes: {
             '/splash': (context) => SplashScreen(),
             '/landingpage': (context) => LandingPage(),
-            '/home': (context) => HomePage(),
+            '/home': (context) => HomePage(
+                  name: '',
+                ),
           },
           home: const SplashScreen(),
         ),

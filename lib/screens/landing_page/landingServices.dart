@@ -370,7 +370,9 @@ class LandingServices with ChangeNotifier {
                                     Navigator.pushAndRemoveUntil(
                                         context,
                                         PageTransition(
-                                            child: HomePage(),
+                                            child: HomePage(
+                                              name: '',
+                                            ),
                                             type:
                                                 PageTransitionType.bottomToTop),
                                         (Route<dynamic> route) => false);
@@ -412,7 +414,7 @@ class LandingServices with ChangeNotifier {
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(30)),
         margin: EdgeInsets.all(15.0),
         width: double.infinity,
-        height: MediaQuery.of(context).size.height * 0.2,
+        height: MediaQuery.of(context).size.height * 0.23,
         child: Column(children: [
           Text("Are you sure to reset your password?",
               style: TextStyle(fontWeight: FontWeight.bold)),

@@ -17,7 +17,7 @@ class PostOptions with ChangeNotifier {
           Provider.of<Authentication>(context, listen: false).getUser()?.uid,
       'useremail':
           Provider.of<Authentication>(context, listen: false).getUser()?.email,
-      'time': Timestamp.now(),
+      'time': Timestamp.now().toString().substring(18, 28),
     });
   }
 
@@ -34,7 +34,7 @@ class PostOptions with ChangeNotifier {
           Provider.of<Authentication>(context, listen: false).getUser()?.uid,
       'useremail':
           Provider.of<Authentication>(context, listen: false).getUser()?.email,
-      'time': Timestamp.now(),
+      'time': Timestamp.now().toString().substring(18, 28),
     });
   }
 
@@ -44,13 +44,24 @@ class PostOptions with ChangeNotifier {
         .doc(postId)
         .collection('comments')
         .doc(comment)
-        .set({
-      'comments': comment,
-      'userId':
-          Provider.of<Authentication>(context, listen: false).getUser()?.uid,
-      'useremail':
-          Provider.of<Authentication>(context, listen: false).getUser()?.email,
-      'time': Timestamp.now(),
-    });
+        .set(
+      {
+        'comments': comment,
+        'userId':
+            Provider.of<Authentication>(context, listen: false).getUser()?.uid,
+        'useremail': Provider.of<Authentication>(context, listen: false)
+            .getUser()
+            ?.email,
+        'time': Timestamp.now().toString().substring(18, 28),
+      },
+    );
+  }
+
+  Future deletePost(BuildContext context, String postId) async {
+    final doc = FirebaseFirestore.instance.collection('posts').doc(postId);
+    await doc
+        .delete()
+        .then((value) => print(postId))
+        .catchError((error) => print("Failed to delete user: $error"));
   }
 }

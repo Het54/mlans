@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:money_lans/main.dart';
 import 'package:money_lans/screens/landing_page/landingHelpers.dart';
+import 'package:money_lans/services/FirebaseOperations.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 
@@ -61,20 +62,28 @@ class Authentication with ChangeNotifier {
     if (firebaseUser != null) {
       userRef.child(firebaseUser.uid);
 
-      Map userDataMap = {
+      dynamic userDataMap = {
         "name": name.trim(),
         "phone": phone.trim(),
         "email": email.trim(),
+        "premium": false,
       };
 
       userRef.child(firebaseUser.uid).set(userDataMap);
+
+      Provider.of<FirebaseOperations>(context, listen: false)
+          .createUserCollection(context, userDataMap);
+
       Provider.of<LandingHelpers>(context, listen: false).displayToast(
           "Congratulations! your account has been created.", context);
 
       Navigator.pushAndRemoveUntil(
           context,
           PageTransition(
-              child: HomePage(), type: PageTransitionType.bottomToTop),
+              child: HomePage(
+                name: name,
+              ),
+              type: PageTransitionType.bottomToTop),
           (Route<dynamic> route) => false);
     } else {
       Navigator.pop(context);
