@@ -7,14 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:money_lans/screens/landing_page/landingHelpers.dart';
-import 'package:money_lans/screens/landing_page/landingUtils.dart';
-import 'package:money_lans/services/Authentication.dart';
-import 'package:money_lans/services/FirebaseOperations.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 
+import '../../services/Authentication.dart';
+import '../../services/FirebaseOperations.dart';
 import '../home_page/homePage.dart';
+import 'landingHelpers.dart';
+import 'landingUtils.dart';
 
 class LandingServices with ChangeNotifier {
   TextEditingController emailController = TextEditingController();

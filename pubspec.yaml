@@ -1,4 +1,4 @@
-name: money_lans
+name: Moneylans
 description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
@@ -37,6 +37,7 @@ dependencies:
   eva_icons_flutter: ^3.1.0
   shared_preferences: ^2.0.13
   url_launcher: ^6.0.20
+  kdgaugeview: ^1.0.4
   flutter_app_name: ^0.1.1
   font_awesome_flutter: ^9.2.0
   page_transition: ^2.0.5
@@ -87,6 +88,7 @@ flutter:
     - assets/images/mlans.jpg
     - assets/images/login.png
     - assets/images/google.png
+    - assets/gifs/money.gif
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

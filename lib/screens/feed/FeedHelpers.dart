@@ -5,6 +5,7 @@ import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -12,10 +13,14 @@ import 'package:provider/provider.dart';
 import '../../services/Authentication.dart';
 import '../../services/FirebaseOperations.dart';
 import '../../utils/PostOptions.dart';
+import '../feedback_question/Feedback.dart';
 import '../landing_page/landingHelpers.dart';
 
 class FeedHelpers with ChangeNotifier {
   TextEditingController debtController = TextEditingController();
+  TextEditingController tenureController = TextEditingController();
+  TextEditingController intrestController = TextEditingController();
+  TextEditingController typeController = TextEditingController();
   TextEditingController contentController = TextEditingController();
 
   uploadPostSheet(BuildContext context) {
@@ -29,7 +34,7 @@ class FeedHelpers with ChangeNotifier {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 10.0),
             child: Container(
-              height: MediaQuery.of(context).size.height * 0.5,
+              height: MediaQuery.of(context).size.height * 0.78,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
                 color: Colors.grey.shade200.withOpacity(0.5),
@@ -54,9 +59,47 @@ class FeedHelpers with ChangeNotifier {
                         controller: debtController,
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
+                          labelText: "Debt amount",
                           fillColor: Colors.white,
                           filled: true,
                           hintText: "Enter the debt amount...",
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        controller: intrestController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          fillColor: Colors.white,
+                          labelText: "Intrest Percentage",
+                          filled: true,
+                          hintText: "Enter the intrest percentage...",
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        controller: typeController,
+                        decoration: InputDecoration(
+                          fillColor: Colors.white,
+                          filled: true,
+                          labelText: "Debt Type",
+                          hintText: "Enter the debt type...",
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        controller: tenureController,
+                        decoration: InputDecoration(
+                          fillColor: Colors.white,
+                          filled: true,
+                          labelText: "Debt Tenure",
+                          hintText: "Enter the time period of debt...",
                         ),
                       ),
                     ),
@@ -68,10 +111,11 @@ class FeedHelpers with ChangeNotifier {
                           width: 400,
                           child: TextFormField(
                             controller: contentController,
-                            minLines: 10,
+                            minLines: 8,
                             maxLines: 200,
                             decoration: InputDecoration(
                               fillColor: Colors.white,
+                              labelText: "Steps",
                               filled: true,
                               hintText: "Enter the steps...",
                             ),
@@ -96,6 +140,9 @@ class FeedHelpers with ChangeNotifier {
                                     "${debtController.text}+${Timestamp.now().toString().substring(18, 28)}",
                                     {
                                   'debt': debtController.text,
+                                  'intrestPercentage': intrestController.text,
+                                  'debtType': typeController.text,
+                                  'timePeriod': tenureController.text,
                                   'content': contentController.text,
                                   'userId': Provider.of<Authentication>(context,
                                           listen: false)
@@ -113,30 +160,38 @@ class FeedHelpers with ChangeNotifier {
                                   .displayToast(
                                       "Post uploaded successfully!", context);
                             }).whenComplete(() {
-                              return FirebaseFirestore.instance
-                                  .collection('users')
-                                  .doc(Provider.of<Authentication>(context,
-                                          listen: false)
-                                      .getUser()
-                                      ?.uid)
-                                  .collection('posts')
-                                  .add({
-                                'debt': debtController.text,
-                                'content': contentController.text,
-                                'userId': Provider.of<Authentication>(context,
-                                        listen: false)
-                                    .getUser()
-                                    ?.uid,
-                                'time': Timestamp.now(),
-                                'userEmail': Provider.of<Authentication>(
-                                        context,
-                                        listen: false)
-                                    .getUser()
-                                    ?.email,
-                              });
+                              Provider.of<FirebaseOperations>(context,
+                                      listen: false)
+                                  .uploadPostDataInProfile(
+                                      Provider.of<Authentication>(context,
+                                              listen: false)
+                                          .getUser()!
+                                          .uid,
+                                      "${debtController.text}+${Timestamp.now().toString().substring(18, 28)}",
+                                      {
+                                    'debt': debtController.text,
+                                    'intrestPercentage': intrestController.text,
+                                    'debtType': typeController.text,
+                                    'timePeriod': tenureController.text,
+                                    'content': contentController.text,
+                                    'userId': Provider.of<Authentication>(
+                                            context,
+                                            listen: false)
+                                        .getUser()
+                                        ?.uid,
+                                    'time': Timestamp.now(),
+                                    'userEmail': Provider.of<Authentication>(
+                                            context,
+                                            listen: false)
+                                        .getUser()
+                                        ?.email,
+                                  });
                             }).whenComplete(() {
                               Navigator.pop(context);
                               debtController.clear();
+                              intrestController.clear();
+                              tenureController.clear();
+                              typeController.clear();
                               contentController.clear();
                             });
                           },
@@ -176,10 +231,12 @@ class FeedHelpers with ChangeNotifier {
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
+                  // notifyListeners();
                   return Center(
                     child: CircularProgressIndicator(),
                   );
                 } else {
+                  // notifyListeners();
                   return Container(child: loadPosts(context, snapshot));
                 }
               },
@@ -282,6 +339,22 @@ class FeedHelpers with ChangeNotifier {
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
                         ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                    child: Text(
+                      data['debtType'] +
+                          " at " +
+                          data['intrestPercentage'] +
+                          "% intrest" +
+                          " for " +
+                          data['timePeriod'],
+                      style: TextStyle(
+                        fontWeight: FontWeight.w100,
+                        color: Colors.lightBlue,
                       ),
                     ),
                   ),
@@ -670,7 +743,7 @@ class FeedHelpers with ChangeNotifier {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 10.0),
               child: Container(
-                height: MediaQuery.of(context).size.height * 0.5,
+                height: MediaQuery.of(context).size.height * 0.6,
                 width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
                   color: Colors.grey.shade200.withOpacity(0.5),
@@ -697,6 +770,7 @@ class FeedHelpers with ChangeNotifier {
                           decoration: InputDecoration(
                             fillColor: Colors.white,
                             filled: true,
+                            labelText: "Debt Amount",
                             hintText: "Enter the debt amount...",
                           ),
                         ),
@@ -714,6 +788,7 @@ class FeedHelpers with ChangeNotifier {
                             decoration: InputDecoration(
                               fillColor: Colors.white,
                               filled: true,
+                              labelText: "Steps",
                               hintText: "Enter the steps...",
                             ),
                           ),
@@ -740,7 +815,7 @@ class FeedHelpers with ChangeNotifier {
                                 Provider.of<LandingHelpers>(context,
                                         listen: false)
                                     .displayToast(
-                                        "Post uploaded successfully!", context);
+                                        "Post updated successfully!", context);
                               }).whenComplete(() {
                                 Navigator.pop(context);
                                 Navigator.pop(context);
@@ -772,35 +847,47 @@ class FeedHelpers with ChangeNotifier {
       height: MediaQuery.of(context).size.height * 0.08,
       width: MediaQuery.of(context).size.width,
       color: Colors.blue,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                height: 35,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(15)),
-                child: TextButton(
-                    onPressed: () {
-                      Provider.of<LandingHelpers>(context, listen: false)
-                          .displayToast("Coming soon..!", context);
-                    },
-                    child: Text("Try")),
-              ),
-              Text("  Premium for free!",
-                  style: TextStyle(color: Colors.white)),
-            ],
-          ),
-          Text("Just answer a few questions and become our premium member!",
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(height: 5),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  height: 35,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15)),
+                  child: TextButton(
+                      onPressed: () {
+                        Provider.of<LandingHelpers>(context, listen: false)
+                            .displayToast("Coming Soon!🔥", context);
+                      },
+                      child: Text("Try")),
+                ),
+                Text("  Premium for free!",
+                    style: TextStyle(color: Colors.white)),
+              ],
+            ),
+            Text(
+              "Just answer a few questions and become our premium member!",
               style: TextStyle(
                 color: Colors.grey.shade400,
                 fontSize: 8,
-              ))
-        ],
+              ),
+            ),
+            Text(
+              "And get a chance to access a lot more features!",
+              style: TextStyle(
+                color: Colors.grey.shade400,
+                fontSize: 8,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,12 +1,13 @@
+import 'package:Moneylans/screens/onboard_screen/OnboardScreen.dart';
+import 'package:Moneylans/screens/profile/ProfileHelpers.dart';
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:money_lans/screens/home_page/homePageHelpers.dart';
-
 import '../../services/Authentication.dart';
 import '../feed/Feed.dart';
 import '../profile/Profile.dart';
+import 'homePageHelpers.dart';
 
 class HomePage extends StatefulWidget {
   String name;
@@ -26,6 +27,20 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        centerTitle: true,
+        elevation: 0.0,
+        title: const Text(
+          "Moneylans",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      drawer: Provider.of<ProfileHelpers>(context, listen: false)
+          .customDrawer(context),
       backgroundColor: Colors.white,
       body: PageView(
         controller: homeController,
@@ -37,6 +52,7 @@ class _HomePageState extends State<HomePage> {
         },
         children: [
           Feed(),
+          OnboardScreen(),
           Profile(name: widget.name),
         ],
       ),

@@ -4,13 +4,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:money_lans/main.dart';
-import 'package:money_lans/screens/landing_page/landingHelpers.dart';
-import 'package:money_lans/services/FirebaseOperations.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 
+import '../main.dart';
 import '../screens/home_page/homePage.dart';
+import '../screens/landing_page/landingHelpers.dart';
+import 'FirebaseOperations.dart';
 
 class Authentication with ChangeNotifier {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;

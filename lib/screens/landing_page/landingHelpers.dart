@@ -3,13 +3,12 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:money_lans/screens/home_page/homePage.dart';
-import 'package:money_lans/screens/landing_page/landingServices.dart';
-import 'package:money_lans/screens/landing_page/landingUtils.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/link.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'landingServices.dart';
 
 class LandingHelpers with ChangeNotifier {
   Widget bodyImage(BuildContext context) {
@@ -35,7 +34,7 @@ class LandingHelpers with ChangeNotifier {
         ),
         child: RichText(
           text: TextSpan(
-              text: "   Welcome ",
+              text: " Welcome ",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
@@ -52,7 +51,7 @@ class LandingHelpers with ChangeNotifier {
                   ),
                 ),
                 TextSpan(
-                  text: "  Moneylans",
+                  text: "Moneylans",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 37,

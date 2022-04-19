@@ -1,16 +1,11 @@
 // ignore_for_file: unnecessary_brace_in_string_interps, prefer_const_constructors, prefer_const_literals_to_create_immutables, deprecated_member_use
 
+import 'package:Moneylans/screens/debt_meter/DebtMeter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:eva_icons_flutter/eva_icons_flutter.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_database/ui/firebase_list.dart';
 import 'package:flutter/material.dart';
-import 'package:money_lans/screens/profile/ProfileHelpers.dart';
 import 'package:provider/provider.dart';
 
-import 'package:money_lans/services/Authentication.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import '../../services/Authentication.dart';
 
 class Profile extends StatelessWidget {
   String name;
@@ -25,34 +20,6 @@ class Profile extends StatelessWidget {
         Provider.of<Authentication>(context, listen: false).getUser()?.uid;
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        centerTitle: true,
-        actions: [
-          IconButton(
-              onPressed: () {
-                showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (BuildContext context) {
-                      return Provider.of<ProfileHelpers>(context, listen: false)
-                          .logoutDialog(context);
-                    });
-              },
-              icon: Icon(
-                EvaIcons.logOut,
-                color: Colors.red,
-              ))
-        ],
-        elevation: 0.0,
-        title: const Text(
-          "Moneylans",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -95,6 +62,44 @@ class Profile extends StatelessWidget {
                                         context,
                                         data['debt'],
                                         data['content'],
+                                      );
+                                    });
+                              },
+                              onLongPress: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return Dialog(
+                                        child: Container(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.08,
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.12,
+                                          decoration: BoxDecoration(
+                                              color: Colors.white),
+                                          child: TextButton(
+                                              onPressed: () {
+                                                FirebaseFirestore.instance
+                                                    .collection('users')
+                                                    .doc(Provider.of<
+                                                                Authentication>(
+                                                            context,
+                                                            listen: false)
+                                                        .getUser()
+                                                        ?.uid)
+                                                    .collection('posts')
+                                                    .doc(
+                                                        "${data['debt']}+${data['time'].toString().substring(18, 28)}")
+                                                    .delete();
+                                                Navigator.pop(context);
+                                              },
+                                              child:
+                                                  Text("Delete post history")),
+                                        ),
                                       );
                                     });
                               },
@@ -280,6 +285,62 @@ class profileBio extends StatelessWidget {
           ),
         ),
         SizedBox(height: 10),
+        Stack(
+          children: [
+            Container(
+              width: MediaQuery.of(context).size.width * 0.9,
+              height: MediaQuery.of(context).size.height * 0.2,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  fit: BoxFit.cover,
+                  image: NetworkImage(
+                      "https://media.istockphoto.com/photos/home-finance-picture-id1295832050?b=1&k=20&m=1295832050&s=170667a&w=0&h=6OQrn4tjqB7QIlDSmCt5Jof3187Iyk-jRMV_qlidROQ="),
+                ),
+                borderRadius: BorderRadius.circular(15),
+              ),
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width * 0.9,
+              height: MediaQuery.of(context).size.height * 0.2,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: Colors.black.withOpacity(0.4)),
+              child: Column(
+                children: [
+                  SizedBox(height: 9),
+                  Text(
+                    "Check your debt-o-score!",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 18),
+                  ),
+                  SizedBox(height: 2),
+                  Text("A healthy debt-o-score is a sign of a good future!",
+                      style:
+                          TextStyle(fontSize: 10, color: Colors.blue.shade100)),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: ((context) => DebtMeter())));
+                      },
+                      child: Text("Check now!",
+                          style: TextStyle(
+                              color: Colors.lightBlue,
+                              fontWeight: FontWeight.bold)),
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(Colors.white),
+                      )),
+                ],
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 15),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Divider(

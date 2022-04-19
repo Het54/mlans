@@ -1,10 +1,12 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:money_lans/services/Authentication.dart';
 import 'package:provider/provider.dart';
 
 import '../screens/landing_page/landingUtils.dart';
+import 'Authentication.dart';
 
 class FirebaseOperations with ChangeNotifier {
   late UploadTask imageUploadTask;
@@ -44,10 +46,46 @@ class FirebaseOperations with ChangeNotifier {
     return FirebaseFirestore.instance.collection('posts').doc(postId).set(data);
   }
 
+  Future uploadPostDataInProfile(
+      String uid, String postId, dynamic data) async {
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('posts')
+        .doc(postId)
+        .set(data);
+  }
+
   Future updatePostData(String postId, dynamic data) async {
     return FirebaseFirestore.instance
         .collection('posts')
         .doc(postId)
         .update(data);
+  }
+
+  Future activatePremium(String uid, dynamic data) async {
+    return FirebaseFirestore.instance
+        .collection('userData')
+        .doc(uid)
+        .update(data);
+  }
+
+  checkPremium(String uid) {
+    bool ret = false;
+    FirebaseFirestore.instance
+        .collection('userData')
+        .doc(uid)
+        .get()
+        .then((value) {
+      if (value.data()!['premium'] == true) {
+        ret = true;
+        notifyListeners();
+      } else {
+        ret = false;
+        notifyListeners();
+      }
+    });
+    notifyListeners();
+    return ret;
   }
 }
