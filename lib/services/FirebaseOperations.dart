@@ -1,4 +1,5 @@
 import 'dart:ffi';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -68,6 +69,22 @@ class FirebaseOperations with ChangeNotifier {
         .collection('userData')
         .doc(uid)
         .update(data);
+  }
+
+  Future uploadFeedbackData(String uid, dynamic data) async {
+    return FirebaseFirestore.instance.collection('feedback').doc(uid).set(data);
+  }
+
+  String generateOnboardCode() {
+    Random random = new Random();
+    const _chars =
+        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+
+    String getRandomString(int length) =>
+        String.fromCharCodes(Iterable.generate(
+            length, (_) => _chars.codeUnitAt(random.nextInt(_chars.length))));
+
+    return getRandomString(6);
   }
 
   checkPremium(String uid) {

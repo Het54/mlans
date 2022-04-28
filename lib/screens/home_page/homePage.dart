@@ -27,20 +27,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        centerTitle: true,
-        elevation: 0.0,
-        title: const Text(
-          "Moneylans",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-      drawer: Provider.of<ProfileHelpers>(context, listen: false)
-          .customDrawer(context),
       backgroundColor: Colors.white,
       body: PageView(
         controller: homeController,

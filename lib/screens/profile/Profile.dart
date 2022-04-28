@@ -1,6 +1,7 @@
 // ignore_for_file: unnecessary_brace_in_string_interps, prefer_const_constructors, prefer_const_literals_to_create_immutables, deprecated_member_use
 
 import 'package:Moneylans/screens/debt_meter/DebtMeter.dart';
+import 'package:Moneylans/screens/profile/ProfileHelpers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -20,6 +21,33 @@ class Profile extends StatelessWidget {
         Provider.of<Authentication>(context, listen: false).getUser()?.uid;
 
     return Scaffold(
+      appBar: AppBar(
+          backgroundColor: Colors.black,
+          centerTitle: true,
+          elevation: 0.0,
+          title: const Text(
+            "Moneylans",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          actions: <Widget>[
+            Padding(
+                padding: EdgeInsets.only(right: 20.0),
+                child: GestureDetector(
+                  onTap: () {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return Provider.of<ProfileHelpers>(context,
+                                  listen: false)
+                              .customDrawer(context);
+                        });
+                  },
+                  child: Icon(Icons.more_vert),
+                )),
+          ]),
       body: SingleChildScrollView(
         child: Column(
           children: [

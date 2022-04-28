@@ -63,146 +63,159 @@ class ProfileHelpers with ChangeNotifier {
   }
 
   customDrawer(BuildContext context) {
-    return Drawer(
-      child: SafeArea(
-        child: Container(
-          color: Colors.black,
-          child: ListView(
-            children: [
-              UserAccountsDrawerHeader(
-                decoration: BoxDecoration(color: Colors.black87),
-                accountName: StreamBuilder<DocumentSnapshot>(
-                  stream: FirebaseFirestore.instance
-                      .collection('userData')
-                      .doc(
-                          "${Provider.of<Authentication>(context, listen: false).getUser()?.uid}")
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    } else {
-                      return Text("Hola " + snapshot.data!.get('name') + ",",
-                          style: TextStyle(
-                              fontWeight: FontWeight.normal, fontSize: 20));
-                    }
-                  },
-                ),
-                accountEmail: Text(
-                  Provider.of<Authentication>(context, listen: false)
-                      .getUser()!
-                      .uid,
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 1.0),
-                child: Divider(
-                  height: 5,
-                  thickness: 1,
-                  color: Colors.white,
-                ),
-              ),
-              ListTile(
-                leading: Icon(
-                  FontAwesomeIcons.discord,
-                  color: Colors.white,
-                ),
-                title: Link(
-                  target: LinkTarget.blank,
-                  uri: Uri.parse("https://discord.gg/atbYDyej"),
-                  builder: (context, followLink) => TextButton(
-                    onPressed: followLink,
-                    child: Text(
-                      "Join our Discord Community",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                child: Divider(
-                  height: 5,
-                  color: Colors.white,
-                ),
-              ),
-              ListTile(
-                leading: Icon(
-                  FontAwesomeIcons.reddit,
-                  color: Colors.white,
-                ),
-                title: Link(
-                  target: LinkTarget.blank,
-                  uri: Uri.parse(
-                      "https://www.reddit.com/r/Moneylans/?utm_medium=android_app&utm_source=share"),
-                  builder: (context, followLink) => TextButton(
-                    onPressed: followLink,
-                    child: Text(
-                      "Join our Reddit Community",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                child: Divider(
-                  height: 5,
-                  color: Colors.white,
-                ),
-              ),
-              ListTile(
-                leading: Icon(
-                  Icons.phone,
-                  color: Colors.white,
-                ),
-                title: Link(
-                  target: LinkTarget.blank,
-                  uri: Uri.parse(
-                      "https://api.whatsapp.com/send/?phone=%2B917417281718&text&app_absent=0"),
-                  builder: (context, followLink) => TextButton(
-                    onPressed: followLink,
-                    child: Text(
-                      "Contact our customer support",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                child: Divider(
-                  height: 5,
-                  color: Colors.white,
-                ),
-              ),
-              ListTile(
-                leading: Icon(
-                  EvaIcons.logOutOutline,
-                  color: Colors.white,
-                ),
-                title: TextButton(
-                  onPressed: () {
-                    showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (BuildContext context) {
-                          return Provider.of<ProfileHelpers>(context,
-                                  listen: false)
-                              .logoutDialog(context);
-                        });
-                  },
-                  child: Text(
-                    "Logout from Moneylans",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
-            ],
+    return Dialog(
+      child: Stack(
+        alignment: AlignmentDirectional.center,
+        children: [
+          Container(
+            height: MediaQuery.of(context).size.height * 0.46,
+            width: MediaQuery.of(context).size.width,
+            color: Colors.white,
           ),
-        ),
+          Container(
+            height: MediaQuery.of(context).size.height * 0.45,
+            color: Colors.black,
+            child: SingleChildScrollView(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  SizedBox(height: 15),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 220.0),
+                    child: Container(
+                      child: GestureDetector(
+                          child: Icon(Icons.close, color: Colors.white),
+                          onTap: () {
+                            Navigator.pop(context);
+                          }),
+                    ),
+                  ),
+                  ListTile(
+                    leading: Icon(
+                      FontAwesomeIcons.discord,
+                      color: Colors.white,
+                    ),
+                    title: Link(
+                      target: LinkTarget.blank,
+                      uri: Uri.parse("https://discord.gg/atbYDyej"),
+                      builder: (context, followLink) => TextButton(
+                        onPressed: followLink,
+                        child: Text(
+                          "Join our Discord Community",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                    child: Divider(
+                      height: 5,
+                      color: Colors.white,
+                    ),
+                  ),
+                  ListTile(
+                    leading: Icon(
+                      FontAwesomeIcons.reddit,
+                      color: Colors.white,
+                    ),
+                    title: Link(
+                      target: LinkTarget.blank,
+                      uri: Uri.parse(
+                          "https://www.reddit.com/r/Moneylans/?utm_medium=android_app&utm_source=share"),
+                      builder: (context, followLink) => TextButton(
+                        onPressed: followLink,
+                        child: Text(
+                          "Join our Reddit Community           ",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                    child: Divider(
+                      height: 5,
+                      color: Colors.white,
+                    ),
+                  ),
+                  ListTile(
+                    leading: Icon(
+                      Icons.phone,
+                      color: Colors.white,
+                    ),
+                    title: Link(
+                      target: LinkTarget.blank,
+                      uri: Uri.parse(
+                          "https://api.whatsapp.com/send/?phone=%2B917417281718&text&app_absent=0"),
+                      builder: (context, followLink) => TextButton(
+                        onPressed: followLink,
+                        child: Text(
+                          "Contact our customer support",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                    child: Divider(
+                      height: 5,
+                      color: Colors.white,
+                    ),
+                  ),
+                  ListTile(
+                    leading: Icon(
+                      FontAwesomeIcons.googlePlay,
+                      color: Colors.white,
+                    ),
+                    title: Link(
+                      target: LinkTarget.blank,
+                      uri: Uri.parse(
+                          "https://play.google.com/store/apps/details?id=com.company.moneylans"),
+                      builder: (context, followLink) => TextButton(
+                        onPressed: followLink,
+                        child: Text(
+                          "Share Moneylans                    ",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                    child: Divider(
+                      height: 5,
+                      color: Colors.white,
+                    ),
+                  ),
+                  ListTile(
+                    leading: Icon(
+                      EvaIcons.logOutOutline,
+                      color: Colors.red,
+                    ),
+                    title: TextButton(
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (BuildContext context) {
+                              return Provider.of<ProfileHelpers>(context,
+                                      listen: false)
+                                  .logoutDialog(context);
+                            });
+                      },
+                      child: Text(
+                        "Logout from Moneylans            ",
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

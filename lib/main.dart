@@ -10,6 +10,7 @@ import 'package:Moneylans/screens/landing_page/landingHelpers.dart';
 import 'package:Moneylans/screens/landing_page/landingPage.dart';
 import 'package:Moneylans/screens/landing_page/landingServices.dart';
 import 'package:Moneylans/screens/landing_page/landingUtils.dart';
+import 'package:Moneylans/screens/onboard_screen/OnboardScreenHelpers.dart';
 import 'package:Moneylans/screens/profile/ProfileHelpers.dart';
 import 'package:Moneylans/screens/splash_screen/splashScreen.dart';
 import 'package:Moneylans/services/Authentication.dart';
@@ -58,6 +59,7 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => PostOptions()),
           ChangeNotifierProvider(create: (_) => FeedbackHelpers()),
           ChangeNotifierProvider(create: (_) => FeedHelpers()),
+          ChangeNotifierProvider(create: (_) => OnboardScreenHelpers()),
           ChangeNotifierProvider(create: (_) => LandingHelpers()),
           ChangeNotifierProvider(create: (_) => DebtMeterHelpers()),
           ChangeNotifierProvider(create: (_) => ProfileHelpers()),

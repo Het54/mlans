@@ -19,6 +19,7 @@ import '../landing_page/landingHelpers.dart';
 class FeedHelpers with ChangeNotifier {
   TextEditingController debtController = TextEditingController();
   TextEditingController tenureController = TextEditingController();
+  TextEditingController goalController = TextEditingController();
   TextEditingController intrestController = TextEditingController();
   TextEditingController typeController = TextEditingController();
   TextEditingController contentController = TextEditingController();
@@ -34,7 +35,7 @@ class FeedHelpers with ChangeNotifier {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 10.0),
             child: Container(
-              height: MediaQuery.of(context).size.height * 0.78,
+              height: MediaQuery.of(context).size.height * 0.842,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
                 color: Colors.grey.shade200.withOpacity(0.5),
@@ -73,9 +74,9 @@ class FeedHelpers with ChangeNotifier {
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
                           fillColor: Colors.white,
-                          labelText: "Intrest Percentage",
+                          labelText: "Interest Percentage",
                           filled: true,
-                          hintText: "Enter the intrest percentage...",
+                          hintText: "Enter the interest percentage...",
                         ),
                       ),
                     ),
@@ -100,6 +101,18 @@ class FeedHelpers with ChangeNotifier {
                           filled: true,
                           labelText: "Debt Tenure",
                           hintText: "Enter the time period of debt...",
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        controller: goalController,
+                        decoration: InputDecoration(
+                          fillColor: Colors.white,
+                          filled: true,
+                          labelText: "Debt Payoff Goal Date",
+                          hintText: "Enter the goal date...",
                         ),
                       ),
                     ),
@@ -143,6 +156,7 @@ class FeedHelpers with ChangeNotifier {
                                   'intrestPercentage': intrestController.text,
                                   'debtType': typeController.text,
                                   'timePeriod': tenureController.text,
+                                  'goalDate': goalController.text,
                                   'content': contentController.text,
                                   'userId': Provider.of<Authentication>(context,
                                           listen: false)
@@ -173,6 +187,7 @@ class FeedHelpers with ChangeNotifier {
                                     'intrestPercentage': intrestController.text,
                                     'debtType': typeController.text,
                                     'timePeriod': tenureController.text,
+                                    'goalDate': goalController.text,
                                     'content': contentController.text,
                                     'userId': Provider.of<Authentication>(
                                             context,
@@ -231,12 +246,10 @@ class FeedHelpers with ChangeNotifier {
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  // notifyListeners();
                   return Center(
                     child: CircularProgressIndicator(),
                   );
                 } else {
-                  // notifyListeners();
                   return Container(child: loadPosts(context, snapshot));
                 }
               },
@@ -349,12 +362,23 @@ class FeedHelpers with ChangeNotifier {
                       data['debtType'] +
                           " at " +
                           data['intrestPercentage'] +
-                          "% intrest" +
+                          "% interest" +
                           " for " +
                           data['timePeriod'],
                       style: TextStyle(
                         fontWeight: FontWeight.w100,
                         color: Colors.lightBlue,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                    child: Text(
+                      "Target: " + data['goalDate'],
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
                       ),
                     ),
                   ),
@@ -863,8 +887,12 @@ class FeedHelpers with ChangeNotifier {
                       borderRadius: BorderRadius.circular(15)),
                   child: TextButton(
                       onPressed: () {
-                        Provider.of<LandingHelpers>(context, listen: false)
-                            .displayToast("Coming Soon!🔥", context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Feedbacck(),
+                          ),
+                        );
                       },
                       child: Text("Try")),
                 ),

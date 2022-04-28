@@ -1,9 +1,7 @@
 // ignore_for_file: dead_code, unused_local_variable
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 
@@ -67,6 +65,8 @@ class Authentication with ChangeNotifier {
         "phone": phone.trim(),
         "email": email.trim(),
         "premium": false,
+        "onBoardCode": Provider.of<FirebaseOperations>(context, listen: false)
+            .generateOnboardCode(),
       };
 
       userRef.child(firebaseUser.uid).set(userDataMap);

@@ -26,28 +26,6 @@ class LandingServices with ChangeNotifier {
   TextEditingController loginpasswordController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
 
-  // Widget passwordLessSignin(BuildContext context) {
-  //   return SizedBox(
-  //     height: MediaQuery.of(context).size.height * 0.4,
-  //     width: MediaQuery.of(context).size.width,
-  //     child: StreamBuilder<QuerySnapshot>(
-  //       stream: FirebaseFirestore.instance.collection('allUsers').snapshots(),
-  //       builder: (context, snapshot) {
-  //         if (snapshot.connectionState == ConnectionState.waiting) {
-  //           return const Center(
-  //             child: CircularProgressIndicator(),
-  //           );
-  //         } else {
-  //           return ListView.builder(
-  //               itemBuilder: snapshot.data?.docs.map((e) {
-
-  //               }).toList());
-  //         }
-  //       },
-  //     ),
-  //   );
-  // }
-
   showUserImage(BuildContext context) {
     return showModalBottomSheet(
         context: context,
@@ -135,13 +113,6 @@ class LandingServices with ChangeNotifier {
                           color: Colors.black,
                         ),
                       ),
-                      // CircleAvatar(
-                      //   backgroundColor: Colors.red,
-                      //   backgroundImage: FileImage(
-                      //       Provider.of<LandingUtils>(context, listen: false)
-                      //           .getUserImage),
-                      //   radius: 70,
-                      // ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
                         child: TextFormField(

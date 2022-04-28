@@ -45,8 +45,13 @@ class DebtMeterHelpers with ChangeNotifier {
               showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return debtMeterCheck(context, debtScore);
+                    return debtMeterCheck(
+                        context,
+                        ((double.parse(debtsController.text) /
+                                double.parse(earningsController.text)) *
+                            100));
                   });
+              print(debtsController.text);
               debtsController.clear();
               earningsController.clear();
               notifyListeners();
@@ -109,8 +114,8 @@ class DebtMeterHelpers with ChangeNotifier {
                     speed: debtScore,
                     animate: true,
                     duration: Duration(seconds: 5),
-                    alertSpeedArray: [40, 80, 90],
-                    alertColorArray: [Colors.orange, Colors.indigo, Colors.red],
+                    alertSpeedArray: [35, 50],
+                    alertColorArray: [Colors.orange, Colors.red],
                     unitOfMeasurement: " \n \n \n Debt-O-Score  ",
                     unitOfMeasurementTextStyle: TextStyle(
                         fontSize: 15,
@@ -120,13 +125,30 @@ class DebtMeterHelpers with ChangeNotifier {
                     fractionDigits: 1,
                   ),
                 ),
-                Text(
-                  "Lower the debt-o-score, better it is!",
-                  style: TextStyle(
-                    color: Color.fromARGB(255, 102, 150, 106),
-                    fontSize: 10,
-                  ),
-                )
+                if (debtScore < 35)
+                  Text(
+                    "Healthy",
+                    style: TextStyle(
+                        color: Color.fromARGB(255, 0, 255, 21),
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold),
+                  )
+                else if (debtScore > 35 && debtScore < 50)
+                  Text(
+                    "Could do some work",
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 255, 123, 7),
+                      fontSize: 10,
+                    ),
+                  )
+                else
+                  Text(
+                    "Unhealthy",
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 255, 0, 0),
+                      fontSize: 10,
+                    ),
+                  )
               ],
             ),
           ),
@@ -135,12 +157,12 @@ class DebtMeterHelpers with ChangeNotifier {
     );
   }
 
-  double debtScoreFunc(TextEditingController incomeController,
+  debtScoreFunc(TextEditingController incomeController,
       TextEditingController debtController) {
-    int income = int.parse(incomeController.text);
-    int debt = int.parse(debtController.text);
+    var income = double.parse(incomeController.text);
+    var debt = double.parse(debtController.text);
 
-    double debtScoreValue = debt / income;
+    var debtScoreValue = (debt / income) * 10;
     return debtScoreValue;
   }
 }
