@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:54498536294:android:b154c49a1c7bcebafbf6a7",
         "android_client_info": {
-          "package_name": "com.example.money_lans"
+          "package_name": "com.company.moneylans"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "54498536294-a5avs6mn1tg60vf0v989b0hatfslms3i.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.money_lans",
+            "package_name": "com.company.moneylans",
             "certificate_hash": "36ba7a07fce4d71f00b731456ca9eed707720370"
           }
         },

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:money_lans/screens/landing_page/landingHelpers.dart';
 import 'package:provider/provider.dart';
+
+import 'landingHelpers.dart';
 
 class LandingPage extends StatelessWidget {
   const LandingPage({Key? key}) : super(key: key);
