@@ -5,10 +5,11 @@ import 'package:Moneylans/services/Authentication.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:provider/provider.dart';
 
 class OnboardScreenHelpers with ChangeNotifier {
+  TextEditingController pinController = TextEditingController();
+
   notPremium(BuildContext context) {
     return Stack(
       children: [
@@ -31,7 +32,7 @@ class OnboardScreenHelpers with ChangeNotifier {
         Center(
           child: Container(
             height: MediaQuery.of(context).size.height * 0.2,
-            width: MediaQuery.of(context).size.width * 0.8,
+            width: MediaQuery.of(context).size.width * 0.9,
             decoration: BoxDecoration(
                 color: Colors.black, borderRadius: BorderRadius.circular(25)),
             child: Column(
@@ -62,9 +63,38 @@ class OnboardScreenHelpers with ChangeNotifier {
   }
 
   premiumOnboard(BuildContext context) {
-    return Column(
+    return Row(
       mainAxisAlignment: MainAxisAlignment.start,
-      children: [],
+      children: [
+        SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 8.0, left: 5.0, bottom: 8.0),
+            child: Column(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                      color: Colors.grey.shade400,
+                      borderRadius: BorderRadius.circular(15)),
+                  width: MediaQuery.of(context).size.width * 0.84,
+                  height: MediaQuery.of(context).size.height,
+                ),
+              ],
+            ),
+          ),
+        ),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(),
+            Padding(
+              padding: const EdgeInsets.only(left: 3.0, top: 2.0, bottom: 5.0),
+              child: CircleAvatar(
+                  minRadius: 3.5,
+                  child: IconButton(onPressed: () {}, icon: Icon(Icons.add))),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -208,7 +238,7 @@ class OnboardScreenHelpers with ChangeNotifier {
           borderRadius: BorderRadius.all(Radius.circular(15.0))),
       child: Container(
         width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height * 0.25,
+        height: MediaQuery.of(context).size.height * 0.4,
         decoration: BoxDecoration(
             image: DecorationImage(
               fit: BoxFit.cover,
@@ -230,28 +260,43 @@ class OnboardScreenHelpers with ChangeNotifier {
                     style: TextStyle(
                         color: Colors.pink,
                         fontWeight: FontWeight.bold,
-                        fontSize: 25)),
+                        fontSize: 20)),
               ),
             ),
             SizedBox(height: 15),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: PinCodeTextField(
-                length: 6,
-                obscureText: false,
-                animationType: AnimationType.fade,
-                pinTheme: PinTheme(
-                  shape: PinCodeFieldShape.box,
-                  borderRadius: BorderRadius.circular(5),
-                  fieldHeight: 50,
-                  fieldWidth: 40,
-                  activeFillColor: Colors.white,
-                ),
-                enableActiveFill: true,
-                appContext: context,
-                onChanged: (String value) {},
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                decoration: InputDecoration(
+                    hintText: "Enter UID...",
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                    ),
+                    fillColor: Colors.white,
+                    focusColor: Colors.white,
+                    filled: true),
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                decoration: InputDecoration(
+                    hintText: "Enter PIN...",
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                    ),
+                    fillColor: Colors.white,
+                    focusColor: Colors.white,
+                    filled: true),
+              ),
+            ),
+            SizedBox(height: 15),
+            ElevatedButton(
+                onPressed: () {},
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 35.0),
+                  child: Text("Check"),
+                ))
           ],
         ),
       ),

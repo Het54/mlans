@@ -39,6 +39,13 @@ class FirebaseOperations with ChangeNotifier {
         .set(data);
   }
 
+  Future addOnboardMembers(BuildContext context, dynamic data) async {
+    return FirebaseFirestore.instance
+        .collection('onBoardMembers')
+        .doc(Provider.of<Authentication>(context, listen: false).getUser()?.uid)
+        .set(data);
+  }
+
   Future addUser(BuildContext context, dynamic data) async {
     return FirebaseFirestore.instance.collection('users').add(data);
   }

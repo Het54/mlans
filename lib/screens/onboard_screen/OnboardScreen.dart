@@ -1,5 +1,11 @@
+import 'dart:math';
 import 'dart:ui';
+import 'package:Moneylans/screens/feedback_question/Feedback.dart';
 import 'package:Moneylans/screens/landing_page/landingHelpers.dart';
+import 'package:Moneylans/screens/onboard_screen/OnboardScreenHelpers.dart';
+import 'package:Moneylans/services/Authentication.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -8,50 +14,58 @@ class OnboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          decoration: new BoxDecoration(
-            image: new DecorationImage(
-              image: NetworkImage(
-                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJkqaMY2BZD5-jwCaWlcBTTjamnzlMthxazA&usqp=CAU"),
-              fit: BoxFit.cover,
-            ),
-          ),
-          child: new BackdropFilter(
-            filter: new ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-            child: new Container(
-              decoration:
-                  new BoxDecoration(color: Colors.white.withOpacity(0.0)),
-            ),
-          ),
-        ),
-        Center(
-          child: Container(
-            height: MediaQuery.of(context).size.height * 0.2,
-            width: MediaQuery.of(context).size.width * 0.8,
-            decoration: BoxDecoration(
-                color: Colors.black, borderRadius: BorderRadius.circular(25)),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("You need to be a premium member",
-                    style: TextStyle(color: Colors.white)),
-                Text("to access this feature :(",
-                    style: TextStyle(color: Colors.white)),
-                SizedBox(height: 5),
-                ElevatedButton(
-                  child: Text("Join the premium gang now🔥"),
-                  onPressed: () {
-                    Provider.of<LandingHelpers>(context, listen: false)
-                        .displayToast("Coming Soon!🔥", context);
-                  },
-                )
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('userData')
+          .doc(Provider.of<Authentication>(context, listen: false)
+          .getUser()
+          ?.uid)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else {
+          return Scaffold(
+            appBar: snapshot.data!.get('premium') == true ? AppBar(
+              backgroundColor: Colors.black,
+              centerTitle: true,
+              elevation: 0.0,
+              title: const Text(
+                "Moneylans",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              actions: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(right: 20.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      showCupertinoDialog(
+                          context: context,
+                          barrierDismissible: true,
+                          builder: (BuildContext context) {
+                            return Provider.of<OnboardScreenHelpers>(context,
+                                listen: false)
+                                .premiumCard(context);
+                          });
+                    },
+                    child: Icon(Icons.group_add_outlined),
+                  ),
+                ),
               ],
-            ),
-          ),
-        ),
-      ],
+            ) : null,
+            body: snapshot.data!.get('premium') == false
+                ? Provider.of<OnboardScreenHelpers>(context, listen: false)
+                .notPremium(context)
+                : Provider.of<OnboardScreenHelpers>(context, listen: false)
+                .premiumOnboard(context),
+          );
+        }
+      },
     );
   }
 }
