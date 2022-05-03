@@ -5,7 +5,6 @@ import 'package:Moneylans/services/Authentication.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:provider/provider.dart';
 
 class OnboardScreenHelpers with ChangeNotifier {

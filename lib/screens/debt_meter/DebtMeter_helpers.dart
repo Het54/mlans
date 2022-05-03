@@ -42,16 +42,15 @@ class DebtMeterHelpers with ChangeNotifier {
           ElevatedButton(
             onPressed: () {
               debtScore = debtScoreFunc(earningsController, debtsController);
+              double val = ( double.parse(debtsController.text) / double.parse(earningsController.text) * 100 );
               showDialog(
                   context: context,
                   builder: (BuildContext context) {
                     return debtMeterCheck(
                         context,
-                        ((double.parse(debtsController.text) /
-                                double.parse(earningsController.text)) *
-                            100));
+                        val
+                    );
                   });
-              print(debtsController.text);
               debtsController.clear();
               earningsController.clear();
               notifyListeners();

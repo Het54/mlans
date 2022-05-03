@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
         },
         children: [
           Feed(),
-          OnboardScreen(),
+          // OnboardScreen(),
           Profile(name: widget.name),
         ],
       ),
