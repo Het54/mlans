@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'dart:ui';
-
 import 'package:Moneylans/screens/feedback_question/Feedback.dart';
 import 'package:Moneylans/screens/landing_page/landingHelpers.dart';
 import 'package:Moneylans/screens/onboard_screen/OnboardScreenHelpers.dart';
@@ -15,58 +14,58 @@ class OnboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        centerTitle: true,
-        elevation: 0.0,
-        title: const Text(
-          "Moneylans",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(right: 20.0),
-            child: GestureDetector(
-              onTap: () {
-                showCupertinoDialog(
-                    context: context,
-                    barrierDismissible: true,
-                    builder: (BuildContext context) {
-                      return Provider.of<OnboardScreenHelpers>(context,
-                              listen: false)
-                          .premiumCard(context);
-                    });
-              },
-              child: Icon(Icons.group_add_outlined),
-            ),
-          ),
-        ],
-      ),
-      body: StreamBuilder<DocumentSnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('userData')
-            .doc(Provider.of<Authentication>(context, listen: false)
-                .getUser()
-                ?.uid)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } else {
-            return snapshot.data!.get('premium') == false
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('userData')
+          .doc(Provider.of<Authentication>(context, listen: false)
+          .getUser()
+          ?.uid)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else {
+          return Scaffold(
+            appBar: snapshot.data!.get('premium') == true ? AppBar(
+              backgroundColor: Colors.black,
+              centerTitle: true,
+              elevation: 0.0,
+              title: const Text(
+                "Moneylans",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              actions: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(right: 20.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      showCupertinoDialog(
+                          context: context,
+                          barrierDismissible: true,
+                          builder: (BuildContext context) {
+                            return Provider.of<OnboardScreenHelpers>(context,
+                                listen: false)
+                                .premiumCard(context);
+                          });
+                    },
+                    child: Icon(Icons.group_add_outlined),
+                  ),
+                ),
+              ],
+            ) : null,
+            body: snapshot.data!.get('premium') == false
                 ? Provider.of<OnboardScreenHelpers>(context, listen: false)
-                    .notPremium(context)
+                .notPremium(context)
                 : Provider.of<OnboardScreenHelpers>(context, listen: false)
-                    .premiumOnboard(context);
-          }
-        },
-      ),
+                .premiumOnboard(context),
+          );
+        }
+      },
     );
   }
 }
