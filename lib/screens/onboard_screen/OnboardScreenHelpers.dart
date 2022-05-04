@@ -63,38 +63,11 @@ class OnboardScreenHelpers with ChangeNotifier {
   }
 
   premiumOnboard(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 8.0, left: 5.0, bottom: 8.0),
-            child: Column(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                      color: Colors.grey.shade400,
-                      borderRadius: BorderRadius.circular(15)),
-                  width: MediaQuery.of(context).size.width * 0.84,
-                  height: MediaQuery.of(context).size.height,
-                ),
-              ],
-            ),
-          ),
-        ),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(),
-            Padding(
-              padding: const EdgeInsets.only(left: 3.0, top: 2.0, bottom: 5.0),
-              child: CircleAvatar(
-                  minRadius: 3.5,
-                  child: IconButton(onPressed: () {}, icon: Icon(Icons.add))),
-            ),
-          ],
-        ),
-      ],
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [],
+      ),
     );
   }
 
