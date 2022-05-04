@@ -16,8 +16,8 @@ class LandingPage extends StatelessWidget {
             bodyColor(context),
             Provider.of<LandingHelpers>(context, listen: false)
                 .bodyImage(context),
-            Provider.of<LandingHelpers>(context, listen: false)
-                .tagLineText(context),
+           /* Provider.of<LandingHelpers>(context, listen: false)
+                .tagLineText(context),*/
             Provider.of<LandingHelpers>(context, listen: false)
                 .loginButton(context),
             Provider.of<LandingHelpers>(context, listen: false)
@@ -34,16 +34,7 @@ class LandingPage extends StatelessWidget {
     return Container(
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
-      decoration: BoxDecoration(
-          gradient: LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0.5, 0.9],
-        colors: [
-          Colors.white,
-          Colors.indigo.shade400,
-        ],
-      )),
+      color: Colors.white,
     );
   }
 }

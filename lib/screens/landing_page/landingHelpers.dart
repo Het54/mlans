@@ -17,56 +17,43 @@ class LandingHelpers with ChangeNotifier {
       width: MediaQuery.of(context).size.width,
       decoration: const BoxDecoration(
         image: DecorationImage(
-          image: AssetImage("assets/images/login.png"),
+          image: AssetImage("assets/images/mlans.jpg"),
         ),
       ),
     );
   }
 
-  Widget tagLineText(BuildContext context) {
+ /* Widget tagLineText(BuildContext context) {
     return Positioned(
       top: 400.0,
-      left: 90.0,
-      child: Container(
-        // ignore: prefer_const_constructors
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width,
-        ),
-        child: RichText(
-          text: TextSpan(
-              text: " Welcome ",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-                fontSize: 32,
-              ),
-              // ignore: prefer_const_literals_to_create_immutables
-              children: <TextSpan>[
-                TextSpan(
-                  text: "to \n",
+      child: Center(
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("Welcome to",
                   style: TextStyle(
+                    fontWeight: FontWeight.bold,
                     color: Colors.black,
-                    fontWeight: FontWeight.bold,
                     fontSize: 32,
-                  ),
-                ),
-                TextSpan(
-                  text: "Moneylans",
+                  )),
+              Text("Moneylans",
                   style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 37,
                     fontWeight: FontWeight.bold,
-                  ),
-                )
-              ]),
+                    color: Colors.black,
+                    fontSize: 32,
+                  ))
+            ],
+          ),
         ),
       ),
     );
-  }
+  }*/
 
   Widget loginButton(BuildContext context) {
     return Positioned(
-      top: 580,
+      top: 640,
       left: MediaQuery.of(context).size.width * 0.25,
       child: Container(
         width: MediaQuery.of(context).size.width * 0.5,
@@ -79,9 +66,18 @@ class LandingHelpers with ChangeNotifier {
           },
           child: Container(
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.white, width: 2),
+              border: Border.all(color: Colors.indigo.shade400, width: 2),
               borderRadius: BorderRadius.circular(10),
-              color: Colors.transparent,
+              //color: Colors.transparent,
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: [0.01, 0.9],
+                  colors: [
+                    Colors.white,
+                    Colors.indigo.shade400,
+                  ],
+                )
             ),
             child: Center(
               child: Text(
@@ -99,7 +95,7 @@ class LandingHelpers with ChangeNotifier {
 
   Widget signinButton(BuildContext context) {
     return Positioned(
-      top: 530,
+      top: 590,
       left: MediaQuery.of(context).size.width * 0.25,
       child: Container(
         width: MediaQuery.of(context).size.width * 0.5,
@@ -112,14 +108,14 @@ class LandingHelpers with ChangeNotifier {
           },
           child: Container(
             decoration: BoxDecoration(
-                border: Border.all(color: Colors.white, width: 2),
+                border: Border.all(color: Colors.indigo.shade400, width: 2),
                 borderRadius: BorderRadius.circular(10),
                 color: Colors.transparent),
             child: Center(
               child: Text(
                 "Sign in to Moneylans",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                 ),
               ),
             ),
@@ -131,7 +127,7 @@ class LandingHelpers with ChangeNotifier {
 
   Widget privacyText(BuildContext context) {
     return Positioned(
-      top: 650,
+      top: 710,
       left: 20,
       right: 20,
       child: Container(
@@ -148,7 +144,11 @@ class LandingHelpers with ChangeNotifier {
             builder: (context, followLink) => TextButton(
               child: Text(
                 "Services and Privacy Policies",
-                style: TextStyle(color: Colors.grey.shade400, fontSize: 10),
+                style: TextStyle(
+                    color: Colors.grey.shade400,
+                    fontSize: 11,
+                    decoration: TextDecoration.underline
+                ),
               ),
               onPressed: followLink,
               style: TextButton.styleFrom(
