@@ -1,7 +1,9 @@
 import 'dart:ui';
 
 import 'package:Moneylans/screens/feedback_question/Feedback.dart';
+import 'package:Moneylans/screens/landing_page/landingHelpers.dart';
 import 'package:Moneylans/services/Authentication.dart';
+import 'package:Moneylans/services/FirebaseOperations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -270,11 +272,26 @@ class OnboardScreenHelpers with ChangeNotifier {
             ),
             SizedBox(height: 15),
             ElevatedButton(
-                onPressed: () {},
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 35.0),
-                  child: Text("Check"),
-                ))
+              onPressed: () {
+                if (Provider.of<FirebaseOperations>(context, listen: false)
+                        .onboardMember(
+                            UIDcontroller.text, PINcontroller.text) ==
+                    true) {
+                  Provider.of<LandingHelpers>(context, listen: false)
+                      .displayToast(
+                          "Yaay, you onboarded your partner!😍", context);
+                } else {
+                  print(
+                      "helloo ${Provider.of<FirebaseOperations>(context, listen: false).onboardMember(UIDcontroller.text, PINcontroller.text)}");
+                  Provider.of<LandingHelpers>(context, listen: false)
+                      .displayToast("Opps thats not matching🤨", context);
+                }
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 35.0),
+                child: Text("Check"),
+              ),
+            )
           ],
         ),
       ),

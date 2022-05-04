@@ -1,7 +1,3 @@
-import 'dart:math';
-import 'dart:ui';
-import 'package:Moneylans/screens/feedback_question/Feedback.dart';
-import 'package:Moneylans/screens/landing_page/landingHelpers.dart';
 import 'package:Moneylans/screens/onboard_screen/OnboardScreenHelpers.dart';
 import 'package:Moneylans/services/Authentication.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

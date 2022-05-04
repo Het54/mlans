@@ -94,41 +94,18 @@ class FirebaseOperations with ChangeNotifier {
     return getRandomString(6);
   }
 
-  checkPremium(String uid) {
-    bool ret = false;
-    FirebaseFirestore.instance
-        .collection('userData')
-        .doc(uid)
-        .get()
-        .then((value) {
-      if (value.data()!['premium'] == true) {
-        ret = true;
-        notifyListeners();
-      } else {
-        ret = false;
-        notifyListeners();
-      }
-    });
-    notifyListeners();
-    return ret;
-  }
-
   onboardMember(String uid, String code) {
-    bool onbret = false;
+    bool onbret = true;
     FirebaseFirestore.instance
         .collection('userData')
         .doc(uid)
         .get()
         .then((value) {
       if (value.data()!['onBoardCode'] == code) {
-        onbret = true;
-        notifyListeners();
+        return true;
       } else {
-        onbret = false;
-        notifyListeners();
+        return false;
       }
     });
-    notifyListeners();
-    return onbret;
   }
 }
