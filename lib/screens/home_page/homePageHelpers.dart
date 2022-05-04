@@ -6,12 +6,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 class homePageHelpers with ChangeNotifier {
   Widget bottomNavBar(int index, PageController pageController) {
     return CustomNavigationBar(
+      elevation: 20,
+      blurEffect: false,
       currentIndex: index,
       bubbleCurve: Curves.bounceIn,
       scaleCurve: Curves.decelerate,
-      selectedColor: Colors.blue,
+      selectedColor: Colors.black,
       unSelectedColor: Colors.grey,
-      strokeColor: Colors.blue,
+      strokeColor: Colors.indigo.shade400,
       scaleFactor: 0.5,
       iconSize: 25,
       onTap: (val) {
@@ -19,7 +21,7 @@ class homePageHelpers with ChangeNotifier {
         pageController.jumpToPage(index);
         notifyListeners();
       },
-      backgroundColor: Colors.black87,
+      backgroundColor: Colors.white,
       items: [
         CustomNavigationBarItem(icon: Icon(EvaIcons.home)),
         CustomNavigationBarItem(icon: Icon(FontAwesomeIcons.yinYang)),

@@ -29,13 +29,13 @@ class OnboardScreen extends StatelessWidget {
         } else {
           return Scaffold(
             appBar: snapshot.data!.get('premium') == true ? AppBar(
-              backgroundColor: Colors.black,
+              backgroundColor: Colors.white,
               centerTitle: true,
               elevation: 0.0,
               title: const Text(
                 "Moneylans",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontWeight: FontWeight.bold,
                 ),
               ),
