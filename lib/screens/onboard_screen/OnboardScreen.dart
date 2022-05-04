@@ -18,8 +18,8 @@ class OnboardScreen extends StatelessWidget {
       stream: FirebaseFirestore.instance
           .collection('userData')
           .doc(Provider.of<Authentication>(context, listen: false)
-          .getUser()
-          ?.uid)
+              .getUser()
+              ?.uid)
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -28,41 +28,45 @@ class OnboardScreen extends StatelessWidget {
           );
         } else {
           return Scaffold(
-            appBar: snapshot.data!.get('premium') == true ? AppBar(
-              backgroundColor: Colors.white,
-              centerTitle: true,
-              elevation: 0.0,
-              title: const Text(
-                "Moneylans",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              actions: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(right: 20.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      showCupertinoDialog(
-                          context: context,
-                          barrierDismissible: true,
-                          builder: (BuildContext context) {
-                            return Provider.of<OnboardScreenHelpers>(context,
-                                listen: false)
-                                .premiumCard(context);
-                          });
-                    },
-                    child: Icon(Icons.group_add_outlined,color: Colors.black),
-                  ),
-                ),
-              ],
-            ) : null,
+            appBar: snapshot.data!.get('premium') == true
+                ? AppBar(
+                    backgroundColor: Colors.white,
+                    centerTitle: true,
+                    elevation: 0.0,
+                    title: const Text(
+                      "Moneylans",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    actions: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.only(right: 20.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            showCupertinoDialog(
+                                context: context,
+                                barrierDismissible: true,
+                                builder: (BuildContext context) {
+                                  return Provider.of<OnboardScreenHelpers>(
+                                          context,
+                                          listen: false)
+                                      .premiumCard(context);
+                                });
+                          },
+                          child: Icon(Icons.group_add_outlined,
+                              color: Colors.black),
+                        ),
+                      ),
+                    ],
+                  )
+                : null,
             body: snapshot.data!.get('premium') == false
                 ? Provider.of<OnboardScreenHelpers>(context, listen: false)
-                .notPremium(context)
+                    .notPremium(context)
                 : Provider.of<OnboardScreenHelpers>(context, listen: false)
-                .premiumOnboard(context),
+                    .premiumOnboard(context),
           );
         }
       },

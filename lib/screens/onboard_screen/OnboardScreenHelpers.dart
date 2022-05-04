@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class OnboardScreenHelpers with ChangeNotifier {
-  TextEditingController pinController = TextEditingController();
+  TextEditingController PINcontroller = TextEditingController();
+  TextEditingController UIDcontroller = TextEditingController();
 
   notPremium(BuildContext context) {
     return Stack(
@@ -34,14 +35,16 @@ class OnboardScreenHelpers with ChangeNotifier {
             height: MediaQuery.of(context).size.height * 0.2,
             width: MediaQuery.of(context).size.width * 0.9,
             decoration: BoxDecoration(
-                color: Colors.black, borderRadius: BorderRadius.circular(25)),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(25),
+                border: Border.all()),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text("You need to be a premium member",
-                    style: TextStyle(color: Colors.white)),
+                    style: TextStyle(color: Colors.black)),
                 Text("to access this feature :(",
-                    style: TextStyle(color: Colors.white)),
+                    style: TextStyle(color: Colors.black)),
                 SizedBox(height: 5),
                 ElevatedButton(
                   child: Text("Join the premium gang now🔥"),
@@ -240,6 +243,7 @@ class OnboardScreenHelpers with ChangeNotifier {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
+                controller: UIDcontroller,
                 decoration: InputDecoration(
                     hintText: "Enter UID...",
                     border: OutlineInputBorder(
@@ -253,6 +257,7 @@ class OnboardScreenHelpers with ChangeNotifier {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
+                controller: PINcontroller,
                 decoration: InputDecoration(
                     hintText: "Enter PIN...",
                     border: OutlineInputBorder(

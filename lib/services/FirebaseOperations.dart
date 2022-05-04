@@ -112,4 +112,23 @@ class FirebaseOperations with ChangeNotifier {
     notifyListeners();
     return ret;
   }
+
+  onboardMember(String uid, String code) {
+    bool onbret = false;
+    FirebaseFirestore.instance
+        .collection('userData')
+        .doc(uid)
+        .get()
+        .then((value) {
+      if (value.data()!['onBoardCode'] == code) {
+        onbret = true;
+        notifyListeners();
+      } else {
+        onbret = false;
+        notifyListeners();
+      }
+    });
+    notifyListeners();
+    return onbret;
+  }
 }
