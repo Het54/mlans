@@ -53,7 +53,7 @@ class OnboardScreen extends StatelessWidget {
                                 .premiumCard(context);
                           });
                     },
-                    child: Icon(Icons.group_add_outlined),
+                    child: Icon(Icons.group_add_outlined,color: Colors.black),
                   ),
                 ),
               ],
