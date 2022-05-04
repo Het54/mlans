@@ -237,7 +237,7 @@ class FeedHelpers with ChangeNotifier {
         child: Container(
           child: RefreshIndicator(
             onRefresh: () {
-              return Future(() => null);
+              return Future(() => Future.delayed(Duration(seconds: 1)));
             },
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
