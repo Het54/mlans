@@ -45,7 +45,7 @@ class Profile extends StatelessWidget {
                               .customDrawer(context);
                         });
                   },
-                  child: Icon(Icons.more_vert),
+                  child: Icon(Icons.more_vert,color: Colors.black),
                 )),
           ]),
       body: SingleChildScrollView(
