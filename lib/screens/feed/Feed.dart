@@ -37,34 +37,7 @@ class Feed extends StatelessWidget {
               .uploadPostSheet(context);
         },
       ),
-      body: SingleChildScrollView(
-        physics: NeverScrollableScrollPhysics(),
-        child: Column(
-          children: [
-            StreamBuilder<DocumentSnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('userData')
-                  .doc(Provider.of<Authentication>(context, listen: false)
-                      .getUser()
-                      ?.uid)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                } else {
-                  return snapshot.data!.get('premium') == false
-                      ? Provider.of<FeedHelpers>(context, listen: false)
-                          .premiumBanner(context)
-                      : Container();
-                }
-              },
-            ),
-            Provider.of<FeedHelpers>(context, listen: false).feedBody(context),
-          ],
-        ),
-      ),
+      body: Provider.of<FeedHelpers>(context, listen: false).feedBody(context),
     );
   }
 }
