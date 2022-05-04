@@ -102,8 +102,10 @@ class FirebaseOperations with ChangeNotifier {
         .get()
         .then((value) {
       if (value.data()!['onBoardCode'] == code) {
+        print("Code Matched");
         return true;
       } else {
+        print("Code not Matched");
         return false;
       }
     });
