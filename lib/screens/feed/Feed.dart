@@ -20,7 +20,7 @@ class Feed extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
-        elevation: 0.0,
+        elevation: 5.0,
         title: const Text(
           "Moneylans",
           style: TextStyle(
