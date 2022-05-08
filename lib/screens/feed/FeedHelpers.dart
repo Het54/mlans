@@ -2,7 +2,6 @@
 
 import 'dart:async';
 import 'dart:ui';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/gestures.dart';
@@ -23,6 +22,8 @@ class FeedHelpers with ChangeNotifier {
   TextEditingController intrestController = TextEditingController();
   TextEditingController typeController = TextEditingController();
   TextEditingController contentController = TextEditingController();
+  int currentTextLength = 0;
+  int i=1;
 
   uploadPostSheet(BuildContext context) {
     return showModalBottomSheet(
@@ -123,6 +124,22 @@ class FeedHelpers with ChangeNotifier {
                               borderRadius: BorderRadius.circular(30)),
                           width: 400,
                           child: TextFormField(
+                            onChanged: (String newText) {
+                              if (newText[0] != 'S') {
+                                newText = 'Step $i • ' + newText;
+                                contentController.text = newText;
+                                contentController.selection = TextSelection.fromPosition(
+                                    TextPosition(offset: contentController.text.length));
+                              }
+                              if (newText[newText.length - 1] == '\n' &&
+                                  newText.length > currentTextLength) {
+                                i += 1;
+                                contentController.text = newText + 'Step $i • ';
+                                contentController.selection = TextSelection.fromPosition(
+                                    TextPosition(offset: contentController.text.length));
+                              }
+                              currentTextLength = contentController.text.length;
+                            },
                             controller: contentController,
                             minLines: 8,
                             maxLines: 200,
@@ -142,6 +159,13 @@ class FeedHelpers with ChangeNotifier {
                                 backgroundColor:
                                     MaterialStateProperty.all(Colors.red)),
                             onPressed: () {
+                              i = 1;
+                              debtController.clear();
+                              intrestController.clear();
+                              tenureController.clear();
+                              typeController.clear();
+                              contentController.clear();
+                              goalController.clear();
                               Navigator.pop(context);
                             },
                             child: Text("Cancel")),
@@ -208,6 +232,8 @@ class FeedHelpers with ChangeNotifier {
                               tenureController.clear();
                               typeController.clear();
                               contentController.clear();
+                              goalController.clear();
+                              i = 1;
                             });
                           },
                           child: Row(
@@ -236,6 +262,8 @@ class FeedHelpers with ChangeNotifier {
         padding: const EdgeInsets.symmetric(vertical: 2.0),
         child: Container(
           child: RefreshIndicator(
+            backgroundColor: Colors.transparent,
+            color: Colors.black,
             onRefresh: () {
               return Future(() => Future.delayed(Duration(seconds: 1)));
             },
@@ -268,97 +296,121 @@ class FeedHelpers with ChangeNotifier {
         children: snapshot.data!.docs.map((DocumentSnapshot documentSnapshot) {
       Map<String, dynamic> data =
           documentSnapshot.data()! as Map<String, dynamic>;
-      return Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Color.fromARGB(255, 223, 222, 222),
-                borderRadius: BorderRadius.circular(15),
-              ),
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Container(
               width: MediaQuery.of(context).size.width,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    height: 10,
-                    decoration: BoxDecoration(
-                      color: Color.fromARGB(255, 209, 209, 209),
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(15),
-                          topRight: Radius.circular(15)),
-                    ),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Color.fromARGB(255, 209, 209, 209),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "    ${data['userId']}",
-                          style: TextStyle(
-                            color: Provider.of<Authentication>(context,
-                                            listen: false)
+              height: 40,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(25),
+                  topRight: Radius.circular(25),
+                ),
+                color: Color(0xffd9d9d9),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 22, right: 15),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "${data['userId']}",
+                      style: TextStyle(
+                        color:
+                            Provider.of<Authentication>(context, listen: false)
                                         .getUser()
                                         ?.uid ==
                                     data['userId']
                                 ? Colors.blue
                                 : Colors.black,
-                            fontWeight: Provider.of<Authentication>(context,
-                                            listen: false)
+                        fontWeight:
+                            Provider.of<Authentication>(context, listen: false)
                                         .getUser()
                                         ?.uid ==
                                     data['userId']
                                 ? FontWeight.bold
                                 : FontWeight.normal,
-                          ),
-                        ),
-                        Provider.of<Authentication>(context, listen: false)
-                                    .getUser()
-                                    ?.uid ==
-                                data['userId']
-                            ? GestureDetector(
-                                child: Icon(EvaIcons.moreVertical),
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) =>
-                                        editDeletePostDialog(
-                                      context,
-                                      data['debt'],
-                                      data['content'],
-                                      "${data['debt']}+${data['time'].toString().substring(18, 28)}",
-                                    ),
-                                  );
-                                },
-                              )
-                            : Container(height: 0, width: 0),
-                      ],
-                    ),
-                  ),
-                  Container(
-                      height: 5, color: Color.fromARGB(255, 209, 209, 209)),
-                  SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                    child: Container(
-                      child: Text(
-                        "₹${data['debt']}",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                    child: Text(
+                    Provider.of<Authentication>(context, listen: false)
+                                .getUser()
+                                ?.uid ==
+                            data['userId']
+                        ? GestureDetector(
+                            child: Icon(EvaIcons.moreVertical),
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) =>
+                                    editDeletePostDialog(
+                                  context,
+                                  data['debt'],
+                                  data['content'],
+                                  "${data['debt']}+${data['time'].toString().substring(18, 28)}",
+                                ),
+                              );
+                            },
+                          )
+                        : Container(height: 0, width: 0),
+                  ],
+                ),
+              ),
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                border: Border.all(width: 2, color: Color(0xffd9d9d9)),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                    text: 'Debt:  ',
+                                    style: TextStyle(fontSize: 16)),
+                                TextSpan(
+                                  text: "₹${data['debt']}",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                    text: 'Target:  ',
+                                    style: TextStyle(fontSize: 16)),
+                                TextSpan(
+                                  text: "${data['goalDate']}",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ), /*
+                          Text(
+                            "Target: " + data['goalDate'],
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                            ),
+                          ),*/
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
                       data['debtType'] +
                           " at " +
                           data['intrestPercentage'] +
@@ -366,192 +418,196 @@ class FeedHelpers with ChangeNotifier {
                           " for " +
                           data['timePeriod'],
                       style: TextStyle(
+                        fontSize: 15,
                         fontWeight: FontWeight.w100,
                         color: Colors.lightBlue,
                       ),
                     ),
-                  ),
-                  SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                    child: Text(
-                      "Target: " + data['goalDate'],
+                    Divider(
+                      height: MediaQuery.of(context).size.height * 0.05,
+                      color: Color(0xff636363),
+                    ),
+                    Text(
+                      data['content'],
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
+                        fontWeight: FontWeight.normal,
+                        color: Colors.black,
                       ),
                     ),
-                  ),
-                  SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                    child: Container(
-                      child: Text(
-                        data['content'],
-                        style: TextStyle(
-                          fontWeight: FontWeight.normal,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Container(
-                        width: 80,
-                        child: Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                Provider.of<PostOptions>(context, listen: false)
-                                    .addUpvote(
-                                        context,
-                                        "${data['debt']}+${data['time'].toString().substring(18, 28)}",
-                                        Provider.of<Authentication>(context,
-                                                listen: false)
-                                            .getUser()!
-                                            .uid);
-                              },
-                              child: Icon(
-                                FontAwesomeIcons.angleUp,
-                                color: Colors.green,
-                                size: 22,
-                              ),
-                            ),
-                            StreamBuilder<QuerySnapshot>(
-                              stream: FirebaseFirestore.instance
-                                  .collection('posts')
-                                  .doc(
-                                      "${data['debt']}+${data['time'].toString().substring(18, 28)}")
-                                  .collection('upvotes')
-                                  .snapshots(),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return Center(
-                                      child: SizedBox(
-                                          height: 10,
-                                          width: 10,
-                                          child: CircularProgressIndicator(
-                                              strokeWidth: 1)));
-                                } else {
-                                  return Text(
-                                      snapshot.data!.docs.length.toString(),
-                                      style: TextStyle(color: Colors.green));
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        width: 80,
-                        child: Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                Provider.of<PostOptions>(context, listen: false)
-                                    .addDownvote(
-                                        context,
-                                        "${data['debt']}+${data['time'].toString().substring(18, 28)}",
-                                        Provider.of<Authentication>(context,
-                                                listen: false)
-                                            .getUser()!
-                                            .uid);
-                              },
-                              child: Icon(
-                                FontAwesomeIcons.angleDown,
-                                color: Colors.red,
-                                size: 22,
-                              ),
-                            ),
-                            StreamBuilder<QuerySnapshot>(
-                              stream: FirebaseFirestore.instance
-                                  .collection('posts')
-                                  .doc(
-                                      "${data['debt']}+${data['time'].toString().substring(18, 28)}")
-                                  .collection('downvotes')
-                                  .snapshots(),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return Center(
-                                      child: SizedBox(
-                                    height: 10,
-                                    width: 10,
-                                    child: CircularProgressIndicator(
-                                        strokeWidth: 1),
-                                  ));
-                                } else {
-                                  return Text(
-                                      snapshot.data!.docs.length.toString(),
-                                      style: TextStyle(color: Colors.red));
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        width: 80,
-                        child: Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                addCommentSheet(
-                                    context,
-                                    documentSnapshot,
-                                    Provider.of<Authentication>(context,
-                                            listen: false)
-                                        .getUser()!
-                                        .uid,
-                                    "${data['debt']}+${data['time'].toString().substring(18, 28)}");
-                              },
-                              child: Icon(
-                                FontAwesomeIcons.comment,
-                                color: Colors.blue,
-                                size: 22,
-                              ),
-                            ),
-                            StreamBuilder<QuerySnapshot>(
-                              stream: FirebaseFirestore.instance
-                                  .collection('posts')
-                                  .doc(
-                                      "${data['debt']}+${data['time'].toString().substring(18, 28)}")
-                                  .collection('comments')
-                                  .snapshots(),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return Center(
-                                      child: SizedBox(
-                                    height: 10,
-                                    width: 10,
-                                    child: CircularProgressIndicator(
-                                        strokeWidth: 1),
-                                  ));
-                                } else {
-                                  return Text(
-                                    " ${snapshot.data!.docs.length.toString()}",
-                                    style: TextStyle(color: Colors.blue),
-                                  );
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 5),
-                ],
+                    SizedBox(height: 10),
+                  ],
+                ),
               ),
             ),
-          ),
-          SizedBox(height: 5),
-        ],
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: 40,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(25),
+                  bottomRight: Radius.circular(25),
+                ),
+                color: Color(0xffd9d9d9),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      Provider.of<PostOptions>(context, listen: false).addUpvote(
+                          context,
+                          "${data['debt']}+${data['time'].toString().substring(18, 28)}",
+                          Provider.of<Authentication>(context, listen: false)
+                              .getUser()!
+                              .uid);
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width / 3 - 10,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            FontAwesomeIcons.angleUp,
+                            color: Colors.green,
+                            size: 22,
+                          ),
+                          SizedBox(width: 4),
+                          StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('posts')
+                                .doc(
+                                    "${data['debt']}+${data['time'].toString().substring(18, 28)}")
+                                .collection('upvotes')
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Center(
+                                    child: SizedBox(
+                                        height: 10,
+                                        width: 10,
+                                        child: CircularProgressIndicator(
+                                            strokeWidth: 1)));
+                              } else {
+                                return Text(
+                                    snapshot.data!.docs.length.toString(),
+                                    style: TextStyle(color: Colors.green));
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      Provider.of<PostOptions>(context, listen: false).addDownvote(
+                          context,
+                          "${data['debt']}+${data['time'].toString().substring(18, 28)}",
+                          Provider.of<Authentication>(context, listen: false)
+                              .getUser()!
+                              .uid);
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width / 3 - 10,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            FontAwesomeIcons.angleDown,
+                            color: Colors.red,
+                            size: 22,
+                          ),
+                          SizedBox(width: 4),
+                          StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('posts')
+                                .doc(
+                                    "${data['debt']}+${data['time'].toString().substring(18, 28)}")
+                                .collection('downvotes')
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Center(
+                                    child: SizedBox(
+                                  height: 10,
+                                  width: 10,
+                                  child:
+                                      CircularProgressIndicator(strokeWidth: 1),
+                                ));
+                              } else {
+                                return Text(
+                                    snapshot.data!.docs.length.toString(),
+                                    style: TextStyle(color: Colors.red));
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      addCommentSheet(
+                          context,
+                          documentSnapshot,
+                          Provider.of<Authentication>(context, listen: false)
+                              .getUser()!
+                              .uid,
+                          "${data['debt']}+${data['time'].toString().substring(18, 28)}");
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width / 3 - 10,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            FontAwesomeIcons.comment,
+                            color: Colors.blue,
+                            size: 22,
+                          ),
+                          SizedBox(width: 4),
+                          StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('posts')
+                                .doc(
+                                    "${data['debt']}+${data['time'].toString().substring(18, 28)}")
+                                .collection('comments')
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Center(
+                                    child: SizedBox(
+                                  height: 10,
+                                  width: 10,
+                                  child:
+                                      CircularProgressIndicator(strokeWidth: 1),
+                                ));
+                              } else {
+                                return Text(
+                                  " ${snapshot.data!.docs.length.toString()}",
+                                  style: TextStyle(color: Colors.blue),
+                                );
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            )
+          ],
+        ),
       );
     }).toList());
   }
