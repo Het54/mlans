@@ -23,7 +23,7 @@ class FeedHelpers with ChangeNotifier {
   TextEditingController typeController = TextEditingController();
   TextEditingController contentController = TextEditingController();
   int currentTextLength = 0;
-  int i=1;
+  int i = 1;
 
   uploadPostSheet(BuildContext context) {
     return showModalBottomSheet(
@@ -128,15 +128,17 @@ class FeedHelpers with ChangeNotifier {
                               if (newText[0] != 'S') {
                                 newText = 'Step $i • ' + newText;
                                 contentController.text = newText;
-                                contentController.selection = TextSelection.fromPosition(
-                                    TextPosition(offset: contentController.text.length));
+                                contentController.selection =
+                                    TextSelection.fromPosition(TextPosition(
+                                        offset: contentController.text.length));
                               }
                               if (newText[newText.length - 1] == '\n' &&
                                   newText.length > currentTextLength) {
                                 i += 1;
                                 contentController.text = newText + 'Step $i • ';
-                                contentController.selection = TextSelection.fromPosition(
-                                    TextPosition(offset: contentController.text.length));
+                                contentController.selection =
+                                    TextSelection.fromPosition(TextPosition(
+                                        offset: contentController.text.length));
                               }
                               currentTextLength = contentController.text.length;
                             },
@@ -176,13 +178,14 @@ class FeedHelpers with ChangeNotifier {
                                 .uploadPostData(
                                     "${debtController.text}+${Timestamp.now().toString().substring(18, 28)}",
                                     {
-                                  'debt': debtController.text,
-                                  'intrestPercentage': intrestController.text,
-                                  'debtType': typeController.text,
-                                  'timePeriod': tenureController.text,
-                                  'goalDate': goalController.text,
-                                  'content': contentController.text,
-                                  'userId': Provider.of<Authentication>(context,
+                                      'edited' : false,
+                                      'debt': debtController.text,
+                                      'intrestPercentage': intrestController.text,
+                                      'debtType': typeController.text,
+                                      'timePeriod': tenureController.text,
+                                      'goalDate': goalController.text,
+                                      'content': contentController.text,
+                                      'userId': Provider.of<Authentication>(context,
                                           listen: false)
                                       .getUser()
                                       ?.uid,
@@ -207,13 +210,14 @@ class FeedHelpers with ChangeNotifier {
                                           .uid,
                                       "${debtController.text}+${Timestamp.now().toString().substring(18, 28)}",
                                       {
-                                    'debt': debtController.text,
-                                    'intrestPercentage': intrestController.text,
-                                    'debtType': typeController.text,
-                                    'timePeriod': tenureController.text,
-                                    'goalDate': goalController.text,
-                                    'content': contentController.text,
-                                    'userId': Provider.of<Authentication>(
+                                        'edited' : false,
+                                        'debt': debtController.text,
+                                        'intrestPercentage': intrestController.text,
+                                        'debtType': typeController.text,
+                                        'timePeriod': tenureController.text,
+                                        'goalDate': goalController.text,
+                                        'content': contentController.text,
+                                        'userId': Provider.of<Authentication>(
                                             context,
                                             listen: false)
                                         .getUser()
@@ -398,14 +402,7 @@ class FeedHelpers with ChangeNotifier {
                                 ),
                               ],
                             ),
-                          ), /*
-                          Text(
-                            "Target: " + data['goalDate'],
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green,
-                            ),
-                          ),*/
+                          ),
                         ],
                       ),
                     ),
@@ -427,14 +424,27 @@ class FeedHelpers with ChangeNotifier {
                       height: MediaQuery.of(context).size.height * 0.05,
                       color: Color(0xff636363),
                     ),
-                    Text(
-                      data['content'],
-                      style: TextStyle(
-                        fontWeight: FontWeight.normal,
-                        color: Colors.black,
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      child: Text(
+                        data['content'],
+                        style: TextStyle(
+                          color: Colors.black,
+                        ),
                       ),
                     ),
-                    SizedBox(height: 10),
+                    SizedBox(height: 1),
+                    data['edited'] ? Row(
+                      children: [
+                        Text(
+                          "(Edited)",
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
+                    ) : SizedBox(width:0)
                   ],
                 ),
               ),
@@ -887,20 +897,17 @@ class FeedHelpers with ChangeNotifier {
                               child: Text("Cancel")),
                           ElevatedButton(
                             onPressed: () async {
-                              Provider.of<FirebaseOperations>(context,
-                                      listen: false)
-                                  .updatePostData(postId, {
-                                'content': contentControl.text,
-                              }).whenComplete(() {
-                                Provider.of<LandingHelpers>(context,
-                                        listen: false)
-                                    .displayToast(
+                              Provider.of<FirebaseOperations>(context, listen: false)
+                                  .updatePostData(postId, {'content': contentControl.text,'edited': true})
+                                  .whenComplete(() {
+                                    Provider.of<LandingHelpers>(context, listen: false)
+                                        .displayToast(
                                         "Post updated successfully!", context);
-                              }).whenComplete(() {
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-                                debtController.clear();
-                                contentController.clear();
+                                  }).whenComplete(() {
+                                    Navigator.pop(context);
+                                    Navigator.pop(context);
+                                    debtController.clear();
+                                    contentController.clear();
                               });
                             },
                             child: Row(
