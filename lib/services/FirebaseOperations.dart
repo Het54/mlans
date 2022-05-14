@@ -71,6 +71,15 @@ class FirebaseOperations with ChangeNotifier {
         .update(data);
   }
 
+  Future reportPost(String userId,String postId,dynamic data) async {
+    return FirebaseFirestore.instance
+        .collection("Reports")
+        .doc(postId)
+        .collection(userId)
+        .doc("report")
+        .set(data);
+  }
+
   Future activatePremium(String uid, dynamic data) async {
     return FirebaseFirestore.instance
         .collection('userData')

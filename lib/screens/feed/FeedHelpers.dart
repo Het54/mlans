@@ -178,7 +178,8 @@ class FeedHelpers with ChangeNotifier {
                                 .uploadPostData(
                                     "${debtController.text}+${Timestamp.now().toString().substring(18, 28)}",
                                     {
-                                      'edited' : false,
+                                      'postId' : "${debtController.text}+${Timestamp.now().toString().substring(18, 28)}",
+                                      'edited': false,
                                       'debt': debtController.text,
                                       'intrestPercentage': intrestController.text,
                                       'debtType': typeController.text,
@@ -210,14 +211,14 @@ class FeedHelpers with ChangeNotifier {
                                           .uid,
                                       "${debtController.text}+${Timestamp.now().toString().substring(18, 28)}",
                                       {
-                                        'edited' : false,
-                                        'debt': debtController.text,
-                                        'intrestPercentage': intrestController.text,
-                                        'debtType': typeController.text,
-                                        'timePeriod': tenureController.text,
-                                        'goalDate': goalController.text,
-                                        'content': contentController.text,
-                                        'userId': Provider.of<Authentication>(
+                                    'edited': false,
+                                    'debt': debtController.text,
+                                    'intrestPercentage': intrestController.text,
+                                    'debtType': typeController.text,
+                                    'timePeriod': tenureController.text,
+                                    'goalDate': goalController.text,
+                                    'content': contentController.text,
+                                    'userId': Provider.of<Authentication>(
                                             context,
                                             listen: false)
                                         .getUser()
@@ -296,6 +297,7 @@ class FeedHelpers with ChangeNotifier {
 
   Widget loadPosts(
       BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+    TextEditingController reportController = TextEditingController();
     return ListView(
         children: snapshot.data!.docs.map((DocumentSnapshot documentSnapshot) {
       Map<String, dynamic> data =
@@ -352,12 +354,50 @@ class FeedHelpers with ChangeNotifier {
                                   context,
                                   data['debt'],
                                   data['content'],
-                                  "${data['debt']}+${data['time'].toString().substring(18, 28)}",
+                                  data['debtType'],
+                                  data['goalDate'],
+                                  data['intrestPercentage'],
+                                  data['timePeriod'],
+                                  data['postId'],
                                 ),
                               );
                             },
                           )
-                        : Container(height: 0, width: 0),
+                        : GestureDetector(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: Text("Report"),
+                              content: TextFormField(
+                                autofocus: true,
+                                controller: reportController,
+                              ),
+                              actions: <Widget>[
+                                FlatButton(
+                                  onPressed: () {
+                                    Provider.of<FirebaseOperations>(context,
+                                        listen: false)
+                                        .reportPost(
+                                        "${Provider.of<Authentication>(context, listen: false)
+                                            .getUser()
+                                            ?.uid}",
+                                        "${data["debt"]}+${data["time"].seconds}",
+                                        {
+                                          "user" : 1,
+                                          "report" : reportController.text
+                                        });
+                                    Navigator.of(ctx).pop();
+                                    reportController.clear();
+                                  },
+                                  child: Text("okay"),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        child: Icon(EvaIcons.moreVertical)
+                    ),
                   ],
                 ),
               ),
@@ -434,17 +474,19 @@ class FeedHelpers with ChangeNotifier {
                       ),
                     ),
                     SizedBox(height: 1),
-                    data['edited'] ? Row(
-                      children: [
-                        Text(
-                          "(Edited)",
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                      ],
-                    ) : SizedBox(width:0)
+                    data['edited']
+                        ? Row(
+                            children: [
+                              Text(
+                                "(Edited)",
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                            ],
+                          )
+                        : SizedBox(width: 0)
                   ],
                 ),
               ),
@@ -762,7 +804,9 @@ class FeedHelpers with ChangeNotifier {
                                     context, postId, commentController.text);
                             commentController.clear();
                           },
-                          child: Icon(FontAwesomeIcons.telegramPlane),
+                          child: Dialog(
+                            child: Container(),
+                          ),
                         )
                       ],
                     ),
@@ -775,7 +819,7 @@ class FeedHelpers with ChangeNotifier {
   }
 
   editDeletePostDialog(
-      BuildContext context, String debt, String content, String postId) {
+      BuildContext context, String debt, String content, String debtType, String goalDate, String interestPercentage, String timePeriod, String postId) {
     return Dialog(
       child: Container(
         height: MediaQuery.of(context).size.height * 0.215,
@@ -790,7 +834,7 @@ class FeedHelpers with ChangeNotifier {
             padding: const EdgeInsets.all(8.0),
             child: TextButton(
               onPressed: () {
-                editPostSheet(context, debt, content, postId);
+                editPostSheet(context, debt, content, debtType, goalDate, interestPercentage, timePeriod, postId);
               },
               child: Text("Edit Steps"),
             ),
@@ -818,13 +862,187 @@ class FeedHelpers with ChangeNotifier {
   }
 
   editPostSheet(
-      BuildContext context, String debt, String content, String postId) {
+      BuildContext context, String debt, String content, String debtType, String goalDate, String interestPercentage, String timePeriod, String postId) {
     TextEditingController debtControl = TextEditingController();
-    debtControl.text = debt;
     TextEditingController contentControl = TextEditingController();
+    TextEditingController debtTypeControl = TextEditingController();
+    TextEditingController goalDateControl = TextEditingController();
+    TextEditingController interestPercentageControl = TextEditingController();
+    TextEditingController timePeriodControl = TextEditingController();
+    debtControl.text = debt;
     contentControl.text = "${content}";
+    debtTypeControl.text = "${debtType}";
+    goalDateControl.text = "${goalDate}";
+    interestPercentageControl.text = "${interestPercentage}";
+    timePeriodControl.text = "${timePeriod}";
 
     return showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (BuildContext context) {
+        return Padding(
+          padding:
+          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 10.0),
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.842,
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200.withOpacity(0.5),
+                borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20)),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  // ignore: prefer_const_literals_to_create_immutables
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 100.0),
+                      child: Divider(
+                        thickness: 4.0,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        controller: debtControl,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: "Debt amount",
+                          fillColor: Colors.white,
+                          filled: true,
+                          hintText: "Enter the debt amount...",
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        controller: interestPercentageControl,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          fillColor: Colors.white,
+                          labelText: "Interest Percentage",
+                          filled: true,
+                          hintText: "Enter the interest percentage...",
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        controller: debtTypeControl,
+                        decoration: InputDecoration(
+                          fillColor: Colors.white,
+                          filled: true,
+                          labelText: "Debt Type",
+                          hintText: "Enter the debt type...",
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        controller: timePeriodControl,
+                        decoration: InputDecoration(
+                          fillColor: Colors.white,
+                          filled: true,
+                          labelText: "Debt Tenure",
+                          hintText: "Enter the time period of debt...",
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        controller: goalDateControl,
+                        decoration: InputDecoration(
+                          fillColor: Colors.white,
+                          filled: true,
+                          labelText: "Debt Payoff Goal Date",
+                          hintText: "Enter the goal date...",
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30)),
+                        width: 400,
+                        child: TextFormField(
+                          controller: contentControl,
+                          minLines: 10,
+                          maxLines: 200,
+                          decoration: InputDecoration(
+                            fillColor: Colors.white,
+                            filled: true,
+                            labelText: "Steps",
+                            hintText: "Enter the steps...",
+                          ),
+                        ),
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(
+                            style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(Colors.red)),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Text("Cancel")),
+                        ElevatedButton(
+                          onPressed: () async {
+                            Provider.of<FirebaseOperations>(context,
+                                listen: false)
+                                .updatePostData(postId, {
+                              'debt': debtControl.text,
+                              'intrestPercentage': interestPercentageControl.text,
+                              'debtType': debtTypeControl.text,
+                              'timePeriod': timePeriodControl.text,
+                              'goalDate': goalDateControl.text,
+                              'content': contentControl.text,
+                              'edited': true
+                            }).whenComplete(() {
+                              Provider.of<LandingHelpers>(context,
+                                  listen: false)
+                                  .displayToast(
+                                  "Post updated successfully!", context);
+                            }).whenComplete(() {
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                              debtControl.clear();
+                              interestPercentageControl.clear();
+                              debtTypeControl.clear();
+                              timePeriodControl.clear();
+                              goalDateControl.clear();
+                              contentControl.clear();
+                            });
+                          },
+                          child: Row(
+                            children: const [
+                              Icon(FontAwesomeIcons.share, size: 12),
+                              SizedBox(width: 5),
+                              Text("Share")
+                            ],
+                          ),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    )
+      /*showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
           return Padding(
@@ -897,17 +1115,21 @@ class FeedHelpers with ChangeNotifier {
                               child: Text("Cancel")),
                           ElevatedButton(
                             onPressed: () async {
-                              Provider.of<FirebaseOperations>(context, listen: false)
-                                  .updatePostData(postId, {'content': contentControl.text,'edited': true})
-                                  .whenComplete(() {
-                                    Provider.of<LandingHelpers>(context, listen: false)
-                                        .displayToast(
+                              Provider.of<FirebaseOperations>(context,
+                                      listen: false)
+                                  .updatePostData(postId, {
+                                'content': contentControl.text,
+                                'edited': true
+                              }).whenComplete(() {
+                                Provider.of<LandingHelpers>(context,
+                                        listen: false)
+                                    .displayToast(
                                         "Post updated successfully!", context);
-                                  }).whenComplete(() {
-                                    Navigator.pop(context);
-                                    Navigator.pop(context);
-                                    debtController.clear();
-                                    contentController.clear();
+                              }).whenComplete(() {
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                                debtController.clear();
+                                contentController.clear();
                               });
                             },
                             child: Row(
@@ -926,7 +1148,7 @@ class FeedHelpers with ChangeNotifier {
               ),
             ),
           );
-        });
+        })*/;
   }
 
   premiumBanner(BuildContext context) {
