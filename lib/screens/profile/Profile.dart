@@ -3,13 +3,16 @@
 import 'package:Moneylans/screens/debt_meter/DebtMeter.dart';
 import 'package:Moneylans/screens/profile/ProfileHelpers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/Authentication.dart';
 
 class Profile extends StatelessWidget {
   String name;
+
   Profile({
     Key? key,
     required this.name,
@@ -17,8 +20,7 @@ class Profile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String? uid =
-        Provider.of<Authentication>(context, listen: false).getUser()?.uid;
+    String? uid = Provider.of<Authentication>(context, listen: false).getUser()?.uid;
 
     return Scaffold(
       appBar: AppBar(
@@ -45,7 +47,7 @@ class Profile extends StatelessWidget {
                               .customDrawer(context);
                         });
                   },
-                  child: Icon(Icons.more_vert,color: Colors.black),
+                  child: Icon(Icons.more_vert, color: Colors.black),
                 )),
           ]),
       body: SingleChildScrollView(
@@ -93,44 +95,7 @@ class Profile extends StatelessWidget {
                                       );
                                     });
                               },
-                              onLongPress: () {
-                                showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return Dialog(
-                                        child: Container(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.08,
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.12,
-                                          decoration: BoxDecoration(
-                                              color: Colors.white),
-                                          child: TextButton(
-                                              onPressed: () {
-                                                FirebaseFirestore.instance
-                                                    .collection('users')
-                                                    .doc(Provider.of<
-                                                                Authentication>(
-                                                            context,
-                                                            listen: false)
-                                                        .getUser()
-                                                        ?.uid)
-                                                    .collection('posts')
-                                                    .doc(
-                                                        "${data['debt']}+${data['time'].toString().substring(18, 28)}")
-                                                    .delete();
-                                                Navigator.pop(context);
-                                              },
-                                              child:
-                                                  Text("Delete post history")),
-                                        ),
-                                      );
-                                    });
-                              },
+                              onLongPress: () => deleteDialog(context, data),
                               child: Container(
                                 height: 10,
                                 decoration: BoxDecoration(
@@ -147,17 +112,32 @@ class Profile extends StatelessWidget {
                                             topLeft: Radius.circular(15)),
                                       ),
                                       width: double.infinity,
-                                      child: Center(
-                                        child: Text(
-                                          "Debt:",
-                                          style: TextStyle(
-                                              color: Colors.blue,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 29),
-                                        ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(left: 10),
+                                            child: Text(
+                                              "Debt:",
+                                              style: TextStyle(
+                                                  color: Colors.blue,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 25),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: GestureDetector(
+                                              onTap: () => deleteDialog(context, data),
+                                              child: Icon(EvaIcons.moreVertical,
+                                                  size: 25),
+                                            ),
+                                          )
+                                        ],
                                       ),
                                     ),
-                                    SizedBox(height: 25),
+                                    SizedBox(height: 35),
                                     Text(
                                       "₹${data['debt']}",
                                       style: TextStyle(
@@ -180,25 +160,78 @@ class Profile extends StatelessWidget {
       ),
     );
   }
+
+  Future<dynamic> deleteDialog(
+      BuildContext context, Map<String, dynamic> data) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.08,
+              width: MediaQuery.of(context).size.width * 0.12,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.white),
+              child: TextButton(
+                  onPressed: () {
+                    FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(Provider.of<Authentication>(context, listen: false)
+                            .getUser()
+                            ?.uid)
+                        .collection('posts')
+                        .doc(
+                            "${data['debt']}+${data['time'].toString().substring(18, 28)}")
+                        .delete();
+                    Navigator.pop(context);
+                  },
+                  child: Text("Delete post history")),
+            ),
+          );
+        });
+  }
 }
 
 profilePostSheet(BuildContext context, String debt, String content) {
   return Dialog(
-    child: Container(
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(35)),
-      height: MediaQuery.of(context).size.height * 0.35,
-      width: MediaQuery.of(context).size.width * 0.7,
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text("₹${debt}",
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+    backgroundColor: Colors.transparent,
+    child: Flexible(
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(width: 2, color: Colors.black),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        width: MediaQuery.of(context).size.width * 0.7,
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Debt : "),
+                      Text("₹${debt}",
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Divider(
+                    height: 5,
+                    color: Colors.black54,
+                  ),
+                ),
+                Text(content),
+                SizedBox(height: 4,)
+              ],
             ),
-            SizedBox(height: 15),
-            Text(content),
-          ],
+          ),
         ),
       ),
     ),
@@ -207,6 +240,7 @@ profilePostSheet(BuildContext context, String debt, String content) {
 
 class profileBio extends StatelessWidget {
   String name;
+
   profileBio({
     Key? key,
     required this.name,
@@ -228,40 +262,35 @@ class profileBio extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 15),
-                Row(
-                  children: [
-                    Text(
-                      '   Hey ',
-                      style: TextStyle(
-                          fontWeight: FontWeight.normal, fontSize: 20),
-                    ),
-                    StreamBuilder<DocumentSnapshot>(
-                      stream: FirebaseFirestore.instance
-                          .collection('userData')
-                          .doc(
-                              "${Provider.of<Authentication>(context, listen: false).getUser()?.uid}")
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        } else {
-                          return Text(snapshot.data!.get('name'),
-                              style: TextStyle(
-                                  fontWeight: FontWeight.normal, fontSize: 20));
-                        }
-                      },
-                    ),
-                    Text(
-                      ',',
-                      style: TextStyle(
-                          fontWeight: FontWeight.normal, fontSize: 20),
-                    ),
-                  ],
+                Padding(
+                  padding: const EdgeInsets.only(left: 15),
+                  child: Row(
+                    children: [
+                      StreamBuilder<DocumentSnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection('userData')
+                            .doc(
+                            "${Provider.of<Authentication>(context, listen: false).getUser()?.uid}")
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          } else {
+                            return Text(snapshot.data!.get('name'),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.normal, fontSize: 20));
+                          }
+                        },
+                      ),
+                      Text(",",style: TextStyle(
+                          fontWeight: FontWeight.normal, fontSize: 20))
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 15),
+                const SizedBox(height: 5),
                 RichText(
                   text: TextSpan(
                     text: '',
@@ -301,13 +330,6 @@ class profileBio extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 10),
-                Center(
-                  child: Text(
-                    "To maintain your anonymity we provide you with this Unique Id.",
-                    style: TextStyle(fontSize: 8, color: Colors.black38),
-                  ),
-                ),
-                SizedBox(height: 10),
               ],
             ),
           ),
@@ -335,7 +357,7 @@ class profileBio extends StatelessWidget {
                   color: Colors.black.withOpacity(0.4)),
               child: Column(
                 children: [
-                  SizedBox(height: 9),
+                  SizedBox(height: 40),
                   Text(
                     "Check your debt-o-score!",
                     style: TextStyle(
@@ -343,11 +365,7 @@ class profileBio extends StatelessWidget {
                         color: Colors.white,
                         fontSize: 18),
                   ),
-                  SizedBox(height: 2),
-                  Text("A healthy debt-o-score is a sign of a good future!",
-                      style:
-                          TextStyle(fontSize: 10, color: Colors.blue.shade100)),
-                  SizedBox(height: 20),
+                  SizedBox(height: 10),
                   ElevatedButton(
                       onPressed: () {
                         Navigator.push(

@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Colors.white,
       body: PageView(
         controller: homeController,
-        physics: NeverScrollableScrollPhysics(),
+        scrollDirection: Axis.horizontal,
         onPageChanged: (page) {
           setState(() {
             pageIndex = page;

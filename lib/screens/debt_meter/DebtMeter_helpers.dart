@@ -15,7 +15,7 @@ class DebtMeterHelpers with ChangeNotifier {
             controller: earningsController,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
-              hintText: "Enter your monthly earnings...",
+              hintText: "Enter your monthly income...",
               prefix: Text(
                 "₹",
                 style: TextStyle(color: Colors.black),
@@ -29,7 +29,7 @@ class DebtMeterHelpers with ChangeNotifier {
             controller: debtsController,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
-              hintText: "Enter your monthly debts...",
+              hintText: "Enter your monthly payments...",
               prefix: Text(
                 "₹",
                 style: TextStyle(color: Colors.black),
@@ -79,33 +79,65 @@ class DebtMeterHelpers with ChangeNotifier {
 
   debtMeterCheck(BuildContext context, double debtScore) {
     return Dialog(
+      backgroundColor: Colors.transparent,
       child: Container(
-        color: Colors.green.shade200,
-        height: MediaQuery.of(context).size.height * 0.61,
+        decoration: BoxDecoration(
+            color: Colors.green.shade200,
+            borderRadius: BorderRadius.circular(15)),
+        height: MediaQuery.of(context).size.height * 0.65,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(15)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      "Moneylans",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green.shade900,
-                          fontSize: 30),
-                    ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15)),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "Moneylans",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green.shade900,
+                        fontSize: 30),
                   ),
                 ),
-                Container(
-                  width: 400,
-                  height: 400,
+              ),
+
+              SizedBox(
+                height: 15,
+              ),
+
+              if (debtScore < 35)
+                Text(
+                  "Healthy",
+                  style: TextStyle(
+                      color: Colors.green[500],
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold),
+                )
+              else if (debtScore > 35 && debtScore < 50)
+                Text(
+                  "Could do some work",
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 255, 123, 7),
+                    fontSize: 20,
+                  ),
+                )
+              else
+                Text(
+                  "Unhealthy",
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 255, 0, 0),
+                    fontSize: 20,
+                  ),
+                ),
+
+              Flexible(
+                child: Container(
                   padding: EdgeInsets.all(10),
                   child: KdGaugeView(
                     minSpeed: 0,
@@ -124,32 +156,8 @@ class DebtMeterHelpers with ChangeNotifier {
                     fractionDigits: 1,
                   ),
                 ),
-                if (debtScore < 35)
-                  Text(
-                    "Healthy",
-                    style: TextStyle(
-                        color: Color.fromARGB(255, 0, 255, 21),
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold),
-                  )
-                else if (debtScore > 35 && debtScore < 50)
-                  Text(
-                    "Could do some work",
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 255, 123, 7),
-                      fontSize: 10,
-                    ),
-                  )
-                else
-                  Text(
-                    "Unhealthy",
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 255, 0, 0),
-                      fontSize: 10,
-                    ),
-                  )
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

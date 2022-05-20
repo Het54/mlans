@@ -23,9 +23,15 @@ class homePageHelpers with ChangeNotifier {
       },
       backgroundColor: Colors.white,
       items: [
-        CustomNavigationBarItem(icon: Icon(EvaIcons.home)),
-        CustomNavigationBarItem(icon: Icon(FontAwesomeIcons.yinYang)),
-        CustomNavigationBarItem(icon: Icon(EvaIcons.person)),
+        CustomNavigationBarItem(
+          title: Text("Home",style: TextStyle(fontSize: 11),),
+            icon: Icon(EvaIcons.home)),
+        CustomNavigationBarItem(
+            title: Text("Family",style: TextStyle(fontSize: 11),),
+            icon: Icon(FontAwesomeIcons.yinYang)),
+        CustomNavigationBarItem(
+            title: Text("Profile",style: TextStyle(fontSize: 11),),
+            icon: Icon(EvaIcons.person)),
       ],
     );
   }

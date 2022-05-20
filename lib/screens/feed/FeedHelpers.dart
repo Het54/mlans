@@ -295,8 +295,7 @@ class FeedHelpers with ChangeNotifier {
     );
   }
 
-  Widget loadPosts(
-      BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+  Widget loadPosts(BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
     TextEditingController reportController = TextEditingController();
     return ListView(
         children: snapshot.data!.docs.map((DocumentSnapshot documentSnapshot) {
@@ -509,7 +508,7 @@ class FeedHelpers with ChangeNotifier {
                     onTap: () {
                       Provider.of<PostOptions>(context, listen: false).addUpvote(
                           context,
-                          "${data['debt']}+${data['time'].toString().substring(18, 28)}",
+                          data['postId'],
                           Provider.of<Authentication>(context, listen: false)
                               .getUser()!
                               .uid);
@@ -530,7 +529,7 @@ class FeedHelpers with ChangeNotifier {
                             stream: FirebaseFirestore.instance
                                 .collection('posts')
                                 .doc(
-                                    "${data['debt']}+${data['time'].toString().substring(18, 28)}")
+                                data['postId'])
                                 .collection('upvotes')
                                 .snapshots(),
                             builder: (context, snapshot) {
@@ -558,7 +557,7 @@ class FeedHelpers with ChangeNotifier {
                     onTap: () {
                       Provider.of<PostOptions>(context, listen: false).addDownvote(
                           context,
-                          "${data['debt']}+${data['time'].toString().substring(18, 28)}",
+                          data['postId'],
                           Provider.of<Authentication>(context, listen: false)
                               .getUser()!
                               .uid);
@@ -579,7 +578,7 @@ class FeedHelpers with ChangeNotifier {
                             stream: FirebaseFirestore.instance
                                 .collection('posts')
                                 .doc(
-                                    "${data['debt']}+${data['time'].toString().substring(18, 28)}")
+                                data['postId'])
                                 .collection('downvotes')
                                 .snapshots(),
                             builder: (context, snapshot) {
@@ -612,7 +611,7 @@ class FeedHelpers with ChangeNotifier {
                           Provider.of<Authentication>(context, listen: false)
                               .getUser()!
                               .uid,
-                          "${data['debt']}+${data['time'].toString().substring(18, 28)}");
+                          data['postId']);
                     },
                     child: Container(
                       width: MediaQuery.of(context).size.width / 3 - 10,
@@ -630,7 +629,7 @@ class FeedHelpers with ChangeNotifier {
                             stream: FirebaseFirestore.instance
                                 .collection('posts')
                                 .doc(
-                                    "${data['debt']}+${data['time'].toString().substring(18, 28)}")
+                                   data['postId'])
                                 .collection('comments')
                                 .snapshots(),
                             builder: (context, snapshot) {
@@ -664,8 +663,7 @@ class FeedHelpers with ChangeNotifier {
     }).toList());
   }
 
-  addCommentSheet(BuildContext context, DocumentSnapshot snapshot, String docId,
-      String postId) {
+  addCommentSheet(BuildContext context, DocumentSnapshot snapshot, String docId, String postId) {
     TextEditingController commentController = TextEditingController();
 
     return showModalBottomSheet(
@@ -797,6 +795,7 @@ class FeedHelpers with ChangeNotifier {
                             ),
                           ),
                         ),
+                        SizedBox(width: 20),
                         FloatingActionButton(
                           onPressed: () {
                             Provider.of<PostOptions>(context, listen: false)
@@ -804,9 +803,9 @@ class FeedHelpers with ChangeNotifier {
                                     context, postId, commentController.text);
                             commentController.clear();
                           },
-                          child: Dialog(
-                            child: Container(),
-                          ),
+                          child: Transform.rotate(
+                              angle: 100,
+                              child: Icon(Icons.send, color: Colors.white)),
                         )
                       ],
                     ),
@@ -818,8 +817,7 @@ class FeedHelpers with ChangeNotifier {
         });
   }
 
-  editDeletePostDialog(
-      BuildContext context, String debt, String content, String debtType, String goalDate, String interestPercentage, String timePeriod, String postId) {
+  editDeletePostDialog(BuildContext context, String debt, String content, String debtType, String goalDate, String interestPercentage, String timePeriod, String postId) {
     return Dialog(
       child: Container(
         height: MediaQuery.of(context).size.height * 0.215,
@@ -844,13 +842,35 @@ class FeedHelpers with ChangeNotifier {
             padding: const EdgeInsets.all(8.0),
             child: TextButton(
               onPressed: () {
-                Provider.of<PostOptions>(context, listen: false)
-                    .deletePost(context, postId)
-                    .whenComplete(() {
-                  Provider.of<LandingHelpers>(context, listen: false)
-                      .displayToast("Post deleted successfully!", context);
-                  Navigator.pop(context);
-                });
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      content: Text("Would you like to delete the post?"),
+                      actions: [
+                        FlatButton(
+                          child: Text("Cancel"),
+                          onPressed:  () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                        FlatButton(
+                          child: Text("Delete",style: TextStyle(color: Colors.red),),
+                          onPressed:  () {
+                            Provider.of<PostOptions>(context, listen: false)
+                                .deletePost(context, postId)
+                                .whenComplete(() {
+                              Provider.of<LandingHelpers>(context, listen: false)
+                                  .displayToast("Post deleted successfully!", context);
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            });
+                          },
+                        )
+                      ],
+                    );
+                  },
+                );
               },
               child: Text("Delete post"),
             ),
@@ -861,8 +881,7 @@ class FeedHelpers with ChangeNotifier {
     );
   }
 
-  editPostSheet(
-      BuildContext context, String debt, String content, String debtType, String goalDate, String interestPercentage, String timePeriod, String postId) {
+  editPostSheet(BuildContext context, String debt, String content, String debtType, String goalDate, String interestPercentage, String timePeriod, String postId) {
     TextEditingController debtControl = TextEditingController();
     TextEditingController contentControl = TextEditingController();
     TextEditingController debtTypeControl = TextEditingController();
@@ -1041,114 +1060,7 @@ class FeedHelpers with ChangeNotifier {
           ),
         );
       },
-    )
-      /*showModalBottomSheet(
-        context: context,
-        builder: (BuildContext context) {
-          return Padding(
-            padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 10.0),
-              child: Container(
-                height: MediaQuery.of(context).size.height * 0.6,
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200.withOpacity(0.5),
-                  borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20)),
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    // ignore: prefer_const_literals_to_create_immutables
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 100.0),
-                        child: Divider(
-                          thickness: 4.0,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextFormField(
-                          controller: debtControl,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            fillColor: Colors.white,
-                            filled: true,
-                            labelText: "Debt Amount",
-                            hintText: "Enter the debt amount...",
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(30)),
-                          width: 400,
-                          child: TextFormField(
-                            controller: contentControl,
-                            minLines: 10,
-                            maxLines: 200,
-                            decoration: InputDecoration(
-                              fillColor: Colors.white,
-                              filled: true,
-                              labelText: "Steps",
-                              hintText: "Enter the steps...",
-                            ),
-                          ),
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          ElevatedButton(
-                              style: ButtonStyle(
-                                  backgroundColor:
-                                      MaterialStateProperty.all(Colors.red)),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: Text("Cancel")),
-                          ElevatedButton(
-                            onPressed: () async {
-                              Provider.of<FirebaseOperations>(context,
-                                      listen: false)
-                                  .updatePostData(postId, {
-                                'content': contentControl.text,
-                                'edited': true
-                              }).whenComplete(() {
-                                Provider.of<LandingHelpers>(context,
-                                        listen: false)
-                                    .displayToast(
-                                        "Post updated successfully!", context);
-                              }).whenComplete(() {
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-                                debtController.clear();
-                                contentController.clear();
-                              });
-                            },
-                            child: Row(
-                              children: const [
-                                Icon(FontAwesomeIcons.share, size: 12),
-                                SizedBox(width: 5),
-                                Text("Share")
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-        })*/;
+    );
   }
 
   premiumBanner(BuildContext context) {

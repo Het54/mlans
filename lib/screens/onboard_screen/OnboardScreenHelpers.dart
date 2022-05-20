@@ -49,7 +49,7 @@ class OnboardScreenHelpers with ChangeNotifier {
                     style: TextStyle(color: Colors.black)),
                 SizedBox(height: 5),
                 ElevatedButton(
-                  child: Text("Join the premium gang now🔥"),
+                  child: Text("Join Premium Club"),
                   onPressed: () {
                     Navigator.push(
                       context,
