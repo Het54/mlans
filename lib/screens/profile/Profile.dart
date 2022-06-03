@@ -196,41 +196,39 @@ class Profile extends StatelessWidget {
 profilePostSheet(BuildContext context, String debt, String content) {
   return Dialog(
     backgroundColor: Colors.transparent,
-    child: Flexible(
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(width: 2, color: Colors.black),
-          borderRadius: BorderRadius.circular(15),
-        ),
-        width: MediaQuery.of(context).size.width * 0.7,
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(5),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Debt : "),
-                      Text("₹${debt}",
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                    ],
-                  ),
+    child: Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(width: 2, color: Colors.black),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      width: MediaQuery.of(context).size.width * 0.7,
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(5),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Debt : "),
+                    Text("₹${debt}",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                  ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(5),
-                  child: Divider(
-                    height: 5,
-                    color: Colors.black54,
-                  ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(5),
+                child: Divider(
+                  height: 5,
+                  color: Colors.black54,
                 ),
-                Text(content),
-                SizedBox(height: 4,)
-              ],
-            ),
+              ),
+              Text(content),
+              SizedBox(height: 4,)
+            ],
           ),
         ),
       ),

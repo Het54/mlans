@@ -3,6 +3,7 @@
 import 'package:Moneylans/screens/profile/ProfileHelpers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/Authentication.dart';
@@ -28,6 +29,12 @@ class Feed extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
+        /*actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 13),
+            child: Icon(Icons.leaderboard,color: Colors.black,),
+          )*/
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blue,

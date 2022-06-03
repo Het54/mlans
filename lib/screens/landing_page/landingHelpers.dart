@@ -23,34 +23,6 @@ class LandingHelpers with ChangeNotifier {
     );
   }
 
- /* Widget tagLineText(BuildContext context) {
-    return Positioned(
-      top: 400.0,
-      child: Center(
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text("Welcome to",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 32,
-                  )),
-              Text("Moneylans",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 32,
-                  ))
-            ],
-          ),
-        ),
-      ),
-    );
-  }*/
-
   Widget loginButton(BuildContext context) {
     return Positioned(
       top: 640,

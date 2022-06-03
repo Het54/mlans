@@ -16,8 +16,6 @@ class LandingPage extends StatelessWidget {
             bodyColor(context),
             Provider.of<LandingHelpers>(context, listen: false)
                 .bodyImage(context),
-           /* Provider.of<LandingHelpers>(context, listen: false)
-                .tagLineText(context),*/
             Provider.of<LandingHelpers>(context, listen: false)
                 .loginButton(context),
             Provider.of<LandingHelpers>(context, listen: false)
