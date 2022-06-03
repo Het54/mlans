@@ -29,11 +29,11 @@ class Feed extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        /*actions: [
+        actions: [
           Padding(
             padding: const EdgeInsets.only(right: 13),
             child: Icon(Icons.leaderboard,color: Colors.black,),
-          )*/
+          )
         ],
       ),
       floatingActionButton: FloatingActionButton(
