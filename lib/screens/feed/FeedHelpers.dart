@@ -15,6 +15,7 @@ import '../../utils/PostOptions.dart';
 import '../feedback_question/Feedback.dart';
 import '../landing_page/landingHelpers.dart';
 
+
 class FeedHelpers with ChangeNotifier {
   TextEditingController debtController = TextEditingController();
   TextEditingController tenureController = TextEditingController();
@@ -178,15 +179,16 @@ class FeedHelpers with ChangeNotifier {
                                 .uploadPostData(
                                     "${debtController.text}+${Timestamp.now().toString().substring(18, 28)}",
                                     {
-                                      'postId' : "${debtController.text}+${Timestamp.now().toString().substring(18, 28)}",
-                                      'edited': false,
-                                      'debt': debtController.text,
-                                      'intrestPercentage': intrestController.text,
-                                      'debtType': typeController.text,
-                                      'timePeriod': tenureController.text,
-                                      'goalDate': goalController.text,
-                                      'content': contentController.text,
-                                      'userId': Provider.of<Authentication>(context,
+                                  'postId':
+                                      "${debtController.text}+${Timestamp.now().toString().substring(18, 28)}",
+                                  'edited': false,
+                                  'debt': debtController.text,
+                                  'intrestPercentage': intrestController.text,
+                                  'debtType': typeController.text,
+                                  'timePeriod': tenureController.text,
+                                  'goalDate': goalController.text,
+                                  'content': contentController.text,
+                                  'userId': Provider.of<Authentication>(context,
                                           listen: false)
                                       .getUser()
                                       ?.uid,
@@ -239,6 +241,20 @@ class FeedHelpers with ChangeNotifier {
                               contentController.clear();
                               goalController.clear();
                               i = 1;
+                            }).then((value) {
+                              FirebaseFirestore.instance
+                                  .collection('leaderboard')
+                                  .doc(Provider.of<Authentication>(context,
+                                          listen: false)
+                                      .getUser()
+                                      ?.uid)
+                                  .set({
+                                'point': FieldValue.increment(10),
+                                'userId' : Provider.of<Authentication>(context,
+                                    listen: false)
+                                    .getUser()
+                                    ?.uid
+                              });
                             });
                           },
                           child: Row(
@@ -295,7 +311,7 @@ class FeedHelpers with ChangeNotifier {
     );
   }
 
-  Widget loadPosts(BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+  Widget loadPosts( BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
     TextEditingController reportController = TextEditingController();
     return ListView(
         children: snapshot.data!.docs.map((DocumentSnapshot documentSnapshot) {
@@ -363,40 +379,37 @@ class FeedHelpers with ChangeNotifier {
                             },
                           )
                         : GestureDetector(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (ctx) => AlertDialog(
-                              title: Text("Report"),
-                              content: TextFormField(
-                                autofocus: true,
-                                controller: reportController,
-                              ),
-                              actions: <Widget>[
-                                FlatButton(
-                                  onPressed: () {
-                                    Provider.of<FirebaseOperations>(context,
-                                        listen: false)
-                                        .reportPost(
-                                        "${Provider.of<Authentication>(context, listen: false)
-                                            .getUser()
-                                            ?.uid}",
-                                        "${data["debt"]}+${data["time"].seconds}",
-                                        {
-                                          "user" : 1,
-                                          "report" : reportController.text
-                                        });
-                                    Navigator.of(ctx).pop();
-                                    reportController.clear();
-                                  },
-                                  child: Text("okay"),
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: Text("Report"),
+                                  content: TextFormField(
+                                    autofocus: true,
+                                    controller: reportController,
+                                  ),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      onPressed: () {
+                                        Provider.of<FirebaseOperations>(context,
+                                                listen: false)
+                                            .reportPost(
+                                                "${Provider.of<Authentication>(context, listen: false).getUser()?.uid}",
+                                                "${data["debt"]}+${data["time"].seconds}",
+                                                {
+                                              "user": 1,
+                                              "report": reportController.text
+                                            });
+                                        Navigator.of(ctx).pop();
+                                        reportController.clear();
+                                      },
+                                      child: Text("okay"),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          );
-                        },
-                        child: Icon(EvaIcons.moreVertical)
-                    ),
+                              );
+                            },
+                            child: Icon(EvaIcons.moreVertical)),
                   ],
                 ),
               ),
@@ -506,12 +519,15 @@ class FeedHelpers with ChangeNotifier {
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () {
-                      Provider.of<PostOptions>(context, listen: false).addUpvote(
-                          context,
-                          data['postId'],
-                          Provider.of<Authentication>(context, listen: false)
-                              .getUser()!
-                              .uid);
+                      Provider.of<PostOptions>(context, listen: false)
+                          .addUpvote(
+                              context,
+                              data['postId'],
+                              Provider.of<Authentication>(context,
+                                      listen: false)
+                                  .getUser()!
+                                  .uid,
+                              data['userId']);
                     },
                     child: Container(
                       width: MediaQuery.of(context).size.width / 3 - 10,
@@ -528,8 +544,7 @@ class FeedHelpers with ChangeNotifier {
                           StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
                                 .collection('posts')
-                                .doc(
-                                data['postId'])
+                                .doc(data['postId'])
                                 .collection('upvotes')
                                 .snapshots(),
                             builder: (context, snapshot) {
@@ -555,12 +570,15 @@ class FeedHelpers with ChangeNotifier {
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () {
-                      Provider.of<PostOptions>(context, listen: false).addDownvote(
-                          context,
-                          data['postId'],
-                          Provider.of<Authentication>(context, listen: false)
-                              .getUser()!
-                              .uid);
+                      Provider.of<PostOptions>(context, listen: false)
+                          .addDownvote(
+                              context,
+                              data['postId'],
+                              Provider.of<Authentication>(context,
+                                      listen: false)
+                                  .getUser()!
+                                  .uid,
+                              data['userId']);
                     },
                     child: Container(
                       width: MediaQuery.of(context).size.width / 3 - 10,
@@ -577,8 +595,7 @@ class FeedHelpers with ChangeNotifier {
                           StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
                                 .collection('posts')
-                                .doc(
-                                data['postId'])
+                                .doc(data['postId'])
                                 .collection('downvotes')
                                 .snapshots(),
                             builder: (context, snapshot) {
@@ -611,7 +628,8 @@ class FeedHelpers with ChangeNotifier {
                           Provider.of<Authentication>(context, listen: false)
                               .getUser()!
                               .uid,
-                          data['postId']);
+                          data['postId'],
+                          data['userId']);
                     },
                     child: Container(
                       width: MediaQuery.of(context).size.width / 3 - 10,
@@ -628,8 +646,7 @@ class FeedHelpers with ChangeNotifier {
                           StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
                                 .collection('posts')
-                                .doc(
-                                   data['postId'])
+                                .doc(data['postId'])
                                 .collection('comments')
                                 .snapshots(),
                             builder: (context, snapshot) {
@@ -656,14 +673,14 @@ class FeedHelpers with ChangeNotifier {
                   )
                 ],
               ),
-            )
+            ),
           ],
         ),
       );
     }).toList());
   }
 
-  addCommentSheet(BuildContext context, DocumentSnapshot snapshot, String docId, String postId) {
+  addCommentSheet(BuildContext context, DocumentSnapshot snapshot, String docId, String postId, String userId) {
     TextEditingController commentController = TextEditingController();
 
     return showModalBottomSheet(
@@ -799,8 +816,8 @@ class FeedHelpers with ChangeNotifier {
                         FloatingActionButton(
                           onPressed: () {
                             Provider.of<PostOptions>(context, listen: false)
-                                .addComment(
-                                    context, postId, commentController.text);
+                                .addComment(context, postId,
+                                    commentController.text, userId);
                             commentController.clear();
                           },
                           child: Transform.rotate(
@@ -832,7 +849,8 @@ class FeedHelpers with ChangeNotifier {
             padding: const EdgeInsets.all(8.0),
             child: TextButton(
               onPressed: () {
-                editPostSheet(context, debt, content, debtType, goalDate, interestPercentage, timePeriod, postId);
+                editPostSheet(context, debt, content, debtType, goalDate,
+                    interestPercentage, timePeriod, postId);
               },
               child: Text("Edit Steps"),
             ),
@@ -850,18 +868,23 @@ class FeedHelpers with ChangeNotifier {
                       actions: [
                         FlatButton(
                           child: Text("Cancel"),
-                          onPressed:  () {
+                          onPressed: () {
                             Navigator.pop(context);
                           },
                         ),
                         FlatButton(
-                          child: Text("Delete",style: TextStyle(color: Colors.red),),
-                          onPressed:  () {
+                          child: Text(
+                            "Delete",
+                            style: TextStyle(color: Colors.red),
+                          ),
+                          onPressed: () {
                             Provider.of<PostOptions>(context, listen: false)
                                 .deletePost(context, postId)
                                 .whenComplete(() {
-                              Provider.of<LandingHelpers>(context, listen: false)
-                                  .displayToast("Post deleted successfully!", context);
+                              Provider.of<LandingHelpers>(context,
+                                      listen: false)
+                                  .displayToast(
+                                      "Post deleted successfully!", context);
                               Navigator.pop(context);
                               Navigator.pop(context);
                             });
@@ -901,7 +924,7 @@ class FeedHelpers with ChangeNotifier {
       builder: (BuildContext context) {
         return Padding(
           padding:
-          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 10.0),
             child: Container(
@@ -1010,7 +1033,8 @@ class FeedHelpers with ChangeNotifier {
                       children: [
                         ElevatedButton(
                             style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(Colors.red)),
+                                backgroundColor:
+                                    MaterialStateProperty.all(Colors.red)),
                             onPressed: () {
                               Navigator.pop(context);
                             },
@@ -1018,10 +1042,11 @@ class FeedHelpers with ChangeNotifier {
                         ElevatedButton(
                           onPressed: () async {
                             Provider.of<FirebaseOperations>(context,
-                                listen: false)
+                                    listen: false)
                                 .updatePostData(postId, {
                               'debt': debtControl.text,
-                              'intrestPercentage': interestPercentageControl.text,
+                              'intrestPercentage':
+                                  interestPercentageControl.text,
                               'debtType': debtTypeControl.text,
                               'timePeriod': timePeriodControl.text,
                               'goalDate': goalDateControl.text,
@@ -1029,9 +1054,9 @@ class FeedHelpers with ChangeNotifier {
                               'edited': true
                             }).whenComplete(() {
                               Provider.of<LandingHelpers>(context,
-                                  listen: false)
+                                      listen: false)
                                   .displayToast(
-                                  "Post updated successfully!", context);
+                                      "Post updated successfully!", context);
                             }).whenComplete(() {
                               Navigator.pop(context);
                               Navigator.pop(context);
@@ -1116,4 +1141,5 @@ class FeedHelpers with ChangeNotifier {
       ),
     );
   }
+
 }

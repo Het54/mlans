@@ -5,7 +5,9 @@ import 'package:provider/provider.dart';
 import '../services/Authentication.dart';
 
 class PostOptions with ChangeNotifier {
-  Future addUpvote(BuildContext context, String postId, String subDocId) async {
+  Future addUpvote(BuildContext context, String postId, String subDocId,
+      String postUser) async {
+
     return FirebaseFirestore.instance
         .collection('posts')
         .doc(postId)
@@ -18,11 +20,18 @@ class PostOptions with ChangeNotifier {
       'useremail':
           Provider.of<Authentication>(context, listen: false).getUser()?.email,
       'time': Timestamp.now().toString().substring(18, 28),
+    }).then((value) {
+      FirebaseFirestore.instance
+          .collection('leaderboard')
+          .doc(postUser)
+          .update({
+        'point': FieldValue.increment(1),
+      });
     });
   }
 
-  Future addDownvote(
-      BuildContext context, String postId, String subDocId) async {
+  Future addDownvote(BuildContext context, String postId, String subDocId,
+      String postUser) async {
     return FirebaseFirestore.instance
         .collection('posts')
         .doc(postId)
@@ -35,10 +44,18 @@ class PostOptions with ChangeNotifier {
       'useremail':
           Provider.of<Authentication>(context, listen: false).getUser()?.email,
       'time': Timestamp.now().toString().substring(18, 28),
+    }).then((value) {
+      FirebaseFirestore.instance
+          .collection('leaderboard')
+          .doc(postUser)
+          .update({
+        'point': FieldValue.increment(-1),
+      });
     });
   }
 
-  Future addComment(BuildContext context, String postId, String comment) async {
+  Future addComment(BuildContext context, String postId, String comment,
+      String postUser) async {
     await FirebaseFirestore.instance
         .collection('posts')
         .doc(postId)
@@ -54,7 +71,14 @@ class PostOptions with ChangeNotifier {
             ?.email,
         'time': Timestamp.now().toString().substring(18, 28),
       },
-    );
+    ).then((value) {
+      FirebaseFirestore.instance
+          .collection('leaderboard')
+          .doc(postUser)
+          .update({
+        'point': FieldValue.increment(1),
+      });
+    });
   }
 
   Future deletePost(BuildContext context, String postId) async {

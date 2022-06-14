@@ -1,9 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:Moneylans/screens/profile/ProfileHelpers.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:Moneylans/screens/leaderboard/leaderboard.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/Authentication.dart';
@@ -32,7 +30,16 @@ class Feed extends StatelessWidget {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 13),
-            child: Icon(Icons.leaderboard,color: Colors.black,),
+            child: GestureDetector(
+                onTap: (){
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: ((context) => leaderboard(userId : Provider.of<Authentication>(context, listen: false)
+                              .getUser()
+                              ?.uid))));
+                },
+                child: Icon(Icons.leaderboard,color: Colors.black,)),
           )
         ],
       ),

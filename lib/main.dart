@@ -9,6 +9,7 @@ import 'package:Moneylans/screens/landing_page/landingHelpers.dart';
 import 'package:Moneylans/screens/landing_page/landingPage.dart';
 import 'package:Moneylans/screens/landing_page/landingServices.dart';
 import 'package:Moneylans/screens/landing_page/landingUtils.dart';
+import 'package:Moneylans/screens/leaderboard/leaderboardHelper.dart';
 import 'package:Moneylans/screens/onboard_screen/OnboardScreenHelpers.dart';
 import 'package:Moneylans/screens/profile/ProfileHelpers.dart';
 import 'package:Moneylans/screens/splash_screen/splashScreen.dart';
@@ -42,6 +43,7 @@ class MyApp extends StatelessWidget {
             fontFamily: 'Poppins',
             primarySwatch: Colors.blue,
             canvasColor: Colors.transparent,
+            androidOverscrollIndicator: AndroidOverscrollIndicator.stretch
           ),
           initialRoute: '/splash',
           routes: {
@@ -65,6 +67,7 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => LandingServices()),
           ChangeNotifierProvider(create: (_) => FirebaseOperations()),
           ChangeNotifierProvider(create: (_) => LandingUtils()),
+          ChangeNotifierProvider(create: (_) => leaderboardHelper()),
         ]);
   }
 }

@@ -16,7 +16,6 @@ class Authentication with ChangeNotifier {
   String? userUid;
   String? get getUserUid => userUid;
 
-  // Stream<User?> get authStateChanges => firebaseAuth.authStateChanges();
 
   Future logIntoAccount(
       String email, String password, BuildContext context) async {
