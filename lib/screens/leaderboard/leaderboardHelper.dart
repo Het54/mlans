@@ -55,16 +55,80 @@ void showCustomDialog(BuildContext context) {
     barrierColor: Colors.black.withOpacity(0.7),
     transitionDuration: Duration(milliseconds: 200),
     pageBuilder: (_, __, ___) {
-      return Center(
-        child: Container(
-          decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(width: 1, color: Colors.blueGrey),
-              borderRadius: BorderRadius.all(Radius.circular(25))),
-          height: MediaQuery.of(context).size.height * 0.35,
-          width: MediaQuery.of(context).size.width - 60,
-          child: SizedBox(width: 10,height: 10),
-          margin: EdgeInsets.symmetric(horizontal: 20),
+      return Scaffold(
+        body: Center(
+          child: Container(
+            decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(width: 1, color: Colors.blueGrey),
+                borderRadius: BorderRadius.all(Radius.circular(25))),
+            height: MediaQuery.of(context).size.height * 0.5,
+            width: MediaQuery.of(context).size.width - 60,
+            child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(12,40, 12, 2),
+                        child:
+                        TextField(
+                          minLines: 1,
+                          maxLines: 7,
+                          decoration: InputDecoration(
+                            labelText: 'Description',
+                              hintText: 'Your story',
+                              border: OutlineInputBorder(),
+                            labelStyle: TextStyle(
+                              color: Colors.black,
+                              fontSize: 20
+                            )
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(12,70,12,0),
+                      child: TextField(
+                        decoration: InputDecoration(
+                          labelText: 'Link',
+                          hintText: 'www.abc.com',
+                          border: OutlineInputBorder(),
+                          labelStyle: TextStyle(color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                          fontSize: 20),
+
+                        ),
+                      ),),
+
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(15, 100, 15, 0),
+                        child: FlatButton(onPressed: (){},
+                            child:
+                               Center(
+                                child: Text(
+                                  "Submit",
+                                  style: TextStyle(color: Colors.white,
+                                  backgroundColor: Colors.blueAccent,
+                                  fontSize: 15),
+
+                                ),
+                              ),
+                            ),
+                      )
+                          // Container(
+                          //   decoration: BoxDecoration(
+                          //     color: Colors.blue,
+                          //       border: Border.all(width: 1, color: Colors.blueGrey),
+                          //       borderRadius: BorderRadius.all(Radius.circular(25))),
+                          //   height: MediaQuery.of(context).size.height * 0.07,
+                          //   width: MediaQuery.of(context).size.width - 80,
+                          //
+                          //   ),
+
+
+
+                    ],
+
+            ),
+            margin: EdgeInsets.symmetric(horizontal: 20),
+          ),
         ),
       );
     },
