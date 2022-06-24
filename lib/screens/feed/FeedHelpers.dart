@@ -299,7 +299,9 @@ class FeedHelpers with ChangeNotifier {
                     child: CircularProgressIndicator(),
                   );
                 } else {
+                  
                   return Container(child: loadPosts(context, snapshot));
+                  
                 }
               },
             ),
@@ -312,6 +314,7 @@ class FeedHelpers with ChangeNotifier {
   }
 
   Widget loadPosts( BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+    int upvote = 0, downvote = 0,comment = 0, points = 0;
     TextEditingController reportController = TextEditingController();
     return ListView(
         children: snapshot.data!.docs.map((DocumentSnapshot documentSnapshot) {
@@ -557,8 +560,10 @@ class FeedHelpers with ChangeNotifier {
                                         child: CircularProgressIndicator(
                                             strokeWidth: 1)));
                               } else {
+                                upvote = snapshot.data!.docs.length.toInt(); 
+                                print("Upvote: $upvote");
                                 return Text(
-                                    snapshot.data!.docs.length.toString(),
+                                    "$upvote",
                                     style: TextStyle(color: Colors.green));
                               }
                             },
@@ -609,8 +614,10 @@ class FeedHelpers with ChangeNotifier {
                                       CircularProgressIndicator(strokeWidth: 1),
                                 ));
                               } else {
+                                downvote = snapshot.data!.docs.length.toInt();
+                                print("downvote: $downvote");
                                 return Text(
-                                    snapshot.data!.docs.length.toString(),
+                                    "$downvote",
                                     style: TextStyle(color: Colors.red));
                               }
                             },
@@ -660,12 +667,27 @@ class FeedHelpers with ChangeNotifier {
                                       CircularProgressIndicator(strokeWidth: 1),
                                 ));
                               } else {
+                                comment = snapshot.data!.docs.length.toInt();
+                                print("comment: $comment");
+                                
+                                points = upvote - downvote + comment;
+                                print("points: $points");
+                                FirebaseFirestore.instance
+                                      .collection('leaderboard')
+                                      .doc(data['userId'])
+                                      .update({
+                                    'point': points,
+                                  });
+                                
+                                upvote = downvote = comment = points = 0;
+                                print("after $points");
                                 return Text(
-                                  " ${snapshot.data!.docs.length.toString()}",
+                                  " ${snapshot.data!.docs.length.toInt()}",
                                   style: TextStyle(color: Colors.blue),
                                 );
                               }
                             },
+                            
                           ),
                         ],
                       ),
