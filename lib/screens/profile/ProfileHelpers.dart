@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:Moneylans/screens/feedback_question/Feedbackonlogout.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -185,6 +186,32 @@ class ProfileHelpers with ChangeNotifier {
                     padding: EdgeInsets.only(left: 20.0),
                     child: Text(
                       "Share Moneylans",
+                      style: TextStyle(color: Colors.white, fontSize: 14),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                child: Divider(
+                  height: MediaQuery.of(context).size.height * 0.005,
+                  color: Colors.white,
+                ),
+              ),
+              
+              ListTile(
+                leading: Icon(
+                  FontAwesomeIcons.solidCommentDots,
+                  color: Colors.white,
+                ),
+                title: GestureDetector(
+                  onTap: (){
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => FeedbackonLogout()));
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 20.0),
+                    child: Text(
+                      "Give Feedback",
                       style: TextStyle(color: Colors.white, fontSize: 14),
                     ),
                   ),
