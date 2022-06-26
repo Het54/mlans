@@ -1,8 +1,8 @@
 
 import 'dart:async';
 
-import 'package:Moneylans/screens/feedback_question/feedbackmodel.dart';
 import 'package:Moneylans/screens/feedback_question/utils.dart';
+import 'package:Moneylans/screens/feedback_question/feedbackmodel.dart';
 import 'package:Moneylans/screens/profile/Profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_feedback/emoji_feedback.dart';
@@ -26,7 +26,6 @@ class _FeedbackonLogoutState extends State<FeedbackonLogout> {
     String feeling = "";
     final TextEditingController shareWithUController= new TextEditingController();
     final _auth = FirebaseAuth.instance;
-    
    
   @override
   Widget build(BuildContext context) {
@@ -65,7 +64,7 @@ class _FeedbackonLogoutState extends State<FeedbackonLogout> {
       elevation: 5,
       borderRadius: BorderRadius.circular(10),
       color: Colors.red[300],
-      child: MaterialButton(onPressed: () { 
+      child: MaterialButton(onPressed: () {
         feedbacktoFirestore();
        },
       child: Text("Submit", textAlign: TextAlign.center, style: TextStyle(fontSize: 20, color: Colors.white),),
@@ -232,26 +231,27 @@ class _FeedbackonLogoutState extends State<FeedbackonLogout> {
         ),
       );
 
-  feedbacktoFirestore() async {
-    if(_formkey.currentState!.validate()){
-      FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-      User? user = _auth.currentUser;
+    feedbacktoFirestore() async {
+      if(_formkey.currentState!.validate()){
+        FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+        User? user = _auth.currentUser;
 
-      feedbackmodel Feedbackmodel = feedbackmodel();
+        feedbackmodel Feedbackmodel = feedbackmodel();
 
-      Feedbackmodel.uid = user!.uid;
-      Feedbackmodel.likeness = indexTop;
-      Feedbackmodel.feeling = feeling;
-      Feedbackmodel.feedback = shareWithUController.text;
-      
+        Feedbackmodel.uid = user!.uid;
+        Feedbackmodel.likeness = indexTop;
+        Feedbackmodel.feeling = feeling;
+        Feedbackmodel.feedback = shareWithUController.text;
 
-      await firebaseFirestore
-        .collection("Feedbackonlogout")
-        .doc(user.uid)
-        .set(Feedbackmodel.toMap());
-      Fluttertoast.showToast(msg: "Feedback Submitted Successfully ");
+        await firebaseFirestore
+            .collection("Feedbackonlogout")
+            .doc(user.uid)
+            .set(Feedbackmodel.toMap());
+        Fluttertoast.showToast(msg: "Feedback Submitted Successfully ");
+        Navigator.pop(context);
+        Navigator.pop(context);
 
+      }
     }
-  }
   
 }
