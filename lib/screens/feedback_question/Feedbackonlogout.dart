@@ -1,9 +1,14 @@
 
 import 'dart:async';
 
+import 'package:Moneylans/screens/feedback_question/feedbackmodel.dart';
 import 'package:Moneylans/screens/feedback_question/utils.dart';
+import 'package:Moneylans/screens/profile/Profile.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_feedback/emoji_feedback.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class FeedbackonLogout extends StatefulWidget {
   const FeedbackonLogout({Key? key}) : super(key: key);
@@ -20,6 +25,7 @@ class _FeedbackonLogoutState extends State<FeedbackonLogout> {
     int indexTop = 1;
     String feeling = "";
     final TextEditingController shareWithUController= new TextEditingController();
+    final _auth = FirebaseAuth.instance;
     
    
   @override
@@ -39,7 +45,7 @@ class _FeedbackonLogoutState extends State<FeedbackonLogout> {
         shareWithUController.text = value!;
       },
       validator: (value) {
-        if(shareWithUController.text == null)
+        if(shareWithUController.text == null || shareWithUController.text == "")
         {
           return ("Please enter a feedback!");
         }
@@ -60,7 +66,7 @@ class _FeedbackonLogoutState extends State<FeedbackonLogout> {
       borderRadius: BorderRadius.circular(10),
       color: Colors.red[300],
       child: MaterialButton(onPressed: () { 
-        
+        feedbacktoFirestore();
        },
       child: Text("Submit", textAlign: TextAlign.center, style: TextStyle(fontSize: 20, color: Colors.white),),
       
@@ -226,6 +232,26 @@ class _FeedbackonLogoutState extends State<FeedbackonLogout> {
         ),
       );
 
-     
+  feedbacktoFirestore() async {
+    if(_formkey.currentState!.validate()){
+      FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+      User? user = _auth.currentUser;
+
+      feedbackmodel Feedbackmodel = feedbackmodel();
+
+      Feedbackmodel.uid = user!.uid;
+      Feedbackmodel.likeness = indexTop;
+      Feedbackmodel.feeling = feeling;
+      Feedbackmodel.feedback = shareWithUController.text;
+      
+
+      await firebaseFirestore
+        .collection("Feedbackonlogout")
+        .doc(user.uid)
+        .set(Feedbackmodel.toMap());
+      Fluttertoast.showToast(msg: "Feedback Submitted Successfully ");
+
+    }
+  }
   
 }
