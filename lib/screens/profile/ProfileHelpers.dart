@@ -10,7 +10,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/link.dart';
 import 'package:share_plus/share_plus.dart';
-
 import '../../services/Authentication.dart';
 
 class ProfileHelpers with ChangeNotifier {

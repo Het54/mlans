@@ -1,5 +1,6 @@
 // ignore_for_file: dead_code, unused_local_variable
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
@@ -14,11 +15,12 @@ class Authentication with ChangeNotifier {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
   String? userUid;
+
   String? get getUserUid => userUid;
 
 
-  Future logIntoAccount(
-      String email, String password, BuildContext context) async {
+  Future logIntoAccount(String email, String password,
+      BuildContext context) async {
     showDialog(
         context: context,
         barrierDismissible: false,
@@ -48,8 +50,8 @@ class Authentication with ChangeNotifier {
         });
 
     final User? firebaseUser = (await firebaseAuth
-            .createUserWithEmailAndPassword(email: email, password: password)
-            .catchError((errMsg) {
+        .createUserWithEmailAndPassword(email: email, password: password)
+        .catchError((errMsg) {
       Navigator.pop(context);
       Provider.of<LandingHelpers>(context, listen: false)
           .displayToast("Error: " + errMsg.toString(), context);
@@ -76,6 +78,22 @@ class Authentication with ChangeNotifier {
       Provider.of<LandingHelpers>(context, listen: false).displayToast(
           "Congratulations! your account has been created.", context);
 
+      FirebaseFirestore.instance
+          .collection('leaderboard')
+          .doc(Provider
+          .of<Authentication>(context, listen: false)
+          .getUser()
+          ?.uid)
+          .set({
+        'point': 0,
+        'userId': Provider
+            .of<Authentication>(context, listen: false)
+            .getUser()
+            ?.uid,
+        'description': "",
+        'link': ""
+      });
+
       Navigator.pushAndRemoveUntil(
           context,
           PageTransition(
@@ -83,7 +101,7 @@ class Authentication with ChangeNotifier {
                 name: name,
               ),
               type: PageTransitionType.bottomToTop),
-          (Route<dynamic> route) => false);
+              (Route<dynamic> route) => false);
     } else {
       Navigator.pop(context);
       Provider.of<LandingHelpers>(context, listen: false)

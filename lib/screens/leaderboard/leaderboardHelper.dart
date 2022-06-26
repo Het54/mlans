@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 int userIndex = 0, userPoint = 0;
 
@@ -37,7 +39,7 @@ class leaderboardHelper with ChangeNotifier {
                   color: Colors.yellow,
                   height: 1,
                 ),
-                winnerNameTemplate()
+                winnerNameTemplate(userId: userId)
               ],
             );
           }
@@ -47,7 +49,9 @@ class leaderboardHelper with ChangeNotifier {
   }
 }
 
-void showCustomDialog(BuildContext context) {
+void showCustomDialog(BuildContext context, String userId) {
+  TextEditingController desc = TextEditingController();
+  TextEditingController link = TextEditingController();
   showGeneralDialog(
     context: context,
     barrierLabel: "Barrier",
@@ -60,74 +64,111 @@ void showCustomDialog(BuildContext context) {
           child: Container(
             decoration: BoxDecoration(
                 color: Colors.white,
-                border: Border.all(width: 1, color: Colors.blueGrey),
+                border: Border.all(
+                  width: 1,
+                  color: Colors.grey,
+                ),
                 borderRadius: BorderRadius.all(Radius.circular(25))),
-            height: MediaQuery.of(context).size.height * 0.5,
-            width: MediaQuery.of(context).size.width - 60,
-            child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(12,40, 12, 2),
-                        child:
-                        TextField(
-                          minLines: 1,
-                          maxLines: 7,
-                          decoration: InputDecoration(
-                            labelText: 'Description',
-                              hintText: 'Your story',
-                              border: OutlineInputBorder(),
-                            labelStyle: TextStyle(
-                              color: Colors.black,
-                              fontSize: 20
-                            )
+            height: MediaQuery.of(context).size.height * 0.4,
+            width: MediaQuery.of(context).size.width * 0.9,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextFormField(
+                      controller: desc,
+                      decoration: new InputDecoration(
+                        labelText: "Enter Description",
+                        labelStyle: TextStyle(color: Colors.black),
+                        hintText: "Your Story",
+                        focusColor: Colors.black,
+                        fillColor: Colors.white,
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          borderSide: BorderSide(
+                            color: Colors.black,
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(12,70,12,0),
-                      child: TextField(
-                        decoration: InputDecoration(
-                          labelText: 'Link',
-                          hintText: 'www.abc.com',
-                          border: OutlineInputBorder(),
-                          labelStyle: TextStyle(color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                          fontSize: 20),
-
+                        border: new OutlineInputBorder(
+                          borderRadius: new BorderRadius.circular(20.0),
+                          borderSide: BorderSide(width: 1, color: Colors.black),
                         ),
-                      ),),
-
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(15, 100, 15, 0),
-                        child: FlatButton(onPressed: (){},
-                            child:
-                               Center(
-                                child: Text(
-                                  "Submit",
-                                  style: TextStyle(color: Colors.white,
-                                  backgroundColor: Colors.blueAccent,
-                                  fontSize: 15),
-
-                                ),
-                              ),
-                            ),
-                      )
-                          // Container(
-                          //   decoration: BoxDecoration(
-                          //     color: Colors.blue,
-                          //       border: Border.all(width: 1, color: Colors.blueGrey),
-                          //       borderRadius: BorderRadius.all(Radius.circular(25))),
-                          //   height: MediaQuery.of(context).size.height * 0.07,
-                          //   width: MediaQuery.of(context).size.width - 80,
-                          //
-                          //   ),
-
-
-
-                    ],
-
+                        //fillColor: Colors.green
+                      ),
+                      maxLength: 300,
+                      maxLines: 4,
+                      cursorColor: Colors.black,
+                      keyboardType: TextInputType.text,
+                      style: new TextStyle(
+                        fontFamily: "Poppins",
+                      )),
+                  TextFormField(
+                      controller: link,
+                      decoration: new InputDecoration(
+                        labelText: "Enter Link",
+                        labelStyle: TextStyle(color: Colors.black),
+                        hintText: "www.affiliate.com",
+                        focusColor: Colors.black,
+                        fillColor: Colors.white,
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          borderSide: BorderSide(
+                            color: Colors.black,
+                          ),
+                        ),
+                        border: new OutlineInputBorder(
+                          borderRadius: new BorderRadius.circular(25.0),
+                          borderSide: BorderSide(width: 1, color: Colors.black),
+                        ),
+                        //fillColor: Colors.green
+                      ),
+                      maxLines: 1,
+                      cursorColor: Colors.black,
+                      keyboardType: TextInputType.url,
+                      style: new TextStyle(
+                        fontFamily: "Poppins",
+                      )),
+                  SizedBox(height: 15),
+                  Flexible(
+                    child: ElevatedButton(
+                        onPressed: () {
+                          if (DateTime.now().weekday == 7 &&
+                              DateTime.now().hour >= 12) {
+                            if (desc.text.isNotEmpty && link.text.isNotEmpty) {
+                              FirebaseFirestore.instance
+                                  .collection("leaderboard")
+                                  .doc(userId)
+                                  .update({
+                                "description": desc.text,
+                                "link": link.text,
+                              }).then((value) => {
+                                        if (userIndex == 1)
+                                          FirebaseFirestore.instance
+                                              .collection("leaderboardDetails")
+                                              .doc("Detail")
+                                              .update({
+                                            "Description": desc.text,
+                                            "Link": link.text,
+                                            "userId": userId
+                                          })
+                                      });
+                              Fluttertoast.showToast(msg: "Data Updated!");
+                              Navigator.pop(context, true);
+                            } else
+                              Fluttertoast.showToast(
+                                  msg: "Enter Valid Details!");
+                          } else
+                            Fluttertoast.showToast(
+                                msg:
+                                    "Can only be updated on Sunday\n12Pm - 12Am");
+                        },
+                        child: SizedBox(
+                            height: 25, child: Center(child: Text("Submit")))),
+                  )
+                ],
+              ),
             ),
-            margin: EdgeInsets.symmetric(horizontal: 20),
           ),
         ),
       );
@@ -151,11 +192,10 @@ void showCustomDialog(BuildContext context) {
   );
 }
 
-
 class winnerNameTemplate extends StatelessWidget {
-  const winnerNameTemplate({
-    Key? key,
-  }) : super(key: key);
+  String? userId;
+
+  winnerNameTemplate({Key? key, this.userId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -200,31 +240,92 @@ class winnerNameTemplate extends StatelessWidget {
                     fontWeight: FontWeight.w400)),
           ),
           Expanded(child: SizedBox()),
-          userIndex > 10 ? Padding(
-            padding: const EdgeInsets.only(right: 20),
-            child: Text("${userPoint}",
-                style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w400)),
-          ) :
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: CircleAvatar(
-              backgroundColor: Colors.transparent,
-              child: IconButton(
-                icon: Icon(
-                  Icons.more_vert_outlined,
-                  color: Colors.black,
-                ),
-                onPressed: () => showCustomDialog(context),
-              ),
-            ),
-          )
+          userIndex < 10 &&
+                  DateTime.now().weekday == 7 &&
+                  DateTime.now().hour >= 12
+              ? Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: CircleAvatar(
+                    backgroundColor: Colors.transparent,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.more_vert_outlined,
+                        color: Colors.black,
+                      ),
+                      onPressed: () => showCustomDialog(context, userId!),
+                    ),
+                  ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.only(right: 20),
+                  child: Text("${userPoint}",
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w400)),
+                )
         ],
       ),
     );
   }
+}
+
+launchUrl(url) async {
+  if (await canLaunch(url))
+    await launch(url);
+  else
+    throw "Could not launch $url";
+}
+
+customDrawer(BuildContext context, description, link) {
+  return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Center(
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.22,
+            width: MediaQuery.of(context).size.width * 0.8,
+            decoration: BoxDecoration(
+                color: Colors.black,
+                border: Border.all(width: 2, color: Colors.grey),
+                borderRadius: BorderRadius.circular(25)),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        right: 12, left: 12, top: 20, bottom: 10),
+                    child: description != null && description != ""
+                        ? Text(description,
+                            style: TextStyle(color: Colors.white))
+                        : Text("No data updated!",
+                            style: TextStyle(color: Colors.white)),
+                  ),
+                  link != "" && link != null
+                      ? ElevatedButton(
+                          onPressed: () => launchUrl("https://${link}"),
+                          child: SizedBox(
+                              width: 100,
+                              height: 25,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text("Goto"),
+                                  SizedBox(width: 10),
+                                  Icon(FontAwesomeIcons.share, size: 12),
+                                ],
+                              )),
+                        )
+                      : SizedBox(height: 0, width: 0),
+                ],
+              ),
+            ),
+          ),
+        );
+      });
 }
 
 Widget leaderList(
@@ -242,89 +343,92 @@ Widget leaderList(
     ;
     return Padding(
       padding: const EdgeInsets.only(right: 8, left: 8, top: 5, bottom: 5),
-      child: Container(
-        decoration: BoxDecoration(
-            color: //Color(0xEEF68FFD),
-                index == 1
-                    ? Color(0xB3FFCC00)
-                    : index == 2
-                        ? Color(0xB38FFFFF)
-                        : index == 3
-                            ? Color(0xB3F68FFD)
-                            : Colors.black12,
-            border: Border.all(
-              width: 1,
-              color: Colors.black,
-            ),
-            borderRadius: BorderRadius.all(Radius.circular(25))),
-        height: 50,
-        width: MediaQuery.of(context).size.width,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 7, right: 15),
-              child: Container(
-                height: 40,
-                width: 40,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                  border: Border.all(
-                    color: Colors.black,
-                    width: 1,
+      child: GestureDetector(
+        onTap: () => customDrawer(context, data["description"], data["link"]),
+        child: Container(
+          decoration: BoxDecoration(
+              color: //Color(0xEEF68FFD),
+                  index == 1
+                      ? Color(0xB3FFCC00)
+                      : index == 2
+                          ? Color(0xB38FFFFF)
+                          : index == 3
+                              ? Color(0xB3F68FFD)
+                              : Colors.black12,
+              border: Border.all(
+                width: 1,
+                color: Colors.black,
+              ),
+              borderRadius: BorderRadius.all(Radius.circular(25))),
+          height: 50,
+          width: MediaQuery.of(context).size.width,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 7, right: 15),
+                child: Container(
+                  height: 40,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(50.0)),
+                    border: Border.all(
+                      color: Colors.black,
+                      width: 1,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text("${index}",
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: index == 1
+                                ? FontWeight.w600
+                                : index == 2
+                                    ? FontWeight.w400
+                                    : index == 3
+                                        ? FontWeight.w300
+                                        : FontWeight.w200)),
                   ),
                 ),
-                child: Center(
-                  child: Text("${index}",
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: index == 1
-                              ? FontWeight.w600
-                              : index == 2
-                                  ? FontWeight.w400
-                                  : index == 3
-                                      ? FontWeight.w300
-                                      : FontWeight.w200)),
-                ),
               ),
-            ),
-            Container(
-              width: 250,
-              child: Text(data["userId"] == userId ? "You" : data["userId"],
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.black,
-                      fontWeight: index == 1
-                          ? FontWeight.w600
-                          : index == 2
-                              ? FontWeight.w400
-                              : index == 3
-                                  ? FontWeight.w300
-                                  : FontWeight.w200)),
-            ),
-            Expanded(child: SizedBox()),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 20),
-                  child: Text("${data["point"] * 10}",
-                      style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.black,
-                          fontWeight: index == 1
-                              ? FontWeight.w600
-                              : index == 2
-                                  ? FontWeight.w400
-                                  : index == 3
-                                      ? FontWeight.w300
-                                      : FontWeight.w200)),
-                )
-              ],
-            )
-          ],
+              Container(
+                width: 250,
+                child: Text(data["userId"] == userId ? "You" : data["userId"],
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.black,
+                        fontWeight: index == 1
+                            ? FontWeight.w600
+                            : index == 2
+                                ? FontWeight.w400
+                                : index == 3
+                                    ? FontWeight.w300
+                                    : FontWeight.w200)),
+              ),
+              Expanded(child: SizedBox()),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 20),
+                    child: Text("${data["point"] * 10}",
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.black,
+                            fontWeight: index == 1
+                                ? FontWeight.w600
+                                : index == 2
+                                    ? FontWeight.w400
+                                    : index == 3
+                                        ? FontWeight.w300
+                                        : FontWeight.w200)),
+                  )
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );

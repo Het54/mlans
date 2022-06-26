@@ -1,20 +1,19 @@
 // ignore_for_file: prefer_const_constructors, void_checks
-
 import 'dart:async';
 import 'dart:ui';
+import 'package:Moneylans/screens/leaderboard/leaderboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../services/Authentication.dart';
 import '../../services/FirebaseOperations.dart';
 import '../../utils/PostOptions.dart';
 import '../feedback_question/Feedback.dart';
 import '../landing_page/landingHelpers.dart';
-
 
 class FeedHelpers with ChangeNotifier {
   TextEditingController debtController = TextEditingController();
@@ -248,12 +247,8 @@ class FeedHelpers with ChangeNotifier {
                                           listen: false)
                                       .getUser()
                                       ?.uid)
-                                  .set({
+                                  .update({
                                 'point': FieldValue.increment(10),
-                                'userId' : Provider.of<Authentication>(context,
-                                    listen: false)
-                                    .getUser()
-                                    ?.uid
                               });
                             });
                           },
@@ -299,9 +294,15 @@ class FeedHelpers with ChangeNotifier {
                     child: CircularProgressIndicator(),
                   );
                 } else {
-                  
-                  return Container(child: loadPosts(context, snapshot));
-                  
+                  return Column(
+                    children: [
+                      Container(
+                        height: 150,
+                        child: leaderboard_winner_data(),
+                      ),
+                      Expanded(child: loadPosts(context, snapshot)),
+                    ],
+                  );
                 }
               },
             ),
@@ -313,8 +314,90 @@ class FeedHelpers with ChangeNotifier {
     );
   }
 
-  Widget loadPosts( BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-    int upvote = 0, downvote = 0,comment = 0, points = 0;
+  leaderboard_winner_data() {
+    CollectionReference data =
+        FirebaseFirestore.instance.collection('leaderboardDetails');
+    return FutureBuilder<DocumentSnapshot>(
+      future: data.doc("Detail").get(),
+      builder:
+          (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+        if (snapshot.hasError) {
+          return Text("Something went wrong", style: TextStyle(fontSize: 10));
+        }
+
+        if (snapshot.hasData && !snapshot.data!.exists) {
+          return Text("Document does not exist",
+              style: TextStyle(fontSize: 10));
+        }
+
+        if (snapshot.connectionState == ConnectionState.done) {
+          Map<String, dynamic> data =
+              snapshot.data!.data() as Map<String, dynamic>;
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(25),
+                        topRight: Radius.circular(25),
+                      ),
+                      color: Color(0xffd9d9d9),
+                    ),
+                    child: Center(
+                        child: Text(
+                      data['userId'],
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    )),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    decoration: BoxDecoration(
+                      border: Border.all(width: 2, color: Color(0xffd9d9d9)),
+                    ),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 15,left: 15,top: 5),
+                          child: Text(data['Description']),
+                        ),
+                        ElevatedButton(
+                          onPressed: () =>
+                              launchUrl(Uri.parse("https://${data["Link"]}")),
+                          child: SizedBox(
+                              width: 100,
+                              height: 25,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text("Goto"),
+                                  SizedBox(width: 10),
+                                  Icon(FontAwesomeIcons.share, size: 12),
+                                ],
+                              )),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+        return SizedBox();
+      },
+    );
+  }
+
+  Widget loadPosts(
+      BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
     TextEditingController reportController = TextEditingController();
     return ListView(
         children: snapshot.data!.docs.map((DocumentSnapshot documentSnapshot) {
@@ -369,15 +452,15 @@ class FeedHelpers with ChangeNotifier {
                                 context: context,
                                 builder: (BuildContext context) =>
                                     editDeletePostDialog(
-                                  context,
-                                  data['debt'],
-                                  data['content'],
-                                  data['debtType'],
-                                  data['goalDate'],
-                                  data['intrestPercentage'],
-                                  data['timePeriod'],
-                                  data['postId'],
-                                ),
+                                        context,
+                                        data['debt'],
+                                        data['content'],
+                                        data['debtType'],
+                                        data['goalDate'],
+                                        data['intrestPercentage'],
+                                        data['timePeriod'],
+                                        data['postId'],
+                                        data['userId']),
                               );
                             },
                           )
@@ -560,10 +643,8 @@ class FeedHelpers with ChangeNotifier {
                                         child: CircularProgressIndicator(
                                             strokeWidth: 1)));
                               } else {
-                                upvote = snapshot.data!.docs.length.toInt(); 
-                                print("Upvote: $upvote");
                                 return Text(
-                                    "$upvote",
+                                    snapshot.data!.docs.length.toString(),
                                     style: TextStyle(color: Colors.green));
                               }
                             },
@@ -614,10 +695,8 @@ class FeedHelpers with ChangeNotifier {
                                       CircularProgressIndicator(strokeWidth: 1),
                                 ));
                               } else {
-                                downvote = snapshot.data!.docs.length.toInt();
-                                print("downvote: $downvote");
                                 return Text(
-                                    "$downvote",
+                                    snapshot.data!.docs.length.toString(),
                                     style: TextStyle(color: Colors.red));
                               }
                             },
@@ -667,27 +746,12 @@ class FeedHelpers with ChangeNotifier {
                                       CircularProgressIndicator(strokeWidth: 1),
                                 ));
                               } else {
-                                comment = snapshot.data!.docs.length.toInt();
-                                print("comment: $comment");
-                                
-                                points = upvote - downvote + comment;
-                                print("points: $points");
-                                FirebaseFirestore.instance
-                                      .collection('leaderboard')
-                                      .doc(data['userId'])
-                                      .update({
-                                    'point': points,
-                                  });
-                                
-                                upvote = downvote = comment = points = 0;
-                                print("after $points");
                                 return Text(
-                                  " ${snapshot.data!.docs.length.toInt()}",
+                                  " ${snapshot.data!.docs.length.toString()}",
                                   style: TextStyle(color: Colors.blue),
                                 );
                               }
                             },
-                            
                           ),
                         ],
                       ),
@@ -702,7 +766,8 @@ class FeedHelpers with ChangeNotifier {
     }).toList());
   }
 
-  addCommentSheet(BuildContext context, DocumentSnapshot snapshot, String docId, String postId, String userId) {
+  addCommentSheet(BuildContext context, DocumentSnapshot snapshot, String docId,
+      String postId, String userId) {
     TextEditingController commentController = TextEditingController();
 
     return showModalBottomSheet(
@@ -856,7 +921,16 @@ class FeedHelpers with ChangeNotifier {
         });
   }
 
-  editDeletePostDialog(BuildContext context, String debt, String content, String debtType, String goalDate, String interestPercentage, String timePeriod, String postId) {
+  editDeletePostDialog(
+      BuildContext context,
+      String debt,
+      String content,
+      String debtType,
+      String goalDate,
+      String interestPercentage,
+      String timePeriod,
+      String postId,
+      String userId) {
     return Dialog(
       child: Container(
         height: MediaQuery.of(context).size.height * 0.215,
@@ -901,7 +975,7 @@ class FeedHelpers with ChangeNotifier {
                           ),
                           onPressed: () {
                             Provider.of<PostOptions>(context, listen: false)
-                                .deletePost(context, postId)
+                                .deletePost(context, postId, userId)
                                 .whenComplete(() {
                               Provider.of<LandingHelpers>(context,
                                       listen: false)
@@ -926,7 +1000,15 @@ class FeedHelpers with ChangeNotifier {
     );
   }
 
-  editPostSheet(BuildContext context, String debt, String content, String debtType, String goalDate, String interestPercentage, String timePeriod, String postId) {
+  editPostSheet(
+      BuildContext context,
+      String debt,
+      String content,
+      String debtType,
+      String goalDate,
+      String interestPercentage,
+      String timePeriod,
+      String postId) {
     TextEditingController debtControl = TextEditingController();
     TextEditingController contentControl = TextEditingController();
     TextEditingController debtTypeControl = TextEditingController();
@@ -1163,5 +1245,4 @@ class FeedHelpers with ChangeNotifier {
       ),
     );
   }
-
 }
