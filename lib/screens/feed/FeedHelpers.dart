@@ -79,36 +79,14 @@ class FeedHelpers with ChangeNotifier {
                                 borderRadius: BorderRadius.circular(30)),
                             width: 400,
                             child: TextFormField(
-                              onChanged: (String newText) {
-                                if (newText[0] != 'S') {
-                                  newText = 'Step $i • ' + newText;
-                                  StrategyStepController.text = newText;
-                                  StrategyStepController.selection =
-                                      TextSelection.fromPosition(TextPosition(
-                                          offset: StrategyStepController
-                                              .text.length));
-                                }
-                                if (newText[newText.length - 1] == '\n' &&
-                                    newText.length > StategycurrentTextLength) {
-                                  i += 1;
-                                  StrategyStepController.text =
-                                      newText + 'Step $i • ';
-                                  StrategyStepController.selection =
-                                      TextSelection.fromPosition(TextPosition(
-                                          offset: StrategyStepController
-                                              .text.length));
-                                }
-                                StategycurrentTextLength =
-                                    StrategyStepController.text.length;
-                              },
                               controller: StrategyStepController,
                               minLines: 8,
                               maxLines: 200,
                               decoration: InputDecoration(
                                 fillColor: Colors.white,
-                                labelText: "Your Strategy Steps",
+                                labelText: "Your Strategy",
                                 filled: true,
-                                hintText: "Enter the steps...",
+                                hintText: "Enter the strategies...",
                               ),
                             )),
                       ),
