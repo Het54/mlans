@@ -5,14 +5,16 @@ import 'package:Moneylans/screens/landing_page/landingHelpers.dart';
 import 'package:Moneylans/services/Authentication.dart';
 import 'package:Moneylans/services/FirebaseOperations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+
 class OnboardScreenHelpers with ChangeNotifier {
   TextEditingController PINcontroller = TextEditingController();
   TextEditingController UIDcontroller = TextEditingController();
-
+  
   notPremium(BuildContext context) {
     return Stack(
       children: [
