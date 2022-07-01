@@ -112,6 +112,11 @@ class FeedbackHelpers with ChangeNotifier {
                         'Question4': q4Controller.text,
                         'Question5': q5Controller.text,
                       }).whenComplete(() {
+                        int timestamp = DateTime.now().millisecondsSinceEpoch;
+                        print(timestamp);
+                        int ts = timestamp;
+                        DateTime tsdate = DateTime.fromMillisecondsSinceEpoch(timestamp);
+                        String datetime = tsdate.year.toString() + "/" + tsdate.month.toString() + "/" + tsdate.day.toString();
                     Provider.of<FirebaseOperations>(context, listen: false)
                         .activatePremium(
                             Provider.of<Authentication>(context, listen: false)
@@ -119,6 +124,7 @@ class FeedbackHelpers with ChangeNotifier {
                                 .uid,
                             {
                           'premium': true,
+                          'premiumtimestamp': timestamp,
                         }).whenComplete(() {
                       Provider.of<LandingHelpers>(context, listen: false)
                           .displayToast(
