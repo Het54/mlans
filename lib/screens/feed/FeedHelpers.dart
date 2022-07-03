@@ -1,9 +1,9 @@
 // ignore_for_file: prefer_const_constructors, void_checks
 import 'dart:async';
 import 'dart:ui';
-import 'package:Moneylans/screens/leaderboard/leaderboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -443,88 +443,6 @@ class FeedHelpers with ChangeNotifier {
     );
   }
 
-  leaderboard_winner_data() {
-    CollectionReference data =
-        FirebaseFirestore.instance.collection('leaderboardDetails');
-    return FutureBuilder<DocumentSnapshot>(
-      future: data.doc("Detail").get(),
-      builder:
-          (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-        if (snapshot.hasError) {
-          return Text("Something went wrong", style: TextStyle(fontSize: 10));
-        }
-        if (snapshot.hasData && !snapshot.data!.exists) {
-          return Text("Document does not exist",
-              style: TextStyle(fontSize: 10));
-        }
-        if (snapshot.connectionState == ConnectionState.done) {
-          Map<String, dynamic> data =
-              snapshot.data!.data() as Map<String, dynamic>;
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(25),
-                        topRight: Radius.circular(25),
-                      ),
-                      color: Color(0xffd9d9d9),
-                    ),
-                    child: Center(
-                        child: Text(
-                      data['userId'],
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                    )),
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    decoration: BoxDecoration(
-                      border: Border.all(width: 2, color: Color(0xffd9d9d9)),
-                    ),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              right: 15, left: 15, top: 5),
-                          child: Text(data['Description']),
-                        ),
-                        ElevatedButton(
-                          onPressed: () =>
-                              launchUrl(Uri.parse("https://${data["Link"]}")),
-                          child: SizedBox(
-                              width: 100,
-                              height: 25,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text("Goto"),
-                                  SizedBox(width: 10),
-                                  Icon(FontAwesomeIcons.share, size: 12),
-                                ],
-                              )),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-        return SizedBox();
-      },
-    );
-  }
-
   Widget feedBody(BuildContext context) {
     return SingleChildScrollView(
       child: Padding(
@@ -549,10 +467,7 @@ class FeedHelpers with ChangeNotifier {
                 } else {
                   return Column(
                     children: [
-                      Container(
-                        height: 150,
-                        child: leaderboard_winner_data(),
-                      ),
+                      leader(),
                       Expanded(child: loadPosts(context, snapshot)),
                     ],
                   );
@@ -567,8 +482,7 @@ class FeedHelpers with ChangeNotifier {
     );
   }
 
-  Widget loadPosts(
-      BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+  Widget loadPosts(BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
     TextEditingController reportController = TextEditingController();
     return ListView(
         children: snapshot.data!.docs.map((DocumentSnapshot documentSnapshot) {
@@ -663,7 +577,7 @@ class FeedHelpers with ChangeNotifier {
                                         Navigator.of(ctx).pop();
                                         reportController.clear();
                                       },
-                                      child: Text("okay"),
+                                      child: Text("Send"),
                                     ),
                                   ],
                                 ),
@@ -984,8 +898,7 @@ class FeedHelpers with ChangeNotifier {
     }).toList());
   }
 
-  addCommentSheet(BuildContext context, DocumentSnapshot snapshot, String docId,
-      String postId, String userId) {
+  addCommentSheet(BuildContext context, DocumentSnapshot snapshot, String docId, String postId, String userId) {
     TextEditingController commentController = TextEditingController();
 
     return showModalBottomSheet(
@@ -1216,7 +1129,7 @@ class FeedHelpers with ChangeNotifier {
                 editPostSheet(context, debt, content, debtType, goalDate,
                     interestPercentage, timePeriod, postId);
               },
-              child: Text("Edit Steps"),
+              child: Text("Edit",style: TextStyle(color: Colors.black,fontSize: 16)),
             ),
           ),
           Divider(),
@@ -1259,7 +1172,7 @@ class FeedHelpers with ChangeNotifier {
                   },
                 );
               },
-              child: Text("Delete post"),
+              child: Text("Delete post",style: TextStyle(color: Colors.black,fontSize: 16)),
             ),
           ),
           SizedBox(height: 0),
@@ -1511,6 +1424,126 @@ class FeedHelpers with ChangeNotifier {
           ],
         ),
       ),
+    );
+  }
+
+}
+
+bool leaderWinnerHeight = false;
+class leader extends StatefulWidget {
+  const leader({Key? key}) : super(key: key);
+  @override
+  State<leader> createState() => _leaderState();
+}
+
+class _leaderState extends State<leader> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          height: leaderWinnerHeight ? 0 : MediaQuery.of(context).size.height * 0.3,
+          child: leaderboard_winner_data(),
+        ),
+        GestureDetector(
+          onTap: ()=> setState(() {
+            leaderWinnerHeight = !leaderWinnerHeight;
+          }),
+          child: CircleAvatar(
+              maxRadius: 15,
+              backgroundColor: Colors.lightBlue,
+              child: Icon(
+                leaderWinnerHeight
+                    ? Icons.keyboard_double_arrow_down_outlined
+                    : Icons.keyboard_double_arrow_up_outlined,
+                color: Colors.white,)),
+        ),
+      ],
+    );
+  }
+
+  leaderboard_winner_data() {
+    CollectionReference data = FirebaseFirestore.instance.collection('leaderboardDetails');
+    return FutureBuilder<DocumentSnapshot>(
+      future: data.doc("Detail").get(),
+      builder:
+          (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+        if (snapshot.hasError) {
+          return Text("Something went wrong", style: TextStyle(fontSize: 10));
+        }
+        if (snapshot.hasData && !snapshot.data!.exists) {
+          return Text("Document does not exist",
+              style: TextStyle(fontSize: 10));
+        }
+        if (snapshot.connectionState == ConnectionState.done) {
+          Map<String, dynamic> data =
+          snapshot.data!.data() as Map<String, dynamic>;
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(25),
+                        topRight: Radius.circular(25),
+                      ),
+                      color: Color(0xffd9d9d9),
+                    ),
+                    child: Center(
+                        child: Text(
+                          data['userId'],
+                          style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                        )),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    decoration: BoxDecoration(
+                      border: Border.all(width: 2, color: Color(0xffd9d9d9)),
+                    ),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              right: 15, left: 15, top: 5),
+                          child: Expanded(
+                              child: Text(
+                                  data['Description']
+                              )
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () =>
+                              launchUrl(Uri.parse("https://${data["Link"]}")),
+                          child: SizedBox(
+                              width: 100,
+                              height: 25,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text("Visit"),
+                                  SizedBox(width: 10),
+                                  Icon(FontAwesomeIcons.share, size: 12),
+                                ],
+                              )),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+        return SizedBox();
+      },
     );
   }
 }
