@@ -1,14 +1,16 @@
 // ignore_for_file: prefer_const_constructors, void_checks
 import 'dart:async';
+import 'dart:convert';
 import 'dart:ui';
 import 'package:Moneylans/screens/leaderboard/leaderboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import 'package:http/http.dart' as http;
 import '../../services/Authentication.dart';
 import '../../services/FirebaseOperations.dart';
 import '../../utils/PostOptions.dart';
@@ -28,6 +30,8 @@ class FeedHelpers with ChangeNotifier {
   int currentTextLength = 0;
   int StategycurrentTextLength = 0;
   int i = 1;
+  List l = [];
+  bool? check = false;
 
   uploadStrategySheet(BuildContext context) {
     return showModalBottomSheet(
@@ -567,6 +571,62 @@ class FeedHelpers with ChangeNotifier {
     );
   }
 
+  sendNotification(String title, String token)async{
+
+    final data = {
+      'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+      'id': '1',
+      'status': 'done',
+      'message': title,
+    };
+
+    try{
+     http.Response response = await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),headers: <String,String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'key=AAAADLBdq2Y:APA91bHH0thNUfQqZnQBnb0mqU3VnJG9sz4uGBLeBZEaB1NZUE6BASB2FJMekDnZPPMmijQY6yB4gFlFaL2-SzmBF364khQiMzA9x3keE5YrHY_cYR_Eu3_WO6bCVqkLpePNmCGJ70kG'
+      },
+      body: jsonEncode(<String,dynamic>{
+        'notification': <String,dynamic> {'title': title,'body': 'You have received $title'},
+        'priority': 'high',
+        'data': data,
+        'to': '$token'
+      })
+      );
+
+
+     if(response.statusCode == 200){
+       print("Notificatin sent");
+     }else{
+       print("Error");
+     }
+
+    }catch(e){
+
+    }
+
+  }
+
+  checkpointer (String postid, String uid,String type) async{
+    await FirebaseFirestore.instance
+    .collection("posts")
+    .doc(postid)
+    .collection("$type")
+    .get() .then((docSnapshot) =>
+      {
+        for(int i = 0 ; i<docSnapshot.docs.length; i++){
+          l.add(docSnapshot.docs[i].data()['userId'])
+        }
+      });
+
+      for (int i =0; i< l.length; i++){
+        if(l[i] == uid) {
+          check = true;
+        }
+      }
+      l.clear(); 
+      return(check);  
+  }
+
   Widget loadPosts(
       BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
     TextEditingController reportController = TextEditingController();
@@ -822,7 +882,22 @@ class FeedHelpers with ChangeNotifier {
                 children: [
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
-                    onTap: () {
+                    onTap: () async {
+                      check = await checkpointer(data['postId'], data['userId'], "upvotes");
+                        if(check == false) {
+                          FirebaseFirestore.instance
+                          .collection("userData")
+                          .doc(data['userId'])
+                          .get()
+                          .then((DocumentSnapshot documentSnapshot) {
+                        if (documentSnapshot.exists) {
+                          print('Document data: ${documentSnapshot.data()}');
+                          var a = documentSnapshot.data();
+                          Map.from(a as Map<String, dynamic>);
+                          String token  = a["token"];
+                          sendNotification("Upvote", token);
+                        }
+                      });
                       Provider.of<PostOptions>(context, listen: false)
                           .addUpvote(
                               context,
@@ -832,6 +907,8 @@ class FeedHelpers with ChangeNotifier {
                                   .getUser()!
                                   .uid,
                               data['userId']);
+                        }
+                        check = false;
                     },
                     child: Container(
                       width: MediaQuery.of(context).size.width / 3 - 10,
@@ -873,7 +950,23 @@ class FeedHelpers with ChangeNotifier {
                   ),
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
-                    onTap: () {
+                    onTap: () async{
+                      check = await checkpointer(data['postId'], data['userId'], "downvotes");
+                      if(check == false) {
+                      FirebaseFirestore.instance
+                          .collection("userData")
+                          .doc(data['userId'])
+                          .get()
+                          .then((DocumentSnapshot documentSnapshot) {
+                        if (documentSnapshot.exists) {
+                          print('Document data: ${documentSnapshot.data()}');
+                          var a = documentSnapshot.data();
+                          Map.from(a as Map<String, dynamic>);
+                          String token  = a["token"];
+                          print(token);
+                          sendNotification("Downvote", token);
+                        }
+                      });
                       Provider.of<PostOptions>(context, listen: false)
                           .addDownvote(
                               context,
@@ -883,6 +976,8 @@ class FeedHelpers with ChangeNotifier {
                                   .getUser()!
                                   .uid,
                               data['userId']);
+                      }
+                      check = false;
                     },
                     child: Container(
                       width: MediaQuery.of(context).size.width / 3 - 10,
@@ -1120,6 +1215,21 @@ class FeedHelpers with ChangeNotifier {
                         SizedBox(width: 20),
                         FloatingActionButton(
                           onPressed: () {
+                            FirebaseFirestore.instance
+                                .collection("userData")
+                                .doc(userId)
+                                .get()
+                                .then((DocumentSnapshot documentSnapshot) {
+                              if (documentSnapshot.exists) {
+                                print(
+                                    'Document data: ${documentSnapshot.data()}');
+                                var a = documentSnapshot.data();
+                                Map.from(a as Map<String, dynamic>);
+                                String token = a["token"];
+                                print(token);
+                                sendNotification("Comment", token);
+                              }
+                            });
                             Provider.of<PostOptions>(context, listen: false)
                                 .addComment(context, postId,
                                     commentController.text, userId);
