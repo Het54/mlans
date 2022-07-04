@@ -28,7 +28,6 @@ class FeedHelpers with ChangeNotifier {
   int currentTextLength = 0;
   int StategycurrentTextLength = 0;
   int i = 1;
-
   uploadStrategySheet(BuildContext context) {
     return showModalBottomSheet(
         isScrollControlled: true,
@@ -1449,13 +1448,13 @@ class _leaderState extends State<leader> {
           onTap: ()=> setState(() {
             leaderWinnerHeight = !leaderWinnerHeight;
           }),
-          child: CircleAvatar(
-              maxRadius: 15,
-              backgroundColor: Colors.lightBlue,
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height * 0.03,
+              //backgroundColor:
+              color: Colors.lightBlue,
               child: Icon(
-                leaderWinnerHeight
-                    ? Icons.keyboard_double_arrow_down_outlined
-                    : Icons.keyboard_double_arrow_up_outlined,
+                Icons.menu_outlined,
                 color: Colors.white,)),
         ),
       ],
@@ -1503,11 +1502,14 @@ class _leaderState extends State<leader> {
                         )),
                   ),
                   Container(
+                    height: MediaQuery.of(context).size.height * 0.23,
                     width: MediaQuery.of(context).size.width,
                     decoration: BoxDecoration(
                       border: Border.all(width: 2, color: Color(0xffd9d9d9)),
                     ),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(
