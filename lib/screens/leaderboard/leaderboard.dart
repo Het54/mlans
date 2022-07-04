@@ -21,7 +21,10 @@ class leaderboard extends StatelessWidget {
         centerTitle: true,
         //elevation: 5,
         backgroundColor: Colors.white,
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: true,
+        leading: GestureDetector(
+            onTap: ()=> Navigator.pop(context),
+            child: Icon(Icons.arrow_back_ios,color: Colors.black,size: 16)),
       ),
       body: Provider.of<leaderboardHelper>(context, listen: false)
           .firebaseTopList(context,this.userId)

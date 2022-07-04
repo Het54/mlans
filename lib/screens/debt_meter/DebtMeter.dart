@@ -14,13 +14,17 @@ class _DebtMeterState extends State<DebtMeter> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        automaticallyImplyLeading: false,
+        /*leading: GestureDetector(
+            onTap: ()=> Navigator.pop(context),
+            child: Icon(Icons.arrow_back_ios,color: Colors.black,size: 16)),*/
+        backgroundColor: Colors.white,
         centerTitle: true,
-        elevation: 0.0,
+        elevation: 4,
         title: const Text(
           "Moneylans",
           style: TextStyle(
-            color: Colors.white,
+            color: Colors.black,
             fontWeight: FontWeight.bold,
           ),
         ),
