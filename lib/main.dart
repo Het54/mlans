@@ -15,15 +15,25 @@ import 'package:Moneylans/screens/profile/ProfileHelpers.dart';
 import 'package:Moneylans/screens/splash_screen/splashScreen.dart';
 import 'package:Moneylans/services/Authentication.dart';
 import 'package:Moneylans/services/FirebaseOperations.dart';
+import 'package:Moneylans/services/local_puch_notification.dart';
 import 'package:Moneylans/utils/PostOptions.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+
+Future<void> handlebckmessaging(RemoteMessage message) async {
+  ///for onclick listner
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  LocalNotificationService.initialize();
+  FirebaseMessaging.onBackgroundMessage(handlebckmessaging);
+
   runApp(const MyApp());
 }
 

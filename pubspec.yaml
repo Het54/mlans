@@ -36,13 +36,16 @@ dependencies:
   firebase_auth: ^3.3.11
   firebase_core: ^1.13.1
   firebase_database: ^9.0.8
+  firebase_messaging: ^11.4.3
   firebase_storage: ^10.2.9
   flutter:
     sdk: flutter
   flutter_app_name: ^0.1.1
+  flutter_local_notifications: ^9.6.1
   fluttertoast: ^8.0.9
   font_awesome_flutter: ^9.2.0
   google_sign_in: ^5.2.4
+  http: ^0.13.4
   image_picker: ^0.8.4+11
   kdgaugeview: ^1.0.4
   page_transition: ^2.0.5
