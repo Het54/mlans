@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import '../../services/Authentication.dart';
@@ -825,7 +826,7 @@ class FeedHelpers with ChangeNotifier {
                         check = false;
                     },
                     child: Container(
-                      width: MediaQuery.of(context).size.width / 3 - 10,
+                      width: MediaQuery.of(context).size.width / 4 - 10,
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -894,7 +895,7 @@ class FeedHelpers with ChangeNotifier {
                       check = false;
                     },
                     child: Container(
-                      width: MediaQuery.of(context).size.width / 3 - 10,
+                      width: MediaQuery.of(context).size.width / 4 - 10,
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -945,7 +946,7 @@ class FeedHelpers with ChangeNotifier {
                           data['userId']);
                     },
                     child: Container(
-                      width: MediaQuery.of(context).size.width / 3 - 10,
+                      width: MediaQuery.of(context).size.width / 4 - 10,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -983,7 +984,32 @@ class FeedHelpers with ChangeNotifier {
                         ],
                       ),
                     ),
-                  )
+                  ),
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => Share.share(data['content'],
+                    subject: data['debtType'] +
+                                " at " +
+                                data['intrestPercentage'] +
+                                "% interest" +
+                                " for " +
+                                data['timePeriod'],
+                    ),
+                    child: Container(
+                      width: MediaQuery.of(context).size.width / 4 - 10,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            FontAwesomeIcons.shareAlt,
+                            color: Colors.blue,
+                            size: 22,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

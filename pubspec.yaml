@@ -27,6 +27,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  after_layout: ^1.2.0
   cloud_firestore: ^3.1.10
   cupertino_icons: ^1.0.2
   custom_navigation_bar: ^0.8.2
@@ -47,6 +48,7 @@ dependencies:
   google_sign_in: ^5.2.4
   http: ^0.13.4
   image_picker: ^0.8.4+11
+  introduction_screen: ^3.0.2
   kdgaugeview: ^1.0.4
   page_transition: ^2.0.5
   pin_code_fields: ^7.4.0
@@ -88,6 +90,10 @@ flutter:
   assets:
     - assets/images/
     - assets/gifs/money.gif
+    - assets/images/home.jpg
+    - assets/images/family.jpg
+    - assets/images/leaderboard.jpg
+    - assets/images/dashboard.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
   # For details regarding adding assets from package dependencies, see
