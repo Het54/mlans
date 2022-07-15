@@ -81,7 +81,7 @@ void showCustomDialog(BuildContext context, String userId) {
             height: MediaQuery
                 .of(context)
                 .size
-                .height * 0.4,
+                .height * 0.5,
             width: MediaQuery
                 .of(context)
                 .size
@@ -148,12 +148,6 @@ void showCustomDialog(BuildContext context, String userId) {
                   Flexible(
                     child: ElevatedButton(
                         onPressed: () {
-                          if (DateTime
-                              .now()
-                              .weekday == 7 &&
-                              DateTime
-                                  .now()
-                                  .hour >= 12) {
                             if (desc.text.isNotEmpty && link.text.isNotEmpty) {
                               FirebaseFirestore.instance
                                   .collection("leaderboard")
@@ -178,10 +172,6 @@ void showCustomDialog(BuildContext context, String userId) {
                             } else
                               Fluttertoast.showToast(
                                   msg: "Enter Valid Details!");
-                          } else
-                            Fluttertoast.showToast(
-                                msg:
-                                "Can only be updated on Sunday\n12Pm - 12Am");
                         },
                         child: SizedBox(
                             height: 25, child: Center(child: Text("Submit")))),
@@ -251,7 +241,6 @@ class winnerNameTemplate extends StatelessWidget {
             ),
           ),
           Container(
-            width: 250,
             child: Text("You",
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -260,34 +249,24 @@ class winnerNameTemplate extends StatelessWidget {
                     fontWeight: FontWeight.w400)),
           ),
           Expanded(child: SizedBox()),
-          userIndex < 10 &&
-              DateTime
-                  .now()
-                  .weekday == 7 &&
-              DateTime
-                  .now()
-                  .hour >= 12
-              ? Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: CircleAvatar(
-              backgroundColor: Colors.transparent,
-              child: IconButton(
-                icon: Icon(
-                  Icons.more_vert_outlined,
-                  color: Colors.black,
-                ),
-                onPressed: () => showCustomDialog(context, userId!),
-              ),
-            ),
-          )
-              : Padding(
-            padding: const EdgeInsets.only(right: 20),
-              child: Text("${userPoint}",
+          Text("${userPoint}",
                 style: TextStyle(
                     fontSize: 20,
                     color: Colors.black,
                     fontWeight: FontWeight.w400)),
-          )
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: CircleAvatar(
+                backgroundColor: Colors.transparent,
+                child: IconButton(
+                  icon: Icon(
+                    Icons.more_vert_outlined,
+                    color: Colors.black,
+                  ),
+                  onPressed: () => showCustomDialog(context, userId!),
+                ),
+              ),
+          ),
         ],
       ),
     );
