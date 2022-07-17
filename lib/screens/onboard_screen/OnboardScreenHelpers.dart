@@ -1,5 +1,7 @@
 import 'dart:ui';
-
+import 'package:Moneylans/main.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:Moneylans/screens/feedback_question/Feedback.dart';
 import 'package:Moneylans/screens/landing_page/landingHelpers.dart';
 import 'package:Moneylans/services/Authentication.dart';
@@ -8,11 +10,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+
+String barcodeScanRes='abcdefgh';
+
+// String? uid = Provider.of<Authentication>(  context, listen: false).getUser()?.uid;
+
+ TextEditingController UIDcontroller = TextEditingController();
 
 class OnboardScreenHelpers with ChangeNotifier {
-  TextEditingController PINcontroller = TextEditingController();
-  TextEditingController UIDcontroller = TextEditingController();
 
+  TextEditingController PINcontroller = TextEditingController();
+ //  TextEditingController UIDcontroller = TextEditingController();
   notPremium(BuildContext context) {
     return Stack(
       children: [
@@ -28,14 +38,20 @@ class OnboardScreenHelpers with ChangeNotifier {
             filter: new ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
             child: new Container(
               decoration:
-                  new BoxDecoration(color: Colors.white.withOpacity(0.0)),
+              new BoxDecoration(color: Colors.white.withOpacity(0.0)),
             ),
           ),
         ),
         Center(
           child: Container(
-            height: MediaQuery.of(context).size.height * 0.2,
-            width: MediaQuery.of(context).size.width * 0.9,
+            height: MediaQuery
+                .of(context)
+                .size
+                .height * 0.2,
+            width: MediaQuery
+                .of(context)
+                .size
+                .width * 0.9,
             decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(25),
@@ -77,13 +93,21 @@ class OnboardScreenHelpers with ChangeNotifier {
   }
 
   premiumCard(BuildContext context) {
+
+
     return Dialog(
       insetAnimationCurve: Curves.easeInCirc,
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(15.0))),
       child: Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height * 0.25,
+        width: MediaQuery
+            .of(context)
+            .size
+            .width,
+        height: MediaQuery
+            .of(context)
+            .size
+            .height * 0.45,
         decoration: BoxDecoration(
             image: DecorationImage(
               fit: BoxFit.cover,
@@ -103,13 +127,12 @@ class OnboardScreenHelpers with ChangeNotifier {
             ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
-
                   showCupertinoDialog(
                       context: context,
                       barrierDismissible: true,
                       builder: (BuildContext context) {
                         return Provider.of<OnboardScreenHelpers>(context,
-                                listen: false)
+                            listen: false)
                             .premiumCodeDisplay(context);
                       });
                 },
@@ -131,7 +154,7 @@ class OnboardScreenHelpers with ChangeNotifier {
                     barrierDismissible: true,
                     builder: (BuildContext context) {
                       return Provider.of<OnboardScreenHelpers>(context,
-                              listen: false)
+                          listen: false)
                           .premiumCodeCheck(context);
                     });
               },
@@ -143,7 +166,9 @@ class OnboardScreenHelpers with ChangeNotifier {
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all(Colors.pink),
               ),
-            )
+            ),
+            SizedBox(height: 3,),
+
           ],
         ),
       ),
@@ -156,8 +181,14 @@ class OnboardScreenHelpers with ChangeNotifier {
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(15.0))),
       child: Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height * 0.25,
+        width: MediaQuery
+            .of(context)
+            .size
+            .width,
+        height: MediaQuery
+            .of(context)
+            .size
+            .height * 0.25,
         decoration: BoxDecoration(
             image: DecorationImage(
               fit: BoxFit.cover,
@@ -181,13 +212,17 @@ class OnboardScreenHelpers with ChangeNotifier {
                         fontWeight: FontWeight.bold,
                         fontSize: 25)),
               ),
+
             ),
             SizedBox(height: 15),
             StreamBuilder<DocumentSnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('userData')
                   .doc(
-                      "${Provider.of<Authentication>(context, listen: false).getUser()?.uid}")
+                  "${Provider
+                      .of<Authentication>(context, listen: false)
+                      .getUser()
+                      ?.uid}")
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -210,13 +245,20 @@ class OnboardScreenHelpers with ChangeNotifier {
   }
 
   premiumCodeCheck(BuildContext context) {
+
     return Dialog(
-      insetAnimationCurve: Curves.easeInCirc,
+    insetAnimationCurve: Curves.easeInCirc,
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(15.0))),
       child: Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height * 0.4,
+        width: MediaQuery
+            .of(context)
+            .size
+            .width,
+        height: MediaQuery
+            .of(context)
+            .size
+            .height * 0.4,
         decoration: BoxDecoration(
             image: DecorationImage(
               fit: BoxFit.cover,
@@ -242,20 +284,38 @@ class OnboardScreenHelpers with ChangeNotifier {
               ),
             ),
             SizedBox(height: 15),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: UIDcontroller,
-                decoration: InputDecoration(
-                    hintText: "Enter UID...",
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide.none,
+            Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    backgroundColor: Colors.white,
+                    child: IconButton(
+                        onPressed: () => _scanqrState().scanQR() ,
+                        icon: Icon(Icons.camera_alt_outlined)),
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Container(
+                      width: 240,
+                      padding: EdgeInsets.all(8),
+                      alignment: Alignment.center,
+                      child: TextField(
+                        decoration: InputDecoration(
+                            labelText: barcodeScanRes,
+                             hintText: "Enter UID Or Scan code...",
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                            ),
+                             fillColor: Colors.white,
+                            focusColor: Colors.white,
+                            filled: true),
+                        controller: UIDcontroller,
+                      ),
                     ),
-                    fillColor: Colors.white,
-                    focusColor: Colors.white,
-                    filled: true),
-              ),
-            ),
+                  ),
+
+                ]),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
@@ -273,20 +333,9 @@ class OnboardScreenHelpers with ChangeNotifier {
             SizedBox(height: 15),
             ElevatedButton(
               onPressed: () {
-                if (Provider.of<FirebaseOperations>(context, listen: false)
-                        .onboardMember(
-                            UIDcontroller.text, PINcontroller.text) ==
-                    true) {
-                  Provider.of<LandingHelpers>(context, listen: false)
-                      .displayToast(
-                          "Yaay, you onboarded your partner!😍", context);
-                } else {
-                  print(
-                      "helloo ${Provider.of<FirebaseOperations>(context, listen: false).onboardMember(UIDcontroller.text, PINcontroller.text)}");
-                  Provider.of<LandingHelpers>(context, listen: false)
-                      .displayToast("Opps thats not matching🤨", context);
-                }
-              },
+                Provider.of<FirebaseOperations>(context, listen: false)
+                    .onboardMember(UIDcontroller.text, PINcontroller.text);
+                } ,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 35.0),
                 child: Text("Check"),
@@ -298,3 +347,38 @@ class OnboardScreenHelpers with ChangeNotifier {
     );
   }
 }
+
+
+class scanqr extends StatefulWidget {
+  const scanqr({Key? key}) : super(key: key);
+
+  @override
+  State<scanqr> createState() => _scanqrState();
+}
+class _scanqrState extends State<scanqr> {
+  @override
+  Widget build(BuildContext context) {
+
+    return SizedBox(height: 0);
+  }
+  void scanQR() async {
+    try {
+       barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+          '#ff6666', 'Cancel', true, ScanMode.QR);
+     setState((){ UIDcontroller.text= barcodeScanRes;
+        print(UIDcontroller);
+      });
+    } on PlatformException {
+      barcodeScanRes = 'Failed to get platform';
+    }
+
+    // setState(()=> qrcreate(barcodeScanRes));
+  }
+  // void qrcreate(barcodeScanRes) {
+  //    setState(() => UIDcontroller = barcodeScanRes);
+  //   }
+
+}
+
+
+

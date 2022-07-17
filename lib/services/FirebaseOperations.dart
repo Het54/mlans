@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 import '../screens/landing_page/landingUtils.dart';
@@ -104,19 +105,14 @@ class FirebaseOperations with ChangeNotifier {
   }
 
   onboardMember(String uid, String code) {
-    bool onbret = true;
-    FirebaseFirestore.instance
-        .collection('userData')
-        .doc(uid)
-        .get()
-        .then((value) {
+
+    FirebaseFirestore.instance.collection('userData').doc(uid).get().then((value) {
       if (value.data()!['onBoardCode'] == code) {
         print("Code Matched");
-        return true;
-      } else {
-        print("Code not Matched");
-        return false;
-      }
+        Fluttertoast.showToast(msg: "yaah!, you onboareded your parthner");
+      } else
+        Fluttertoast.showToast(msg: "Opps thats not matching🤨");
+
     });
   }
 }
