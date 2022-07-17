@@ -472,7 +472,8 @@ class FeedHelpers with ChangeNotifier {
                   return Column(
                     children: [
                       leader(),
-                      Expanded(child: loadPosts(context, snapshot)),
+                      Expanded(
+                          child: loadPosts(context, snapshot)),
                     ],
                   );
                 }
@@ -486,8 +487,7 @@ class FeedHelpers with ChangeNotifier {
     );
   }
 
-  sendNotification(String title, String token)async{
-
+  sendNotification(String title, String token) async {
     final data = {
       'click_action': 'FLUTTER_NOTIFICATION_CLICK',
       'id': '1',
@@ -495,51 +495,50 @@ class FeedHelpers with ChangeNotifier {
       'message': title,
     };
 
-    try{
-     http.Response response = await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),headers: <String,String>{
-        'Content-Type': 'application/json',
-        'Authorization': 'key=AAAADLBdq2Y:APA91bHH0thNUfQqZnQBnb0mqU3VnJG9sz4uGBLeBZEaB1NZUE6BASB2FJMekDnZPPMmijQY6yB4gFlFaL2-SzmBF364khQiMzA9x3keE5YrHY_cYR_Eu3_WO6bCVqkLpePNmCGJ70kG'
-      },
-      body: jsonEncode(<String,dynamic>{
-        'notification': <String,dynamic> {'title': title,'body': 'You have received $title'},
-        'priority': 'high',
-        'data': data,
-        'to': '$token'
-      })
-      );
+    try {
+      http.Response response =
+          await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+              headers: <String, String>{
+                'Content-Type': 'application/json',
+                'Authorization':
+                    'key=AAAADLBdq2Y:APA91bHH0thNUfQqZnQBnb0mqU3VnJG9sz4uGBLeBZEaB1NZUE6BASB2FJMekDnZPPMmijQY6yB4gFlFaL2-SzmBF364khQiMzA9x3keE5YrHY_cYR_Eu3_WO6bCVqkLpePNmCGJ70kG'
+              },
+              body: jsonEncode(<String, dynamic>{
+                'notification': <String, dynamic>{
+                  'title': title,
+                  'body': 'You have received $title'
+                },
+                'priority': 'high',
+                'data': data,
+                'to': '$token'
+              }));
 
-
-     if(response.statusCode == 200){
-       print("Notificatin sent");
-     }else{
-       print("Error");
-     }
-
-    }catch(e){
-
-    }
-
+      if (response.statusCode == 200) {
+        print("Notificatin sent");
+      } else {
+        print("Error");
+      }
+    } catch (e) {}
   }
 
-  checkpointer (String postid, String uid,String type) async{
+  checkpointer(String postid, String uid, String type) async {
     await FirebaseFirestore.instance
-    .collection("posts")
-    .doc(postid)
-    .collection("$type")
-    .get() .then((docSnapshot) =>
-      {
-        for(int i = 0 ; i<docSnapshot.docs.length; i++){
-          l.add(docSnapshot.docs[i].data()['userId'])
-        }
-      });
+        .collection("posts")
+        .doc(postid)
+        .collection("$type")
+        .get()
+        .then((docSnapshot) => {
+              for (int i = 0; i < docSnapshot.docs.length; i++)
+                {l.add(docSnapshot.docs[i].data()['userId'])}
+            });
 
-      for (int i =0; i< l.length; i++){
-        if(l[i] == uid) {
-          check = true;
-        }
+    for (int i = 0; i < l.length; i++) {
+      if (l[i] == uid) {
+        check = true;
       }
-      l.clear(); 
-      return(check);  
+    }
+    l.clear();
+    return (check);
   }
 
   Widget loadPosts(
@@ -742,7 +741,7 @@ class FeedHelpers with ChangeNotifier {
                       ),
                     ),
                   )
-                  : Container(
+                : Container(
                     width: MediaQuery.of(context).size.width,
                     decoration: BoxDecoration(
                       border: Border.all(width: 2, color: Color(0xffd9d9d9)),
@@ -798,32 +797,33 @@ class FeedHelpers with ChangeNotifier {
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () async {
-                      check = await checkpointer(data['postId'], data['userId'], "upvotes");
-                        if(check == false) {
-                          FirebaseFirestore.instance
-                          .collection("userData")
-                          .doc(data['userId'])
-                          .get()
-                          .then((DocumentSnapshot documentSnapshot) {
-                        if (documentSnapshot.exists) {
-                          print('Document data: ${documentSnapshot.data()}');
-                          var a = documentSnapshot.data();
-                          Map.from(a as Map<String, dynamic>);
-                          String token  = a["token"];
-                          sendNotification("Upvote", token);
-                        }
-                      });
-                      Provider.of<PostOptions>(context, listen: false)
-                          .addUpvote(
-                              context,
-                              data['postId'],
-                              Provider.of<Authentication>(context,
-                                      listen: false)
-                                  .getUser()!
-                                  .uid,
-                              data['userId']);
-                        }
-                        check = false;
+                      check = await checkpointer(
+                          data['postId'], data['userId'], "upvotes");
+                      if (check == false) {
+                        FirebaseFirestore.instance
+                            .collection("userData")
+                            .doc(data['userId'])
+                            .get()
+                            .then((DocumentSnapshot documentSnapshot) {
+                          if (documentSnapshot.exists) {
+                            print('Document data: ${documentSnapshot.data()}');
+                            var a = documentSnapshot.data();
+                            Map.from(a as Map<String, dynamic>);
+                            String token = a["token"];
+                            sendNotification("Upvote", token);
+                          }
+                        });
+                        Provider.of<PostOptions>(context, listen: false)
+                            .addUpvote(
+                                context,
+                                data['postId'],
+                                Provider.of<Authentication>(context,
+                                        listen: false)
+                                    .getUser()!
+                                    .uid,
+                                data['userId']);
+                      }
+                      check = false;
                     },
                     child: Container(
                       width: MediaQuery.of(context).size.width / 4 - 10,
@@ -865,32 +865,33 @@ class FeedHelpers with ChangeNotifier {
                   ),
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
-                    onTap: () async{
-                      check = await checkpointer(data['postId'], data['userId'], "downvotes");
-                      if(check == false) {
-                      FirebaseFirestore.instance
-                          .collection("userData")
-                          .doc(data['userId'])
-                          .get()
-                          .then((DocumentSnapshot documentSnapshot) {
-                        if (documentSnapshot.exists) {
-                          print('Document data: ${documentSnapshot.data()}');
-                          var a = documentSnapshot.data();
-                          Map.from(a as Map<String, dynamic>);
-                          String token  = a["token"];
-                          print(token);
-                          sendNotification("Downvote", token);
-                        }
-                      });
-                      Provider.of<PostOptions>(context, listen: false)
-                          .addDownvote(
-                              context,
-                              data['postId'],
-                              Provider.of<Authentication>(context,
-                                      listen: false)
-                                  .getUser()!
-                                  .uid,
-                              data['userId']);
+                    onTap: () async {
+                      check = await checkpointer(
+                          data['postId'], data['userId'], "downvotes");
+                      if (check == false) {
+                        FirebaseFirestore.instance
+                            .collection("userData")
+                            .doc(data['userId'])
+                            .get()
+                            .then((DocumentSnapshot documentSnapshot) {
+                          if (documentSnapshot.exists) {
+                            print('Document data: ${documentSnapshot.data()}');
+                            var a = documentSnapshot.data();
+                            Map.from(a as Map<String, dynamic>);
+                            String token = a["token"];
+                            print(token);
+                            sendNotification("Downvote", token);
+                          }
+                        });
+                        Provider.of<PostOptions>(context, listen: false)
+                            .addDownvote(
+                                context,
+                                data['postId'],
+                                Provider.of<Authentication>(context,
+                                        listen: false)
+                                    .getUser()!
+                                    .uid,
+                                data['userId']);
                       }
                       check = false;
                     },
@@ -987,13 +988,14 @@ class FeedHelpers with ChangeNotifier {
                   ),
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
-                    onTap: () => Share.share(data['content'],
-                    subject: data['debtType'] +
-                                " at " +
-                                data['intrestPercentage'] +
-                                "% interest" +
-                                " for " +
-                                data['timePeriod'],
+                    onTap: () => Share.share(
+                      data['content'],
+                      subject: data['debtType'] +
+                          " at " +
+                          data['intrestPercentage'] +
+                          "% interest" +
+                          " for " +
+                          data['timePeriod'],
                     ),
                     child: Container(
                       width: MediaQuery.of(context).size.width / 4 - 10,
@@ -1019,7 +1021,8 @@ class FeedHelpers with ChangeNotifier {
     }).toList());
   }
 
-  addCommentSheet(BuildContext context, DocumentSnapshot snapshot, String docId, String postId, String userId) {
+  addCommentSheet(BuildContext context, DocumentSnapshot snapshot, String docId,
+      String postId, String userId) {
     TextEditingController commentController = TextEditingController();
 
     return showModalBottomSheet(
@@ -1265,7 +1268,8 @@ class FeedHelpers with ChangeNotifier {
                 editPostSheet(context, debt, content, debtType, goalDate,
                     interestPercentage, timePeriod, postId);
               },
-              child: Text("Edit",style: TextStyle(color: Colors.black,fontSize: 16)),
+              child: Text("Edit",
+                  style: TextStyle(color: Colors.black, fontSize: 16)),
             ),
           ),
           Divider(),
@@ -1308,7 +1312,8 @@ class FeedHelpers with ChangeNotifier {
                   },
                 );
               },
-              child: Text("Delete post",style: TextStyle(color: Colors.black,fontSize: 16)),
+              child: Text("Delete post",
+                  style: TextStyle(color: Colors.black, fontSize: 16)),
             ),
           ),
           SizedBox(height: 0),
@@ -1562,12 +1567,13 @@ class FeedHelpers with ChangeNotifier {
       ),
     );
   }
-
 }
 
-bool leaderWinnerHeight = false;
+bool leaderWinnerHeight = true;
+
 class leader extends StatefulWidget {
   const leader({Key? key}) : super(key: key);
+
   @override
   State<leader> createState() => _leaderState();
 }
@@ -1578,28 +1584,31 @@ class _leaderState extends State<leader> {
     return Column(
       children: [
         Container(
-          height: leaderWinnerHeight ? 0 : MediaQuery.of(context).size.height * 0.3,
+          height:
+              leaderWinnerHeight ? 0 : MediaQuery.of(context).size.height * 0.3,
           child: leaderboard_winner_data(),
         ),
         GestureDetector(
-          onTap: ()=> setState(() {
+          onTap: () => setState(() {
             leaderWinnerHeight = !leaderWinnerHeight;
           }),
           child: Container(
-            width: MediaQuery.of(context).size.width,
+              width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height * 0.03,
               //backgroundColor:
               color: Colors.lightBlue,
               child: Icon(
                 Icons.menu_outlined,
-                color: Colors.white,)),
+                color: Colors.white,
+              )),
         ),
       ],
     );
   }
 
   leaderboard_winner_data() {
-    CollectionReference data = FirebaseFirestore.instance.collection('leaderboardDetails');
+    CollectionReference data =
+        FirebaseFirestore.instance.collection('leaderboardDetails');
     return FutureBuilder<DocumentSnapshot>(
       future: data.doc("Detail").get(),
       builder:
@@ -1613,71 +1622,65 @@ class _leaderState extends State<leader> {
         }
         if (snapshot.connectionState == ConnectionState.done) {
           Map<String, dynamic> data =
-          snapshot.data!.data() as Map<String, dynamic>;
+              snapshot.data!.data() as Map<String, dynamic>;
           return Padding(
             padding: const EdgeInsets.all(8.0),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(25),
-                        topRight: Radius.circular(25),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(25),
+                      topRight: Radius.circular(25),
+                    ),
+                    color: Color(0xffd9d9d9),
+                  ),
+                  child: Center(
+                      child: Text(
+                    data['userId'],
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  )),
+                ),
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.23,
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 2, color: Color(0xffd9d9d9)),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            right: 15, left: 15, top: 5),
+                        child: Expanded(child: Text(data['Description'])),
                       ),
-                      color: Color(0xffd9d9d9),
-                    ),
-                    child: Center(
-                        child: Text(
-                          data['userId'],
-                          style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                        )),
+                      ElevatedButton(
+                        onPressed: () =>
+                            launchUrl(Uri.parse("https://${data["Link"]}")),
+                        child: SizedBox(
+                            width: 100,
+                            height: 25,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text("Visit"),
+                                SizedBox(width: 10),
+                                Icon(FontAwesomeIcons.share, size: 12),
+                              ],
+                            )),
+                      ),
+                    ],
                   ),
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.23,
-                    width: MediaQuery.of(context).size.width,
-                    decoration: BoxDecoration(
-                      border: Border.all(width: 2, color: Color(0xffd9d9d9)),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              right: 15, left: 15, top: 5),
-                          child: Expanded(
-                              child: Text(
-                                  data['Description']
-                              )
-                          ),
-                        ),
-                        ElevatedButton(
-                          onPressed: () =>
-                              launchUrl(Uri.parse("https://${data["Link"]}")),
-                          child: SizedBox(
-                              width: 100,
-                              height: 25,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text("Visit"),
-                                  SizedBox(width: 10),
-                                  Icon(FontAwesomeIcons.share, size: 12),
-                                ],
-                              )),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           );
         }

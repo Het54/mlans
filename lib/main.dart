@@ -1,3 +1,4 @@
+// @dart=2.9
 // ignore_for_file: deprecated_member_use
 import 'package:Moneylans/screens/debt_meter/DebtMeter_helpers.dart';
 import 'package:Moneylans/screens/feed/FeedHelpers.dart';
@@ -41,7 +42,7 @@ final userReference = FirebaseDatabase.instance;
 final userRef = userReference.reference().child("user");
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({Key key}) : super(key: key);
 
   // This widget is the root of your application.
   @override
