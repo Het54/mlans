@@ -82,8 +82,7 @@ class PostOptions with ChangeNotifier {
 
   Future deletePost(BuildContext context, String postId, String postUser) async {
     final doc = FirebaseFirestore.instance.collection('posts').doc(postId);
-    await doc
-        .delete().then((value) => FirebaseFirestore.instance
+    await doc.delete().then((value) => FirebaseFirestore.instance
         .collection('leaderboard')
         .doc(postUser)
         .update({

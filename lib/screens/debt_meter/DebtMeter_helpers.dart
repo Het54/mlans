@@ -56,7 +56,7 @@ class DebtMeterHelpers with ChangeNotifier {
               notifyListeners();
             },
             style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(Colors.green),
+              backgroundColor: MaterialStateProperty.all(Colors.blue),
             ),
             child: Container(
               height: 40,
@@ -121,7 +121,7 @@ class DebtMeterHelpers with ChangeNotifier {
                 )
               else if (debtScore > 35 && debtScore < 50)
                 Text(
-                  "Could do some work",
+                  "Moderate",
                   style: TextStyle(
                     color: Color.fromARGB(255, 255, 123, 7),
                     fontSize: 20,

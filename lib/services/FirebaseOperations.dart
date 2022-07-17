@@ -72,7 +72,7 @@ class FirebaseOperations with ChangeNotifier {
         .update(data);
   }
 
-  Future reportPost(String userId,String postId,dynamic data) async {
+  Future reportPost(String userId, String postId, dynamic data) async {
     return FirebaseFirestore.instance
         .collection("Reports")
         .doc(postId)
@@ -105,14 +105,13 @@ class FirebaseOperations with ChangeNotifier {
   }
 
   onboardMember(String uid, String code) {
-
     FirebaseFirestore.instance.collection('userData').doc(uid).get().then((value) {
       if (value.data()!['onBoardCode'] == code) {
         print("Code Matched");
-        Fluttertoast.showToast(msg: "yaah!, you onboareded your parthner");
-      } else
+        Fluttertoast.showToast(msg: "Yaay, you onboarded your partner!😍");
+      }
+      else
         Fluttertoast.showToast(msg: "Opps thats not matching🤨");
-
     });
   }
 }
