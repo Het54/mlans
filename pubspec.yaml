@@ -27,6 +27,14 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  flutter:
+    sdk: flutter
+  qr_flutter: ^4.0.0
+  flutter_barcode_scanner: ^2.0.0
+
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
   after_layout: ^1.2.0
   cloud_firestore: ^3.1.10
   cupertino_icons: ^1.0.2
@@ -54,9 +62,9 @@ dependencies:
   pin_code_fields: ^7.4.0
   provider: ^6.0.2
   share_plus: ^4.0.4
+  qr_code_scanner: ^1.0.0
   shared_preferences: ^2.0.13
   url_launcher: ^6.0.20
-
 dev_dependencies:
   flutter_test:
     sdk: flutter

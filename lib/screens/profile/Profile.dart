@@ -9,9 +9,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/Authentication.dart';
-
+import 'package:qr_flutter/qr_flutter.dart';
 class Profile extends StatelessWidget {
   String name;
+
 
   Profile({
     Key? key,
@@ -246,6 +247,7 @@ class profileBio extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String? uid = Provider.of<Authentication>(context, listen: false).getUser()?.uid;
     return Column(
       children: [
         Padding(
@@ -256,79 +258,106 @@ class profileBio extends StatelessWidget {
               color: Color.fromARGB(255, 223, 222, 222),
               borderRadius: BorderRadius.circular(15),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
-                const SizedBox(height: 15),
-                Padding(
-                  padding: const EdgeInsets.only(left: 15),
-                  child: Row(
-                    children: [
-                      StreamBuilder<DocumentSnapshot>(
-                        stream: FirebaseFirestore.instance
-                            .collection('userData')
-                            .doc(
-                            "${Provider.of<Authentication>(context, listen: false).getUser()?.uid}")
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          } else {
-                            return Text(snapshot.data!.get('name'),
-                                style: TextStyle(
-                                    fontWeight: FontWeight.normal, fontSize: 20));
-                          }
-                        },
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 15),
+
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15),
+                      child: Row(
+                        children: [
+                          StreamBuilder<DocumentSnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('userData')
+                                .doc(
+                                "${Provider.of<Authentication>(context, listen: false).getUser()?.uid}")
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              } else {
+                                return Text(snapshot.data!.get('name'),
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.normal, fontSize: 20));
+                              }
+                            },
+                          ),
+                          Text(",",style: TextStyle(
+                              fontWeight: FontWeight.normal, fontSize: 20))
+                        ],
                       ),
-                      Text(",",style: TextStyle(
-                          fontWeight: FontWeight.normal, fontSize: 20))
-                    ],
+                    ),
+                    const SizedBox(height: 5),
+                    Container( width: 220,
+                      child: RichText( textAlign: TextAlign.start,
+                        overflow: TextOverflow.ellipsis,
+                        text: TextSpan(
+                          text: '',
+                          style: DefaultTextStyle.of(context).style,
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: '    Email: ',
+                              style: TextStyle(fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                            TextSpan(
+                              text:
+                                  '${Provider.of<Authentication>(context, listen: false).getUser()?.email}',
+                              style: TextStyle(
+
+                                  fontWeight: FontWeight.bold, color: Colors.blue),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 120,
+                      child: RichText(
+                             textAlign: TextAlign.start,
+                        overflow: TextOverflow.ellipsis,
+                        text: TextSpan(
+                          text: '',
+                          style: DefaultTextStyle.of(context).style,
+                          children: [
+                            TextSpan(
+                              text: '    Unique Id: ',
+                              style: TextStyle(fontWeight: FontWeight.normal),
+                            ),
+
+                            TextSpan(
+                              text:
+                                  '${Provider.of<Authentication>(context, listen: false).getUser()?.uid}',
+
+                              style: TextStyle(
+
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue,
+                                  fontSize: 13),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                  ],
+                ),
+                //SizedBox(width: 5,),
+                Container(
+                  child: QrImage(
+                    data: uid!,
+                    size:120,
+                    gapless: false,
                   ),
                 ),
-                const SizedBox(height: 5),
-                RichText(
-                  text: TextSpan(
-                    text: '',
-                    style: DefaultTextStyle.of(context).style,
-                    children: <TextSpan>[
-                      TextSpan(
-                        text: '    Email: ',
-                        style: TextStyle(fontWeight: FontWeight.normal),
-                      ),
-                      TextSpan(
-                        text:
-                            '${Provider.of<Authentication>(context, listen: false).getUser()?.email}',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.blue),
-                      ),
-                    ],
-                  ),
-                ),
-                RichText(
-                  text: TextSpan(
-                    text: '',
-                    style: DefaultTextStyle.of(context).style,
-                    children: <TextSpan>[
-                      TextSpan(
-                        text: '    Unique Id: ',
-                        style: TextStyle(fontWeight: FontWeight.normal),
-                      ),
-                      TextSpan(
-                        text:
-                            '${Provider.of<Authentication>(context, listen: false).getUser()?.uid}',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue,
-                            fontSize: 13),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 10),
               ],
+
             ),
           ),
         ),
