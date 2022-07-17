@@ -280,9 +280,9 @@ launchUrl(url) async {
     throw "Could not launch $url";
 }
 
-customDrawer(BuildContext context, userId, description, link, userPoints) {
+customDrawer(BuildContext context, userId, description, link, userPoints, index) {
   return showDialog(
-      context: context,
+      context: context, 
       builder: (BuildContext context) {
         return Center(
           child: Container(
@@ -320,8 +320,8 @@ customDrawer(BuildContext context, userId, description, link, userPoints) {
                           Padding(
                             padding: const EdgeInsets.only(
                                 right: 12, left: 12, top: 20, bottom: 10),
-                            child: description != null && description != ""
-                                ? Text(description,
+                            child: link != null && link != ""
+                                ? Text("This week's $index rank holders get help from $link, try by clicking on the visit",
                                 style: TextStyle(color: Colors.white))
                                 : Text("No data updated!",
                                 style: TextStyle(color: Colors.white)),
@@ -343,6 +343,14 @@ customDrawer(BuildContext context, userId, description, link, userPoints) {
                                 )),
                           )
                               : SizedBox(height: 0, width: 0),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                right: 12, left: 12, top: 20, bottom: 10),
+                            child: link != null && link != ""
+                                ? Text("Description: $description",
+                                style: TextStyle(color: Colors.white))
+                                : SizedBox(height: 0, width: 0),
+                          ),
                         ],
                       ),
                     ),
@@ -754,6 +762,10 @@ Widget leaderList(BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot,
         Map<String, dynamic> data =
         documentSnapshot.data()! as Map<String, dynamic>;
         index++;
+        FirebaseFirestore.instance
+          .collection("leaderboard")
+          .doc(data["userId"])
+          .set({'index': index}, SetOptions(merge: true));
         if (data["userId"] == userId) {
           userIndex = index;
           userPoint = data["point"] * 10;
@@ -762,7 +774,7 @@ Widget leaderList(BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot,
           padding: const EdgeInsets.only(right: 8, left: 8, top: 5, bottom: 5),
           child: GestureDetector(
             onTap: () =>
-                customDrawer(context, data["userId"], data["description"], data["link"], data["point"] * 10),
+                customDrawer(context, data["userId"], data["description"], data["link"], data["point"] * 10, data["index"]),
             child: Container(
               decoration: BoxDecoration(
                   color: index == 1
