@@ -81,7 +81,7 @@ void showCustomDialog(BuildContext context, String userId) {
             height: MediaQuery
                 .of(context)
                 .size
-                .height * 0.4,
+                .height * 0.5,
             width: MediaQuery
                 .of(context)
                 .size
@@ -148,12 +148,6 @@ void showCustomDialog(BuildContext context, String userId) {
                   Flexible(
                     child: ElevatedButton(
                         onPressed: () {
-                          if (DateTime
-                              .now()
-                              .weekday == 7 &&
-                              DateTime
-                                  .now()
-                                  .hour >= 12) {
                             if (desc.text.isNotEmpty && link.text.isNotEmpty) {
                               FirebaseFirestore.instance
                                   .collection("leaderboard")
@@ -178,10 +172,6 @@ void showCustomDialog(BuildContext context, String userId) {
                             } else
                               Fluttertoast.showToast(
                                   msg: "Enter Valid Details!");
-                          } else
-                            Fluttertoast.showToast(
-                                msg:
-                                "Can only be updated on Sunday\n12Pm - 12Am");
                         },
                         child: SizedBox(
                             height: 25, child: Center(child: Text("Submit")))),
@@ -251,7 +241,6 @@ class winnerNameTemplate extends StatelessWidget {
             ),
           ),
           Container(
-            width: 250,
             child: Text("You",
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -260,34 +249,24 @@ class winnerNameTemplate extends StatelessWidget {
                     fontWeight: FontWeight.w400)),
           ),
           Expanded(child: SizedBox()),
-          userIndex < 10 &&
-              DateTime
-                  .now()
-                  .weekday == 7 &&
-              DateTime
-                  .now()
-                  .hour >= 12
-              ? Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: CircleAvatar(
-              backgroundColor: Colors.transparent,
-              child: IconButton(
-                icon: Icon(
-                  Icons.more_vert_outlined,
-                  color: Colors.black,
-                ),
-                onPressed: () => showCustomDialog(context, userId!),
-              ),
-            ),
-          )
-              : Padding(
-            padding: const EdgeInsets.only(right: 20),
-              child: Text("${userPoint}",
+          Text("${userPoint}",
                 style: TextStyle(
                     fontSize: 20,
                     color: Colors.black,
                     fontWeight: FontWeight.w400)),
-          )
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: CircleAvatar(
+                backgroundColor: Colors.transparent,
+                child: IconButton(
+                  icon: Icon(
+                    Icons.more_vert_outlined,
+                    color: Colors.black,
+                  ),
+                  onPressed: () => showCustomDialog(context, userId!),
+                ),
+              ),
+          ),
         ],
       ),
     );
@@ -301,9 +280,9 @@ launchUrl(url) async {
     throw "Could not launch $url";
 }
 
-customDrawer(BuildContext context, userId, description, link, userPoints) {
+customDrawer(BuildContext context, userId, description, link, userPoints, index) {
   return showDialog(
-      context: context,
+      context: context, 
       builder: (BuildContext context) {
         return Center(
           child: Container(
@@ -341,8 +320,8 @@ customDrawer(BuildContext context, userId, description, link, userPoints) {
                           Padding(
                             padding: const EdgeInsets.only(
                                 right: 12, left: 12, top: 20, bottom: 10),
-                            child: description != null && description != ""
-                                ? Text(description,
+                            child: link != null && link != ""
+                                ? Text("This week's $index rank holders get help from $link, try by clicking on the visit",
                                 style: TextStyle(color: Colors.white))
                                 : Text("No data updated!",
                                 style: TextStyle(color: Colors.white)),
@@ -364,6 +343,14 @@ customDrawer(BuildContext context, userId, description, link, userPoints) {
                                 )),
                           )
                               : SizedBox(height: 0, width: 0),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                right: 12, left: 12, top: 20, bottom: 10),
+                            child: link != null && link != ""
+                                ? Text("Description: $description",
+                                style: TextStyle(color: Colors.white))
+                                : SizedBox(height: 0, width: 0),
+                          ),
                         ],
                       ),
                     ),
@@ -775,6 +762,10 @@ Widget leaderList(BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot,
         Map<String, dynamic> data =
         documentSnapshot.data()! as Map<String, dynamic>;
         index++;
+        FirebaseFirestore.instance
+          .collection("leaderboard")
+          .doc(data["userId"])
+          .set({'index': index}, SetOptions(merge: true));
         if (data["userId"] == userId) {
           userIndex = index;
           userPoint = data["point"] * 10;
@@ -783,7 +774,7 @@ Widget leaderList(BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot,
           padding: const EdgeInsets.only(right: 8, left: 8, top: 5, bottom: 5),
           child: GestureDetector(
             onTap: () =>
-                customDrawer(context, data["userId"], data["description"], data["link"], data["point"] * 10),
+                customDrawer(context, data["userId"], data["description"], data["link"], data["point"] * 10, data["index"]),
             child: Container(
               decoration: BoxDecoration(
                   color: index == 1
