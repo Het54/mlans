@@ -165,7 +165,6 @@ class LandingHelpers with ChangeNotifier {
 
   progressDialog(BuildContext context, String msg) {
     return Dialog(
-      backgroundColor: Colors.blue,
       child: Container(
         margin: EdgeInsets.all(15.0),
         width: double.infinity,
@@ -181,10 +180,10 @@ class LandingHelpers with ChangeNotifier {
               CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
               ),
-              SizedBox(width: 26.0),
+              SizedBox(width: 10),
               Text(
                 msg,
-                style: TextStyle(color: Colors.black, fontSize: 10),
+                style: TextStyle(color: Colors.black, fontSize: 11),
               )
             ],
           ),
