@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -521,7 +522,7 @@ class FeedHelpers with ChangeNotifier {
     } catch (e) {}
   }
 
-  checkpointer(String postid, String uid, String type) async {
+  checkpointer(String postid, String type) async {
     await FirebaseFirestore.instance
         .collection("posts")
         .doc(postid)
@@ -533,7 +534,7 @@ class FeedHelpers with ChangeNotifier {
             });
 
     for (int i = 0; i < l.length; i++) {
-      if (l[i] == uid) {
+      if (l[i] == FirebaseAuth.instance.currentUser?.uid) {
         check = true;
       }
     }
@@ -798,7 +799,7 @@ class FeedHelpers with ChangeNotifier {
                     behavior: HitTestBehavior.opaque,
                     onTap: () async {
                       check = await checkpointer(
-                          data['postId'], data['userId'], "upvotes");
+                          data['postId'], "upvotes");
                       if (check == false) {
                         FirebaseFirestore.instance
                             .collection("userData")
@@ -867,7 +868,7 @@ class FeedHelpers with ChangeNotifier {
                     behavior: HitTestBehavior.opaque,
                     onTap: () async {
                       check = await checkpointer(
-                          data['postId'], data['userId'], "downvotes");
+                          data['postId'], "downvotes");
                       if (check == false) {
                         FirebaseFirestore.instance
                             .collection("userData")
