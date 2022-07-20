@@ -181,7 +181,7 @@ class ProfileHelpers with ChangeNotifier {
                 ),
                 title: GestureDetector(
                   onTap: () => Share.share(
-                      "https://play.google.com/store/apps/details?id=com.company.moneylans"),
+                      "Let's become debt-free together with Moneylans \n https://play.google.com/store/apps/details?id=com.company.moneylans"),
                   child: Padding(
                     padding: EdgeInsets.only(left: 20.0),
                     child: Text(

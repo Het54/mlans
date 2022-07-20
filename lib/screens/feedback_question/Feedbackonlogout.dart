@@ -44,7 +44,7 @@ class _FeedbackonLogoutState extends State<FeedbackonLogout> {
       validator: (value) {
         if(shareWithUController.text == null || shareWithUController.text == "")
         {
-          return ("Please enter a feedback!");
+          return ("Please enter your feedback!");
         }
         return null;
 
@@ -53,7 +53,7 @@ class _FeedbackonLogoutState extends State<FeedbackonLogout> {
       decoration: InputDecoration(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10)),
-        hintText: 'Enter a Feedback',
+        hintText: 'Enter your Feedback',
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),  
       ),
     );
