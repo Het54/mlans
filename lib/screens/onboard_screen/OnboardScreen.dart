@@ -48,8 +48,17 @@ class OnboardScreen extends StatelessWidget {
                                   return Provider.of<OnboardScreenHelpers>(
                                           context,
                                           listen: false)
-                                      .premiumCard(context);
+                                      .Comingsoon(context);
                                 });
+                            /*showCupertinoDialog(
+                                context: context,
+                                barrierDismissible: true,
+                                builder: (BuildContext context) {
+                                  return Provider.of<OnboardScreenHelpers>(
+                                          context,
+                                          listen: false)
+                                      .premiumCard(context);
+                                });*/
                           },
                           child: Icon(Icons.group_add_outlined,
                               color: Colors.black),
