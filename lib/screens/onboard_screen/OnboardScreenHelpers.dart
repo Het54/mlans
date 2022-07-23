@@ -176,6 +176,45 @@ class OnboardScreenHelpers with ChangeNotifier {
     );
   }
 
+
+  Comingsoon(BuildContext context) {
+
+
+    return Dialog(
+      insetAnimationCurve: Curves.easeInCirc,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(15.0))),
+      child: Container(
+        width: MediaQuery
+            .of(context)
+            .size
+            .width,
+        height: MediaQuery
+            .of(context)
+            .size
+            .height * 0.2,
+        decoration: BoxDecoration(
+            image: DecorationImage(
+              fit: BoxFit.cover,
+              image: NetworkImage(
+                  "https://images.unsplash.com/photo-1534175507998-e5477e27c2c7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80"),
+            ),
+            borderRadius: BorderRadius.circular(15)),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("Coming Soon...",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 25)),
+            
+          ],
+        ),
+      ),
+    );
+  }
+
   premiumCodeDisplay(BuildContext context) {
     return Dialog(
       insetAnimationCurve: Curves.easeInCirc,

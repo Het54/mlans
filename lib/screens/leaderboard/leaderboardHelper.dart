@@ -1,13 +1,22 @@
+import 'dart:convert';
+
 import 'package:Moneylans/services/Authentication.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
+
+import '../../utils/PostOptions.dart';
 
 int userIndex = 0,
     userPoint = 0;
+List l = [];    
+bool? check = false;    
 
 class leaderboardHelper with ChangeNotifier {
   Widget firebaseTopList(BuildContext context, userId) {
@@ -61,6 +70,7 @@ class leaderboardHelper with ChangeNotifier {
 void showCustomDialog(BuildContext context, String userId) {
   TextEditingController desc = TextEditingController();
   TextEditingController link = TextEditingController();
+  TextEditingController product = TextEditingController();
   showGeneralDialog(
     context: context,
     barrierLabel: "Barrier",
@@ -81,7 +91,7 @@ void showCustomDialog(BuildContext context, String userId) {
             height: MediaQuery
                 .of(context)
                 .size
-                .height * 0.5,
+                .height * 0.8,
             width: MediaQuery
                 .of(context)
                 .size
@@ -91,6 +101,31 @@ void showCustomDialog(BuildContext context, String userId) {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  TextFormField(
+                      controller: product,
+                      decoration: new InputDecoration(
+                        labelText: "Enter Product/Service Name",
+                        labelStyle: TextStyle(color: Colors.black),
+                        focusColor: Colors.black,
+                        fillColor: Colors.white,
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          borderSide: BorderSide(
+                            color: Colors.black,
+                          ),
+                        ),
+                        border: new OutlineInputBorder(
+                          borderRadius: new BorderRadius.circular(20.0),
+                          borderSide: BorderSide(width: 1, color: Colors.black),
+                        ),
+                        //fillColor: Colors.green
+                      ), 
+                      cursorColor: Colors.black,
+                      keyboardType: TextInputType.text,
+                      style: new TextStyle(
+                        fontFamily: "Poppins",
+                      )),
+                  SizedBox(height: 15),
                   TextFormField(
                       controller: desc,
                       decoration: new InputDecoration(
@@ -153,6 +188,7 @@ void showCustomDialog(BuildContext context, String userId) {
                                   .collection("leaderboard")
                                   .doc(userId)
                                   .update({
+                                "Product": product.text,    
                                 "description": desc.text,
                                 "link": link.text,
                               }).then((value) =>
@@ -162,6 +198,7 @@ void showCustomDialog(BuildContext context, String userId) {
                                       .collection("leaderboardDetails")
                                       .doc("Detail")
                                       .update({
+                                    "Product": product.text,    
                                     "Description": desc.text,
                                     "Link": link.text,
                                     "userId": userId
@@ -446,6 +483,60 @@ Widget feedBody(BuildContext context,userId,userPoints) {
   );
 }
 
+sendNotification(String title, String token) async {
+    final data = {
+      'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+      'id': '1',
+      'status': 'done',
+      'message': title,
+    };
+
+    try {
+      http.Response response =
+          await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+              headers: <String, String>{
+                'Content-Type': 'application/json',
+                'Authorization':
+                    'key=AAAADLBdq2Y:APA91bHH0thNUfQqZnQBnb0mqU3VnJG9sz4uGBLeBZEaB1NZUE6BASB2FJMekDnZPPMmijQY6yB4gFlFaL2-SzmBF364khQiMzA9x3keE5YrHY_cYR_Eu3_WO6bCVqkLpePNmCGJ70kG'
+              },
+              body: jsonEncode(<String, dynamic>{
+                'notification': <String, dynamic>{
+                  'title': title,
+                  'body': 'You have received $title'
+                },
+                'priority': 'high',
+                'data': data,
+                'to': '$token'
+              }));
+
+      if (response.statusCode == 200) {
+        print("Notificatin sent");
+      } else {
+        print("Error");
+      }
+    } catch (e) {}
+  }
+
+checkpointer(String postid, String type) async {
+    await FirebaseFirestore.instance
+        .collection("posts")
+        .doc(postid)
+        .collection("$type")
+        .get()
+        .then((docSnapshot) => {
+              for (int i = 0; i < docSnapshot.docs.length; i++)
+                {l.add(docSnapshot.docs[i].data()['userId'])}
+            });
+
+    for (int i = 0; i < l.length; i++) {
+      if (l[i] == FirebaseAuth.instance.currentUser?.uid) {
+        check = true;
+      }
+    }
+    l.clear();
+    return (check);
+  }
+
 Widget loadPosts(BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot,userId) {
   return ListView(
       children: snapshot.data!.docs.map((DocumentSnapshot documentSnapshot) {
@@ -530,229 +621,506 @@ Widget loadPosts(BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot,use
                       SizedBox(height: 10),
                       Text(
                         data['debtType'] +
-                            " at " +
-                            data['intrestPercentage'] +
-                            "% interest" +
-                            " for " +
-                            data['timePeriod'],
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w100,
-                          color: Colors.lightBlue,
+                                    " at " +
+                                    data['intrestPercentage'] +
+                                    "% interest" +
+                                    " for " +
+                                    data['timePeriod'],
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w100,
+                                  color: Colors.lightBlue,
+                                ),
+                              ),
+                              Divider(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.02,
+                                thickness: 1,
+                                color: Color(0xff636363),
+                              ),
+                              Container(
+                                width: MediaQuery.of(context).size.width,
+                                child: Text(
+                                  data['content'],
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 1),
+                              data['edited']
+                                  ? Row(
+                                      children: [
+                                        Text(
+                                          "(Edited)",
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: Colors.grey.shade600,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : SizedBox(width: 0)
+                            ],
+                          ),
                         ),
-                      ),
-                      Divider(
-                        height: MediaQuery.of(context).size.height * 0.02,
-                        thickness: 1,
-                        color: Color(0xff636363),
-                      ),
-                      Container(
+                      )
+                    : Container(
                         width: MediaQuery.of(context).size.width,
-                        child: Text(
-                          data['content'],
-                          style: TextStyle(
-                            color: Colors.black,
+                        decoration: BoxDecoration(
+                          border:
+                              Border.all(width: 2, color: Color(0xffd9d9d9)),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Center(
+                                child: Text(
+                                  data['title'],
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.lightBlue,
+                                  ),
+                                ),
+                              ),
+                              Divider(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.02,
+                                thickness: 1,
+                                color: Color(0xff636363),
+                              ),
+                              Text(
+                                data['content'],
+                                //overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w200,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                      SizedBox(height: 1),
-                      data['edited']
-                          ? Row(
-                        children: [
-                          Text(
-                            "(Edited)",
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.grey.shade600,
-                            ),
-                          ),
-                        ],
-                      )
-                          : SizedBox(width: 0)
-                    ],
-                  ),
-                ),
-              )
-                  : Container(
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  border: Border.all(width: 2, color: Color(0xffd9d9d9)),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Center(
-                        child: Text(
-                          data['title'],
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.lightBlue,
-                          ),
-                        ),
+                Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(25),
+                        bottomRight: Radius.circular(25),
                       ),
-                      Divider(
-                        height: MediaQuery.of(context).size.height * 0.02,
-                        thickness: 1,
-                        color: Color(0xff636363),
-                      ),
-                      Text(
-                        data['content'],
-                        //overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w200,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              GestureDetector(
-                onTap:() => Fluttertoast.showToast(msg: "Can't perform here"),
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(25),
-                      bottomRight: Radius.circular(25),
+                      color: Color(0xffd9d9d9),
                     ),
-                    color: Color(0xffd9d9d9),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Container(
-                        width: MediaQuery.of(context).size.width / 3 - 10,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              FontAwesomeIcons.angleUp,
-                              color: Colors.green,
-                              size: 22,
-                            ),
-                            SizedBox(width: 4),
-                            StreamBuilder<QuerySnapshot>(
-                              stream: FirebaseFirestore.instance
-                                  .collection('posts')
-                                  .doc(data['postId'])
-                                  .collection('upvotes')
-                                  .snapshots(),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return Center(
-                                      child: SizedBox(
-                                          height: 10,
-                                          width: 10,
-                                          child: CircularProgressIndicator(
-                                              strokeWidth: 1)));
-                                } else {
-                                  return Text(
-                                      snapshot.data!.docs.length.toString(),
-                                      style: TextStyle(color: Colors.green));
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () async {
+                            check =
+                                await checkpointer(data['postId'], "upvotes");
+                            if (check == false) {
+                              FirebaseFirestore.instance
+                                  .collection("userData")
+                                  .doc(data['userId'])
+                                  .get()
+                                  .then((DocumentSnapshot documentSnapshot) {
+                                if (documentSnapshot.exists) {
+                                  print(
+                                      'Document data: ${documentSnapshot.data()}');
+                                  var a = documentSnapshot.data();
+                                  Map.from(a as Map<String, dynamic>);
+                                  String token = a["token"];
+                                  sendNotification("Upvote", token);
                                 }
-                              },
+                              });
+                              Provider.of<PostOptions>(context, listen: false)
+                                  .addUpvote(
+                                      context,
+                                      data['postId'],
+                                      Provider.of<Authentication>(context,
+                                              listen: false)
+                                          .getUser()!
+                                          .uid,
+                                      data['userId']);
+                            }
+                            check = false;
+                          },
+                          child: Container(
+                            width: MediaQuery.of(context).size.width / 4 - 10,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  FontAwesomeIcons.angleUp,
+                                  color: Colors.green,
+                                  size: 22,
+                                ),
+                                SizedBox(width: 4),
+                                StreamBuilder<QuerySnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection('posts')
+                                      .doc(data['postId'])
+                                      .collection('upvotes')
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return Center(
+                                          child: SizedBox(
+                                              height: 10,
+                                              width: 10,
+                                              child: CircularProgressIndicator(
+                                                  strokeWidth: 1)));
+                                    } else {
+                                      return Text(
+                                          snapshot.data!.docs.length.toString(),
+                                          style:
+                                              TextStyle(color: Colors.green));
+                                    }
+                                  },
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                      Container(
-                        width: MediaQuery.of(context).size.width / 3 - 10,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              FontAwesomeIcons.angleDown,
-                              color: Colors.red,
-                              size: 22,
-                            ),
-                            SizedBox(width: 4),
-                            StreamBuilder<QuerySnapshot>(
-                              stream: FirebaseFirestore.instance
-                                  .collection('posts')
-                                  .doc(data['postId'])
-                                  .collection('downvotes')
-                                  .snapshots(),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return Center(
-                                      child: SizedBox(
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () async {
+                            check =
+                                await checkpointer(data['postId'], "downvotes");
+                            if (check == false) {
+                              FirebaseFirestore.instance
+                                  .collection("userData")
+                                  .doc(data['userId'])
+                                  .get()
+                                  .then((DocumentSnapshot documentSnapshot) {
+                                if (documentSnapshot.exists) {
+                                  print(
+                                      'Document data: ${documentSnapshot.data()}');
+                                  var a = documentSnapshot.data();
+                                  Map.from(a as Map<String, dynamic>);
+                                  String token = a["token"];
+                                  print(token);
+                                  sendNotification("Downvote", token);
+                                }
+                              });
+                              Provider.of<PostOptions>(context, listen: false)
+                                  .addDownvote(
+                                      context,
+                                      data['postId'],
+                                      Provider.of<Authentication>(context,
+                                              listen: false)
+                                          .getUser()!
+                                          .uid,
+                                      data['userId']);
+                            }
+                            check = false;
+                          },
+                          child: Container(
+                            width: MediaQuery.of(context).size.width / 4 - 10,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  FontAwesomeIcons.angleDown,
+                                  color: Colors.red,
+                                  size: 22,
+                                ),
+                                SizedBox(width: 4),
+                                StreamBuilder<QuerySnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection('posts')
+                                      .doc(data['postId'])
+                                      .collection('downvotes')
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return Center(
+                                          child: SizedBox(
                                         height: 10,
                                         width: 10,
-                                        child:
-                                        CircularProgressIndicator(strokeWidth: 1),
+                                        child: CircularProgressIndicator(
+                                            strokeWidth: 1),
                                       ));
-                                } else {
-                                  return Text(
-                                      snapshot.data!.docs.length.toString(),
-                                      style: TextStyle(color: Colors.red));
-                                }
-                              },
+                                    } else {
+                                      return Text(
+                                          snapshot.data!.docs.length.toString(),
+                                          style: TextStyle(color: Colors.red));
+                                    }
+                                  },
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                      Container(
-                        width: MediaQuery.of(context).size.width / 3 - 10,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Icon(
-                              FontAwesomeIcons.comment,
-                              color: Colors.blue,
-                              size: 22,
-                            ),
-                            SizedBox(width: 4),
-                            StreamBuilder<QuerySnapshot>(
-                              stream: FirebaseFirestore.instance
-                                  .collection('posts')
-                                  .doc(data['postId'])
-                                  .collection('comments')
-                                  .snapshots(),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return Center(
-                                      child: SizedBox(
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {
+                            addCommentSheet(
+                                context,
+                                documentSnapshot,
+                                Provider.of<Authentication>(context,
+                                        listen: false)
+                                    .getUser()!
+                                    .uid,
+                                data['postId'],
+                                data['userId']);
+                          },
+                          child: Container(
+                            width: MediaQuery.of(context).size.width / 4 - 10,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  FontAwesomeIcons.comment,
+                                  color: Colors.blue,
+                                  size: 22,
+                                ),
+                                SizedBox(width: 4),
+                                StreamBuilder<QuerySnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection('posts')
+                                      .doc(data['postId'])
+                                      .collection('comments')
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return Center(
+                                          child: SizedBox(
                                         height: 10,
                                         width: 10,
-                                        child:
-                                        CircularProgressIndicator(strokeWidth: 1),
+                                        child: CircularProgressIndicator(
+                                            strokeWidth: 1),
                                       ));
-                                } else {
-                                  return Text(
-                                    " ${snapshot.data!.docs.length.toString()}",
-                                    style: TextStyle(color: Colors.blue),
-                                  );
-                                }
-                              },
+                                    } else {
+                                      return Text(
+                                        " ${snapshot.data!.docs.length.toString()}",
+                                        style: TextStyle(color: Colors.blue),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
-                      )
-                    ],
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () => Share.share(
+                            data['content'],
+                            subject: data['debtType'] +
+                                " at " +
+                                data['intrestPercentage'] +
+                                "% interest" +
+                                " for " +
+                                data['timePeriod'],
+                          ),
+                          child: Container(
+                            width: MediaQuery.of(context).size.width / 4 - 10,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  FontAwesomeIcons.shareAlt,
+                                  color: Colors.blue,
+                                  size: 22,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ),
-            ],
-          ),
-        )
-              : SizedBox();
-      }).toList());
+              ],
+            ),
+          )
+        : SizedBox();
+  }).toList());
 }
+
+addCommentSheet(BuildContext context, DocumentSnapshot snapshot, String docId,
+      String postId, String userId) {
+    TextEditingController commentController = TextEditingController();
+
+    return showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (BuildContext context) {
+          return Container(
+            height: MediaQuery.of(context).size.height * 0.7,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(15), topLeft: Radius.circular(15)),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  // ignore: prefer_const_literals_to_create_immutables
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 100.0),
+                      child: Divider(
+                        thickness: 4.0,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    Text(
+                      "Comments..",
+                      style: TextStyle(fontSize: 20, color: Colors.black),
+                    ),
+                    SizedBox(height: 10),
+                    StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('posts')
+                          .doc(postId)
+                          .collection('comments')
+                          .orderBy('time', descending: true)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else {
+                          return ListView(
+                            shrinkWrap: true,
+                            children: snapshot.data!.docs
+                                .map((DocumentSnapshot documentSnapshot) {
+                              Map<String, dynamic> data = documentSnapshot
+                                  .data()! as Map<String, dynamic>;
+
+                              return SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.11,
+                                width: MediaQuery.of(context).size.width,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12.0),
+                                      child: Text(
+                                        data['userId'],
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Provider.of<Authentication>(
+                                                          context,
+                                                          listen: false)
+                                                      .getUser()
+                                                      ?.uid ==
+                                                  data['userId']
+                                              ? Colors.blue
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        // ignore: prefer_const_literals_to_create_immutables
+                                        children: [
+                                          Icon(
+                                            Icons.arrow_forward_ios_outlined,
+                                            color: Colors.blue,
+                                            size: 12,
+                                          ),
+                                          SizedBox(width: 2),
+                                          SizedBox(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.9,
+                                              child: Text(data['comments']))
+                                        ],
+                                      ),
+                                    ),
+                                    Divider(
+                                      thickness: 1,
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          );
+                        }
+                      },
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: SizedBox(
+                            width: 300,
+                            height: 20,
+                            child: TextField(
+                              controller: commentController,
+                              textCapitalization: TextCapitalization.sentences,
+                              decoration:
+                                  InputDecoration(hintText: "Add comment..."),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 20),
+                        FloatingActionButton(
+                          onPressed: () {
+                            FirebaseFirestore.instance
+                                .collection("userData")
+                                .doc(userId)
+                                .get()
+                                .then((DocumentSnapshot documentSnapshot) {
+                              if (documentSnapshot.exists) {
+                                print(
+                                    'Document data: ${documentSnapshot.data()}');
+                                var a = documentSnapshot.data();
+                                Map.from(a as Map<String, dynamic>);
+                                String token = a["token"];
+                                print(token);
+                                sendNotification("Comment", token);
+                              }
+                            });
+                            Provider.of<PostOptions>(context, listen: false)
+                                .addComment(context, postId,
+                                    commentController.text, userId);
+                            commentController.clear();
+                          },
+                          child: Transform.rotate(
+                              angle: 100,
+                              child: Icon(Icons.send, color: Colors.white)),
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
+          );
+        });
+  }
 
 Widget leaderList(BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot,
     userId) {

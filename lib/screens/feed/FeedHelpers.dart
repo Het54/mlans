@@ -1586,7 +1586,7 @@ class _leaderState extends State<leader> {
       children: [
         Container(
           height:
-              leaderWinnerHeight ? 0 : MediaQuery.of(context).size.height * 0.3,
+              leaderWinnerHeight ? 0 : MediaQuery.of(context).size.height * 0.4,
           child: leaderboard_winner_data(),
         ),
         GestureDetector(
