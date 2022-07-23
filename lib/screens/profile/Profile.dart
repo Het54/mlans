@@ -349,13 +349,13 @@ class profileBio extends StatelessWidget {
                   ],
                 ),
                 //SizedBox(width: 5,),
-                Container(
+                /*Container(
                   child: QrImage(
                     data: uid!,
                     size:120,
                     gapless: false,
                   ),
-                ),
+                ),*/
               ],
 
             ),

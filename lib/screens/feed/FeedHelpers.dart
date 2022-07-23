@@ -1584,12 +1584,12 @@ class _leaderState extends State<leader> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
+        /*Container(
           height:
               leaderWinnerHeight ? 0 : MediaQuery.of(context).size.height * 0.4,
           child: leaderboard_winner_data(),
-        ),
-        GestureDetector(
+        ),*/
+        /*GestureDetector(
           onTap: () => setState(() {
             leaderWinnerHeight = !leaderWinnerHeight;
           }),
@@ -1602,7 +1602,7 @@ class _leaderState extends State<leader> {
                 Icons.menu_outlined,
                 color: Colors.white,
               )),
-        ),
+        ),*/
       ],
     );
   }
