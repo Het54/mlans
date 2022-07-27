@@ -29,6 +29,7 @@ class _firebaseTopListState extends State<firebaseTopList> {
   @override
   void initState() {
     super.initState();
+
     Future.delayed(const Duration(milliseconds: 300), () {
       if (userlink == "" || userlink == null)
         WidgetsBinding.instance.addPostFrameCallback((_) async {
