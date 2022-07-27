@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'leaderboardHelper.dart';
 
@@ -26,8 +25,7 @@ class leaderboard extends StatelessWidget {
             onTap: ()=> Navigator.pop(context),
             child: Icon(Icons.arrow_back_ios,color: Colors.black,size: 16)),
       ),
-      body: Provider.of<leaderboardHelper>(context, listen: false)
-          .firebaseTopList(context,this.userId)
+      body: firebaseTopList(userId: userId)
     );
   }
 }

@@ -78,7 +78,7 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => LandingServices()),
           ChangeNotifierProvider(create: (_) => FirebaseOperations()),
           ChangeNotifierProvider(create: (_) => LandingUtils()),
-          ChangeNotifierProvider(create: (_) => leaderboardHelper()),
+          //ChangeNotifierProvider(create: (_) => leaderboardHelper()),
         ]);
   }
 }

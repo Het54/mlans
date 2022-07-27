@@ -73,6 +73,11 @@ android {
            crunchPngs false
        }
    }
+
+   lintOptions {
+       checkReleaseBuilds false
+       abortOnError false
+   }
 }
 
 flutter {
