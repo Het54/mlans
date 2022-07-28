@@ -323,8 +323,7 @@ launchUrl(url) async {
     throw "Could not launch $url";
 }
 
-customDrawer(
-    BuildContext context, userId, description, link, userPoints, index) {
+customDrawer(BuildContext context, userId, description, link, userPoints, index, product) {
   return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -356,9 +355,8 @@ customDrawer(
                             padding: const EdgeInsets.only(
                                 right: 12, left: 12, top: 20, bottom: 10),
                             child: link != null && link != ""
-                                ? Text(
-                                    "This week's $index rank holders get help from $link, try by clicking on the visit",
-                                    style: TextStyle(color: Colors.white))
+                                ? Text("This week's $index rank holders get help from $product, try by clicking on the visit",
+                                style: TextStyle(color: Colors.white))
                                 : Text("No data updated!",
                                     style: TextStyle(color: Colors.white)),
                           ),
@@ -1131,27 +1129,25 @@ Widget leaderList(
       children: snapshot.data!.docs.map((DocumentSnapshot documentSnapshot) {
     Map<String, dynamic> data =
         documentSnapshot.data()! as Map<String, dynamic>;
-    index++;
-    FirebaseFirestore.instance
-        .collection("leaderboard")
-        .doc(data["userId"])
-        .set({'index': index},
-        SetOptions(merge: true));
-    if (data["userId"] == userId) {
-      userIndex = index;
-      userPoint = data["point"] * 10;
-      userlink = data["link"];
-    };
-    return Padding(
-      padding: const EdgeInsets.only(right: 8, left: 8, top: 5, bottom: 5),
-      child: GestureDetector(
-        onTap: () => customDrawer(context, data["userId"], data["description"],
-            data["link"], data["point"] * 10, data["index"]),
-        child: Container(
-          decoration: BoxDecoration(
-              color: index == 1
-                  ? Color(0xB3FFCC00)
-                  : index == 2
+        index++;
+        FirebaseFirestore.instance
+          .collection("leaderboard")
+          .doc(data["userId"])
+          .set({'index': index}, SetOptions(merge: true));
+        if (data["userId"] == userId) {
+          userIndex = index;
+          userPoint = data["point"] * 10;
+        };
+        return Padding(
+          padding: const EdgeInsets.only(right: 8, left: 8, top: 5, bottom: 5),
+          child: GestureDetector(
+            onTap: () =>
+                customDrawer(context, data["userId"], data["description"], data["link"], data["point"] * 10, data["index"], data["Product"]),
+            child: Container(
+              decoration: BoxDecoration(
+                  color: index == 1
+                      ? Color(0xB3FFCC00)
+                      : index == 2
                       ? Color(0xB38FFFFF)
                       : index == 3
                           ? Color(0xB3F68FFD)
