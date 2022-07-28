@@ -317,7 +317,7 @@ launchUrl(url) async {
     throw "Could not launch $url";
 }
 
-customDrawer(BuildContext context, userId, description, link, userPoints, index) {
+customDrawer(BuildContext context, userId, description, link, userPoints, index, product) {
   return showDialog(
       context: context, 
       builder: (BuildContext context) {
@@ -358,7 +358,7 @@ customDrawer(BuildContext context, userId, description, link, userPoints, index)
                             padding: const EdgeInsets.only(
                                 right: 12, left: 12, top: 20, bottom: 10),
                             child: link != null && link != ""
-                                ? Text("This week's $index rank holders get help from $link, try by clicking on the visit",
+                                ? Text("This week's $index rank holders get help from $product, try by clicking on the visit",
                                 style: TextStyle(color: Colors.white))
                                 : Text("No data updated!",
                                 style: TextStyle(color: Colors.white)),
@@ -1142,7 +1142,7 @@ Widget leaderList(BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot,
           padding: const EdgeInsets.only(right: 8, left: 8, top: 5, bottom: 5),
           child: GestureDetector(
             onTap: () =>
-                customDrawer(context, data["userId"], data["description"], data["link"], data["point"] * 10, data["index"]),
+                customDrawer(context, data["userId"], data["description"], data["link"], data["point"] * 10, data["index"], data["Product"]),
             child: Container(
               decoration: BoxDecoration(
                   color: index == 1
