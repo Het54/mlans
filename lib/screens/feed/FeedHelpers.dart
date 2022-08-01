@@ -494,6 +494,7 @@ class FeedHelpers with ChangeNotifier {
       'id': '1',
       'status': 'done',
       'message': title,
+      'icon' : 'assets/images/mlans.jpg'
     };
 
     try {
@@ -1472,8 +1473,7 @@ class FeedHelpers with ChangeNotifier {
                                     listen: false)
                                 .updatePostData(postId, {
                               'debt': debtControl.text,
-                              'intrestPercentage':
-                                  interestPercentageControl.text,
+                              'intrestPercentage': interestPercentageControl.text,
                               'debtType': debtTypeControl.text,
                               'timePeriod': timePeriodControl.text,
                               'goalDate': goalDateControl.text,

@@ -1,12 +1,13 @@
 import 'dart:ffi';
+import 'dart:io';
 import 'dart:math';
-
+import 'package:Moneylans/screens/landing_page/landingHelpers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:provider/provider.dart';
-
 import '../screens/landing_page/landingUtils.dart';
 import 'Authentication.dart';
 
@@ -14,6 +15,7 @@ class FirebaseOperations with ChangeNotifier {
   late UploadTask imageUploadTask;
 
   Future uploadUserImage(BuildContext context) async {
+    context.loaderOverlay.show();
     Reference imageReference = FirebaseStorage.instance.ref().child(
         'userProfileImage/${Provider.of<LandingUtils>(context, listen: false).getUserImage.path}/${TimeOfDay.now()}');
 
@@ -21,14 +23,26 @@ class FirebaseOperations with ChangeNotifier {
         Provider.of<LandingUtils>(context, listen: false).getUserImage);
 
     await imageUploadTask.whenComplete(() {
-      print("Image Uploaded!");
+      Provider.of<LandingHelpers>(context,
+          listen: false)
+          .displayToast(
+          "Uploaded Successfully!", context);
     });
 
     imageReference.getDownloadURL().then((url) {
       Provider.of<LandingUtils>(context, listen: false).userImageUrl =
           url.toString();
-      print(
-          "image url: ${Provider.of<LandingUtils>(context, listen: false).userImageUrl}");
+
+      FirebaseFirestore.instance
+          .collection('userData')
+          .doc(Provider.of<Authentication>(context,
+          listen: false)
+          .getUser()
+          ?.uid)
+          .update({"profileUrl": Provider.of<LandingUtils>(context, listen: false).userImageUrl});
+      Navigator.pop(context);
+      Navigator.pop(context);
+      context.loaderOverlay.hide();
       notifyListeners();
     });
   }

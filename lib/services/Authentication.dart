@@ -49,14 +49,14 @@ class Authentication with ChangeNotifier {
               .progressDialog(context, "Registering, please wait......");
         });
 
-    final User? firebaseUser = (await firebaseAuth
+    final User? firebaseUser = (
+        await firebaseAuth
         .createUserWithEmailAndPassword(email: email, password: password)
         .catchError((errMsg) {
       Navigator.pop(context);
       Provider.of<LandingHelpers>(context, listen: false)
           .displayToast("Error: " + errMsg.toString(), context);
-    }))
-        .user;
+    })).user;
 
     if (firebaseUser != null) {
       userRef.child(firebaseUser.uid);
@@ -68,28 +68,19 @@ class Authentication with ChangeNotifier {
         "premium": false,
         "onBoardCode": Provider.of<FirebaseOperations>(context, listen: false)
             .generateOnboardCode(),
+        "description" : "",
+        "profileUrl" : ""
       };
 
       userRef.child(firebaseUser.uid).set(userDataMap);
 
-      Provider.of<FirebaseOperations>(context, listen: false)
-          .createUserCollection(context, userDataMap);
+      Provider.of<FirebaseOperations>(context, listen: false).createUserCollection(context, userDataMap);
 
-      Provider.of<LandingHelpers>(context, listen: false).displayToast(
-          "Congratulations! your account has been created.", context);
+      Provider.of<LandingHelpers>(context, listen: false).displayToast("Congratulations! your account has been created.", context);
 
-      FirebaseFirestore.instance
-          .collection('leaderboard')
-          .doc(Provider
-          .of<Authentication>(context, listen: false)
-          .getUser()
-          ?.uid)
-          .set({
+      FirebaseFirestore.instance.collection('leaderboard').doc(Provider.of<Authentication>(context, listen: false).getUser()?.uid).set({
         'point': 0,
-        'userId': Provider
-            .of<Authentication>(context, listen: false)
-            .getUser()
-            ?.uid,
+        'userId': Provider.of<Authentication>(context, listen: false).getUser()?.uid,
         'description': "",
         'link': ""
       });
@@ -111,6 +102,7 @@ class Authentication with ChangeNotifier {
 
   Future logOutAccount(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
+
 
     Navigator.pushNamedAndRemoveUntil(
         context, '/landingpage', (route) => false);

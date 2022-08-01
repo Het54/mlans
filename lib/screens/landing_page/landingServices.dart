@@ -42,12 +42,13 @@ class LandingServices with ChangeNotifier {
                     color: Colors.black,
                   ),
                 ),
-                CircleAvatar(
+                /*Provider.of<LandingUtils>(context, listen: false)
+                    .userImage == null ? SizedBox() : */CircleAvatar(
                   radius: 80.0,
-                  backgroundColor: Colors.red,
+                  backgroundColor: Colors.white,
                   backgroundImage: FileImage(
                       Provider.of<LandingUtils>(context, listen: false)
-                          .userImage),
+                          .userImage!),
                 ),
                 Container(
                   child: Row(
@@ -63,10 +64,7 @@ class LandingServices with ChangeNotifier {
                             onPressed: () {
                               Provider.of<FirebaseOperations>(context,
                                       listen: false)
-                                  .uploadUserImage(context)
-                                  .whenComplete(() {
-                                signInSheet(context);
-                              });
+                                  .uploadUserImage(context);
                             },
                             child: Text("Confirm")),
                       ]),
