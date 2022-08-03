@@ -1027,7 +1027,7 @@ class FeedHelpers with ChangeNotifier {
   addCommentSheet(BuildContext context, DocumentSnapshot snapshot, String docId,
       String postId, String userId) {
     TextEditingController commentController = TextEditingController();
-
+    TextEditingController report =TextEditingController();
     return showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -1081,7 +1081,7 @@ class FeedHelpers with ChangeNotifier {
 
                               return SizedBox(
                                 height:
-                                    MediaQuery.of(context).size.height * 0.11,
+                                MediaQuery.of(context).size.height * 0.11,
                                 width: MediaQuery.of(context).size.width,
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
@@ -1095,11 +1095,11 @@ class FeedHelpers with ChangeNotifier {
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Provider.of<Authentication>(
-                                                          context,
-                                                          listen: false)
-                                                      .getUser()
-                                                      ?.uid ==
-                                                  data['userId']
+                                              context,
+                                              listen: false)
+                                              .getUser()
+                                              ?.uid ==
+                                              data['userId']
                                               ? Colors.blue
                                               : Colors.black,
                                         ),
@@ -1108,21 +1108,61 @@ class FeedHelpers with ChangeNotifier {
                                     Expanded(
                                       child: Row(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.start,
+                                        MainAxisAlignment.start,
                                         // ignore: prefer_const_literals_to_create_immutables
                                         children: [
-                                          Icon(
-                                            Icons.arrow_forward_ios_outlined,
-                                            color: Colors.blue,
-                                            size: 12,
+                                          Column(
+                                              children:[ Icon(
+                                                Icons.arrow_forward_ios_outlined,
+                                                color: Colors.blue,
+                                                size: 13,
+                                              ),
+                                              ]
                                           ),
                                           SizedBox(width: 2),
                                           SizedBox(
                                               width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.9,
-                                              child: Text(data['comments']))
+                                                  .size
+                                                  .width *0.71,
+                                              child: Text(data['comments'])),
+
+                                          Column(
+                                              children:[
+                                                GestureDetector(
+                                                    onTap: (){
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (ctx) => AlertDialog(
+                                                            title: Text("Report"),
+                                                            content: TextFormField(
+                                                              autofocus: true,
+                                                              controller: report,
+                                                            ),
+                                                            actions:<Widget>[
+                                                              FlatButton(onPressed: ()
+                                                              {
+                                                                Provider.of<FirebaseOperations>(context,
+                                                                    listen: false)
+                                                                    .reportComment(
+                                                                    "${Provider.of<Authentication>(context, listen: false).getUser()?.uid}",
+                                                                    "${data["postId"]},${data["data"]}",
+                                                                    {
+                                                                      "user": 1,
+                                                                      "report": report.text
+                                                                    });
+                                                                Navigator.of(ctx).pop();
+                                                                report.clear();
+                                                              },
+                                                                child:Text("SEND"),
+                                                              ),
+                                                            ]
+                                                        ),
+                                                      );
+                                                    },
+                                                    child: Icon(Icons.more_vert )
+                                                )
+                                              ]
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -1153,7 +1193,7 @@ class FeedHelpers with ChangeNotifier {
                               controller: commentController,
                               textCapitalization: TextCapitalization.sentences,
                               decoration:
-                                  InputDecoration(hintText: "Add comment..."),
+                              InputDecoration(hintText: "Add comment..."),
                             ),
                           ),
                         ),
@@ -1177,7 +1217,7 @@ class FeedHelpers with ChangeNotifier {
                             });
                             Provider.of<PostOptions>(context, listen: false)
                                 .addComment(context, postId,
-                                    commentController.text, userId);
+                                commentController.text, userId);
                             commentController.clear();
                           },
                           child: Transform.rotate(
