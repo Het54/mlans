@@ -128,4 +128,13 @@ class FirebaseOperations with ChangeNotifier {
         Fluttertoast.showToast(msg: "Opps thats not matching🤨");
     });
   }
+  Future reportComment(String userId, String postId, dynamic data) async {
+    return FirebaseFirestore.instance
+        .collection("Reports")
+        .doc(postId)
+        .collection(userId)
+        .doc("report")
+        .set(data);
+  }
+
 }
