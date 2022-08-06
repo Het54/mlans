@@ -1,3 +1,4 @@
+import 'package:Moneylans/screens/explore/explore.dart';
 import 'package:Moneylans/screens/onboard_screen/OnboardScreen.dart';
 import 'package:Moneylans/screens/profile/ProfileHelpers.dart';
 import 'package:Moneylans/services/local_puch_notification.dart';
@@ -53,7 +54,8 @@ class _HomePageState extends State<HomePage> {
         },
         children: [
           Feed(),
-          OnboardScreen(),
+          Explore(),
+          //OnboardScreen(),
           Profile(name: widget.name),
         ],
       ),
