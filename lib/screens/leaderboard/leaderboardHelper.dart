@@ -30,7 +30,7 @@ class _firebaseTopListState extends State<firebaseTopList> {
   void initState() {
     super.initState();
 
-    Future.delayed(const Duration(milliseconds: 300), () {
+    Future.delayed(Duration(milliseconds: 300), () {
       if (userlink == "" || userlink == null)
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           await showCustomDialog(context, widget.userId.toString());

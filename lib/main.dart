@@ -34,7 +34,6 @@ void main() async {
   await Firebase.initializeApp();
   LocalNotificationService.initialize();
   FirebaseMessaging.onBackgroundMessage(handlebckmessaging);
-
   runApp(const MyApp());
 }
 

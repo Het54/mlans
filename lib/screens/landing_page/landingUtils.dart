@@ -1,7 +1,5 @@
 // ignore_for_file: deprecated_member_use, avoid_print, unnecessary_null_comparison
-
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
@@ -13,23 +11,24 @@ import 'landingServices.dart';
 class LandingUtils with ChangeNotifier {
   final picker = ImagePicker();
 
-  late File userImage;
-  File get getUserImage => userImage;
+  File? userImage = null;
+  File get getUserImage => userImage!;
 
   late String userImageUrl;
   String get getUserImageUrl => userImageUrl;
 
   Future pickUserImage(BuildContext context, ImageSource source) async {
     final pickedUserImage = await picker.getImage(source: source);
-    pickedUserImage == null
-        ? print("Select Image")
-        : userImage = File(pickedUserImage.path);
-    print(userImage.path);
+    pickedUserImage == null ?
+    userImage = null
+        : userImage = await File(pickedUserImage.path);
 
-    userImage != null
-        ? Provider.of<LandingServices>(context, listen: false)
+    print("This is the path->>>>>"+userImage!.path);
+
+    userImage != null ?
+      Provider.of<LandingServices>(context, listen: false)
             .showUserImage(context)
-        : print("Image upload error!");
+        : print("No path found");
     notifyListeners();
   }
 

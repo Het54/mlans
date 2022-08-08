@@ -456,8 +456,8 @@ class FeedHelpers with ChangeNotifier {
         padding: const EdgeInsets.symmetric(vertical: 2.0),
         child: Container(
           child: RefreshIndicator(
-            backgroundColor: Colors.transparent,
-            color: Colors.black,
+            backgroundColor: Colors.white,
+            color: Colors.blue,
             onRefresh: () {
               return Future(() => Future.delayed(Duration(seconds: 1)));
             },
@@ -475,8 +475,7 @@ class FeedHelpers with ChangeNotifier {
                   return Column(
                     children: [
                       leader(),
-                      Expanded(
-                          child: loadPosts(context, snapshot)),
+                      Expanded(child: loadPosts(context, snapshot)),
                     ],
                   );
                 }
@@ -507,6 +506,7 @@ class FeedHelpers with ChangeNotifier {
       'id': '1',
       'status': 'done',
       'message': title,
+      'icon': 'assets/images/mlans.jpg'
     };
     http.Response response;
     await FirebaseFirestore.instance
@@ -830,8 +830,7 @@ class FeedHelpers with ChangeNotifier {
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () async {
-                      check = await checkpointer(
-                          data['postId'], "upvotes");
+                      check = await checkpointer(data['postId'], "upvotes");
                       if (check == false) {
                         FirebaseFirestore.instance
                             .collection("userData")
@@ -899,8 +898,7 @@ class FeedHelpers with ChangeNotifier {
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () async {
-                      check = await checkpointer(
-                          data['postId'], "downvotes");
+                      check = await checkpointer(data['postId'], "downvotes");
                       if (check == false) {
                         FirebaseFirestore.instance
                             .collection("userData")
@@ -1057,7 +1055,7 @@ class FeedHelpers with ChangeNotifier {
   addCommentSheet(BuildContext context, DocumentSnapshot snapshot, String docId,
       String postId, String userId) {
     TextEditingController commentController = TextEditingController();
-
+    TextEditingController report = TextEditingController();
     return showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -1119,7 +1117,7 @@ class FeedHelpers with ChangeNotifier {
                                   children: [
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
-                                          horizontal: 12.0),
+                                          horizontal: 15.0),
                                       child: Text(
                                         data['userId'],
                                         style: TextStyle(
@@ -1135,26 +1133,59 @@ class FeedHelpers with ChangeNotifier {
                                         ),
                                       ),
                                     ),
-                                    Expanded(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        // ignore: prefer_const_literals_to_create_immutables
-                                        children: [
-                                          Icon(
-                                            Icons.arrow_forward_ios_outlined,
-                                            color: Colors.blue,
-                                            size: 12,
-                                          ),
-                                          SizedBox(width: 2),
-                                          SizedBox(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.9,
-                                              child: Text(data['comments']))
-                                        ],
-                                      ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      // ignore: prefer_const_literals_to_create_immutables
+                                      children: [
+                                        Row(
+                                            children: [
+                                              Icon(
+                                                Icons.arrow_forward_ios_outlined,
+                                                color: Colors.blue,
+                                                size: 13,
+                                              ),
+                                              SizedBox(width: 4),
+                                              Text(data['comments'])
+                                        ]),
+                                        GestureDetector(
+                                            onTap: () {
+                                              showDialog(
+                                                context: context,
+                                                builder: (ctx) => AlertDialog(
+                                                    title: Text("Report"),
+                                                    content: TextFormField(
+                                                      autofocus: true,
+                                                      controller: report,
+                                                    ),
+                                                    actions: <Widget>[
+                                                      FlatButton(
+                                                        onPressed: () {
+                                                          Provider.of<FirebaseOperations>(
+                                                                  context,
+                                                                  listen: false)
+                                                              .reportComment(
+                                                                  "${Provider.of<Authentication>(context, listen: false).getUser()?.uid}",
+                                                                  "${data["postId"]},${data["data"]}",
+                                                                  {
+                                                                "user": 1,
+                                                                "report":
+                                                                    report.text
+                                                              });
+                                                          Navigator.of(ctx)
+                                                              .pop();
+                                                          report.clear();
+                                                        },
+                                                        child: Text("SEND"),
+                                                      ),
+                                                    ]),
+                                              );
+                                            },
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(10),
+                                              child: Icon(Icons.more_vert),
+                                            ))
+                                      ],
                                     ),
                                     Divider(
                                       thickness: 1,
@@ -1638,19 +1669,19 @@ class _leaderState extends State<leader> {
       ],
     );
   }
-  
 
   leaderboard_winner_data() {
     CollectionReference data =
         FirebaseFirestore.instance.collection('leaderboardDetails');
-    return Scaffold( 
+    return Scaffold(
       body: SingleChildScrollView(
         child: FutureBuilder<DocumentSnapshot>(
           future: data.doc("Detail").get(),
           builder:
               (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
             if (snapshot.hasError) {
-              return Text("Something went wrong", style: TextStyle(fontSize: 10));
+              return Text("Something went wrong",
+                  style: TextStyle(fontSize: 10));
             }
             if (snapshot.hasData && !snapshot.data!.exists) {
               return Text("Document does not exist",
@@ -1678,8 +1709,8 @@ class _leaderState extends State<leader> {
                       child: Center(
                           child: Text(
                         data['userId'],
-                        style:
-                            TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w600),
                       )),
                     ),
                     Container(
@@ -1697,25 +1728,27 @@ class _leaderState extends State<leader> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Padding(
-                            padding:
-                                const EdgeInsets.only(right: 15, left: 15, top: 5, bottom: 10),
-                            child: Expanded(
-                                child: Text.rich(
+                            padding: const EdgeInsets.only(
+                                right: 15, left: 15, top: 5, bottom: 10),
+                            child: Text.rich(
                               TextSpan(
-                                text: "This week's 1st rank holders get help from ", 
-                                children: <TextSpan>[
-                                  TextSpan(
-                                      text: data['product'],
-                                      style:
-                                          TextStyle(fontWeight: FontWeight.bold)),
-                                  TextSpan(
-                                      text: ', try by clicking on the visit',
-                                  ),
-                                ],
+                            text:
+                                "This week's 1st rank holders get help from ",
+                            children: <TextSpan>[
+                              TextSpan(
+                                  text: data['product'],
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold)),
+                              TextSpan(
+                                text: ', try by clicking on the visit',
                               ),
-                            )),
+                            ],
+                              ),
+                            ),
                           ),
-                          SizedBox(height: 10,),
+                          SizedBox(
+                            height: 10,
+                          ),
                           ElevatedButton(
                             onPressed: () =>
                                 launchUrl("https://${data["Link"]}"),
@@ -1732,38 +1765,45 @@ class _leaderState extends State<leader> {
                                   ],
                                 )),
                           ),
-                          SizedBox(height: 10,),
+                          SizedBox(
+                            height: 10,
+                          ),
                           Padding(
-                            padding: const EdgeInsets.only(right: 15, left: 15, top: 5, bottom: 10),
+                            padding: const EdgeInsets.only(
+                                right: 15, left: 15, top: 5, bottom: 10),
                             child: Text.rich(
-                                TextSpan(
-                                  text: "Description: ", 
-                                  children: <TextSpan>[
-                                    TextSpan(
-                                        text: data['Description'],
-                                        style:
-                                            TextStyle(fontWeight: FontWeight.bold)),
-                                  ],
-                                ),
+                              TextSpan(
+                                text: "Description: ",
+                                children: <TextSpan>[
+                                  TextSpan(
+                                      text: data['Description'],
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                ],
                               ),
+                            ),
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: 20,),
-                    ElevatedButton(
-                      onPressed:() {
-                        Navigator.push(context,
-                          MaterialPageRoute(
-                            builder: (context) => feedBody(context,data['userId'],data['point'] * 10),
-                          ),
-                        );
-                    }, 
-                    child: Text("View Strategies"),
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.black),
-                    )
+                    SizedBox(
+                      height: 20,
                     ),
+                    ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => feedBody(
+                                  context, data['userId'], data['point'] * 10),
+                            ),
+                          );
+                        },
+                        child: Text("View Strategies"),
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.black),
+                        )),
                   ],
                 ),
               );

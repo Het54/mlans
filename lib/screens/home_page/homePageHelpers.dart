@@ -27,8 +27,8 @@ class homePageHelpers with ChangeNotifier {
           title: Text("Home",style: TextStyle(fontSize: 11),),
             icon: Icon(EvaIcons.homeOutline)),
         CustomNavigationBarItem(
-            title: Text("Family",style: TextStyle(fontSize: 11),),
-            icon: Icon(FontAwesomeIcons.yinYang)),
+            title: Text("Explore",style: TextStyle(fontSize: 11),),
+            icon: Icon(Icons.explore_rounded)),
             CustomNavigationBarItem(
           title: Text("Notification",style: TextStyle(fontSize: 11),),
             icon: Icon(EvaIcons.bellOutline)),
