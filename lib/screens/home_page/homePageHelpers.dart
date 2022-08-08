@@ -25,13 +25,16 @@ class homePageHelpers with ChangeNotifier {
       items: [
         CustomNavigationBarItem(
           title: Text("Home",style: TextStyle(fontSize: 11),),
-            icon: Icon(EvaIcons.home)),
+            icon: Icon(EvaIcons.homeOutline)),
         CustomNavigationBarItem(
             title: Text("Family",style: TextStyle(fontSize: 11),),
             icon: Icon(FontAwesomeIcons.yinYang)),
+            CustomNavigationBarItem(
+          title: Text("Notification",style: TextStyle(fontSize: 11),),
+            icon: Icon(EvaIcons.bellOutline)),
         CustomNavigationBarItem(
             title: Text("Profile",style: TextStyle(fontSize: 11),),
-            icon: Icon(EvaIcons.person)),
+            icon: Icon(EvaIcons.personOutline)),
       ],
     );
   }

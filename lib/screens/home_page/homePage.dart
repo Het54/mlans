@@ -1,3 +1,4 @@
+import 'package:Moneylans/screens/notification/notification_screen.dart';
 import 'package:Moneylans/screens/onboard_screen/OnboardScreen.dart';
 import 'package:Moneylans/screens/profile/ProfileHelpers.dart';
 import 'package:Moneylans/services/local_puch_notification.dart';
@@ -54,6 +55,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           Feed(),
           OnboardScreen(),
+          notification(),
           Profile(name: widget.name),
         ],
       ),
