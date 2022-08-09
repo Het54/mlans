@@ -316,9 +316,9 @@ class winnerNameTemplate extends StatelessWidget {
   }
 }
 
-launchUrl(url) async {
-  if (await canLaunchUrl(url))
-    await launchUrl(url);
+launchurl(url) async {
+  if (await canLaunchUrl(Uri.parse(url)))
+    await launchUrl(Uri.parse(url));
   else
     throw "Could not launch $url";
 }
@@ -362,7 +362,7 @@ customDrawer(BuildContext context, userId, description, link, userPoints, index,
                           ),
                           link != "" && link != null
                               ? ElevatedButton(
-                                  onPressed: () => launchUrl("https://${link}"),
+                                  onPressed: () => launchurl("https://${link}"),
                                   child: SizedBox(
                                       width: 100,
                                       height: 25,

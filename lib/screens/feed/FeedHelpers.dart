@@ -3,7 +3,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi';
 import 'dart:ui';
-import 'package:Moneylans/screens/leaderboard/leaderboardHelper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -19,6 +18,7 @@ import '../../utils/PostOptions.dart';
 import '../feedback_question/Feedback.dart';
 import '../landing_page/landingHelpers.dart';
 import 'package:intl/intl.dart';
+import '../leaderboard/leaderboardHelper.dart';
 
 class FeedHelpers with ChangeNotifier {
   TextEditingController debtController = TextEditingController();
@@ -1751,7 +1751,7 @@ class _leaderState extends State<leader> {
                           ),
                           ElevatedButton(
                             onPressed: () =>
-                                launchUrl("https://${data["Link"]}"),
+                                launchurl("https://${data["Link"]}"),
                             child: SizedBox(
                                 width: 100,
                                 height: 25,
