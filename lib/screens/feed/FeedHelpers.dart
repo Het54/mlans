@@ -3,7 +3,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi';
 import 'dart:ui';
-import 'package:Moneylans/screens/leaderboard/leaderboardHelper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,6 +17,8 @@ import '../../services/FirebaseOperations.dart';
 import '../../utils/PostOptions.dart';
 import '../feedback_question/Feedback.dart';
 import '../landing_page/landingHelpers.dart';
+import 'package:intl/intl.dart';
+import '../leaderboard/leaderboardHelper.dart';
 
 class FeedHelpers with ChangeNotifier {
   TextEditingController debtController = TextEditingController();
@@ -488,7 +489,18 @@ class FeedHelpers with ChangeNotifier {
     );
   }
 
-  sendNotification(String title, String token) async {
+  String createId() {
+    String date = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    String string = DateFormat('hh:mm:ss').format(DateTime.now());
+    String id = '$date - $string';
+    return id.toString();
+  }
+  String date = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+  sendNotification(
+    String title, String token, String userId, String postId) async {
+    String? helper = createId();
+    final String? currentuserid = FirebaseAuth.instance.currentUser?.uid;
     final data = {
       'click_action': 'FLUTTER_NOTIFICATION_CLICK',
       'id': '1',
@@ -496,31 +508,50 @@ class FeedHelpers with ChangeNotifier {
       'message': title,
       'icon': 'assets/images/mlans.jpg'
     };
-
-    try {
-      http.Response response =
-          await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
-              headers: <String, String>{
-                'Content-Type': 'application/json',
-                'Authorization':
-                    'key=AAAADLBdq2Y:APA91bHH0thNUfQqZnQBnb0mqU3VnJG9sz4uGBLeBZEaB1NZUE6BASB2FJMekDnZPPMmijQY6yB4gFlFaL2-SzmBF364khQiMzA9x3keE5YrHY_cYR_Eu3_WO6bCVqkLpePNmCGJ70kG'
-              },
-              body: jsonEncode(<String, dynamic>{
-                'notification': <String, dynamic>{
-                  'title': title,
-                  'body': 'You have received $title'
-                },
-                'priority': 'high',
-                'data': data,
-                'to': '$token'
-              }));
-
-      if (response.statusCode == 200) {
-        print("Notificatin sent");
-      } else {
-        print("Error");
-      }
-    } catch (e) {}
+    http.Response response;
+    await FirebaseFirestore.instance
+        .collection("notifications")
+        .doc(userId)
+        .collection(helper)
+        .doc(currentuserid)
+        .set({
+      "userId": currentuserid,
+      "PostId": postId,
+      "notification": 'You have received a $title from $currentuserid',
+      "Date - Time": helper,
+      "Date": date,
+    }).then((value) async => {
+              await FirebaseFirestore.instance
+                  .collection("notifications getter")
+                  .doc(userId)
+                  .collection(userId)
+                  .doc(helper)
+                  .set({
+                helper: helper,
+              }).whenComplete(() async => {
+                        response = await http.post(
+                            Uri.parse('https://fcm.googleapis.com/fcm/send'),
+                            headers: <String, String>{
+                              'Content-Type': 'application/json',
+                              'Authorization':
+                                  'key=AAAADLBdq2Y:APA91bHH0thNUfQqZnQBnb0mqU3VnJG9sz4uGBLeBZEaB1NZUE6BASB2FJMekDnZPPMmijQY6yB4gFlFaL2-SzmBF364khQiMzA9x3keE5YrHY_cYR_Eu3_WO6bCVqkLpePNmCGJ70kG'
+                            },
+                            body: jsonEncode(<String, dynamic>{
+                              'notification': <String, dynamic>{
+                                'title': '$title',
+                                'body':
+                                    'You have received a $title from $currentuserid'
+                              },
+                              'priority': 'high',
+                              'data': data,
+                              'to': '$token'
+                            })),
+                        if (response.statusCode == 200)
+                          {print("Notificatin sent")}
+                        else
+                          {print("Error")}
+                      })
+            });
   }
 
   checkpointer(String postid, String type) async {
@@ -811,7 +842,7 @@ class FeedHelpers with ChangeNotifier {
                             var a = documentSnapshot.data();
                             Map.from(a as Map<String, dynamic>);
                             String token = a["token"];
-                            sendNotification("Upvote", token);
+                            sendNotification("Upvote", token ,data['userId'], data['postId']);
                           }
                         });
                         Provider.of<PostOptions>(context, listen: false)
@@ -880,7 +911,7 @@ class FeedHelpers with ChangeNotifier {
                             Map.from(a as Map<String, dynamic>);
                             String token = a["token"];
                             print(token);
-                            sendNotification("Downvote", token);
+                            sendNotification("Downvote", token, data['userId'], data['postId']);
                           }
                         });
                         Provider.of<PostOptions>(context, listen: false)
@@ -1202,7 +1233,7 @@ class FeedHelpers with ChangeNotifier {
                                 Map.from(a as Map<String, dynamic>);
                                 String token = a["token"];
                                 print(token);
-                                sendNotification("Comment", token);
+                                sendNotification("Comment", token, userId, postId);
                               }
                             });
                             Provider.of<PostOptions>(context, listen: false)
@@ -1720,7 +1751,7 @@ class _leaderState extends State<leader> {
                           ),
                           ElevatedButton(
                             onPressed: () =>
-                                launchUrl("https://${data["Link"]}"),
+                                launchurl("https://${data["Link"]}"),
                             child: SizedBox(
                                 width: 100,
                                 height: 25,

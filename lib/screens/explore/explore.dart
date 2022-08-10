@@ -270,7 +270,7 @@ class Explore extends StatelessWidget {
                                   size: 22,
                                 ),
                                 SizedBox(width: 4),
-                                Text("${upvote?.length}")
+                                Text("${upvote.length}")
                               ])),
                     ),
                     VerticalDivider(
@@ -304,7 +304,7 @@ class Explore extends StatelessWidget {
                                   size: 22,
                                 ),
                                 SizedBox(width: 4),
-                                Text("${downvote?.length}")
+                                Text("${downvote.length}")
                               ])),
                     )
                   ],
