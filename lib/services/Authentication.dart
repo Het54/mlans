@@ -18,7 +18,6 @@ class Authentication with ChangeNotifier {
 
   String? get getUserUid => userUid;
 
-
   Future logIntoAccount(String email, String password,
       BuildContext context) async {
     showDialog(
