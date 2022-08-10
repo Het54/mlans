@@ -108,12 +108,12 @@ class _ExploreState extends State<Explore> {
                 width: 100,
                 child: Center(
                     child: Text(
-                  "${items[index]}",
-                  style: TextStyle(color: Colors.black),
-                )), //Color(0xFFFF2323)
+                      "${items[index]}",
+                      style: TextStyle(color: Colors.black),
+                    )), //Color(0xFFFF2323)
                 decoration: BoxDecoration(
                     color:
-                        activeTag == index ? Color(0xffd9d9d9) : Colors.white,
+                    activeTag == index ? Color(0xffd9d9d9) : Colors.white,
                     border: Border.all(
                         width: 1.5,
                         color: activeTag == index
@@ -134,268 +134,268 @@ class _ExploreState extends State<Explore> {
   loadPosts(BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
     return ListView(
         children: snapshot.data!.docs.map((DocumentSnapshot documentSnapshot) {
-      Map<String, dynamic> data =
+          Map<String, dynamic> data =
           documentSnapshot.data()! as Map<String, dynamic>;
-      List upvote;
-      List downvote;
-      List postTags = data["tags"];
-      String? userId =
-          Provider.of<Authentication>(context, listen: false).getUser()?.uid;
-      upvote = data['upvotes'];
-      downvote = data['downvotes'];
-      return data["Accepted"] &&
+          List upvote;
+          List downvote;
+          List postTags = data["tags"];
+          String? userId =
+              Provider.of<Authentication>(context, listen: false).getUser()?.uid;
+          upvote = data['upvotes'];
+          downvote = data['downvotes'];
+          return data["Accepted"] &&
               (postTags.contains(items[activeTag]) || activeTag == 0)
-          ? Container(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(25),
-                          topRight: Radius.circular(25),
-                        ),
-                        color: Color(0xffd9d9d9),
+              ? Container(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(25),
+                        topRight: Radius.circular(25),
                       ),
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 22, right: 15),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              data['title'],
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.lightBlue,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      color: Color(0xffd9d9d9),
                     ),
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                        border: Border.all(width: 2, color: Color(0xffd9d9d9)),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              data['description'],
-                              overflow: TextOverflow.visible,
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: Colors.black,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Row(
-                              children: [
-                                Text(
-                                  'Link :  ',
-                                  //overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                Text(
-                                  data['link'],
-                                  //overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Divider(
-                              height: 10,
-                              thickness: 1,
-                              color: Colors.grey.shade400,
-                            ),
-                            Container(
-                              width: MediaQuery.of(context).size.width,
-                              child: Padding(
-                                padding: const EdgeInsets.all(20),
-                                child: Image.network(
-                                  data['imageLink'],
-                                  fit: BoxFit.fitWidth,
-                                ),
-                              ),
-                            ),
-                            Divider(
-                              height: 10,
-                              thickness: 1,
-                              color: Colors.grey.shade400,
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                  'Shared by :  ',
-                                  //overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                Text(
-                                  data['sharedBy'],
-                                  //overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                  'Appreciate by :  ',
-                                  //overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                ElevatedButton(
-                                  onPressed: () => launchUrl(Uri.parse(
-                                      "https://${data["appreciateLink"]}")),
-                                  child: SizedBox(
-                                      width: 100,
-                                      height: 25,
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text("Visit"),
-                                          SizedBox(width: 10),
-                                          Icon(FontAwesomeIcons.share,
-                                              size: 12),
-                                        ],
-                                      )),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(25),
-                          bottomRight: Radius.circular(25),
-                        ),
-                        color: Color(0xffd9d9d9),
-                      ),
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 22, right: 15),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            onTap: () {
-                              upvote.contains(userId)
-                                  ? upvote.remove(userId)
-                                  : upvote.add(userId);
-                              FirebaseFirestore.instance
-                                  .collection('Explore')
-                                  .doc(data['link'])
-                                  .update({
-                                "upvotes": upvote,
-                                "postPoints":
-                                    max(upvote.length, downvote.length) -
-                                        min(upvote.length, downvote.length)
-                              });
-                            },
-                            child: Container(
-                                width:
-                                    MediaQuery.of(context).size.width / 2 - 20,
-                                child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        FontAwesomeIcons.angleUp,
-                                        color: Colors.green,
-                                        size: 22,
-                                      ),
-                                      SizedBox(width: 4),
-                                      Text("${upvote.length}")
-                                    ])),
+                          Text(
+                            data['title'],
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.lightBlue,
+                            ),
                           ),
-                          VerticalDivider(
-                            width: 1,
-                            thickness: 2,
-                            color: Colors.grey.shade400,
-                            indent: 5,
-                            endIndent: 5,
-                          ),
-                          GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            onTap: () {
-                              downvote.contains(userId)
-                                  ? downvote.remove(userId)
-                                  : downvote.add(userId);
-                              FirebaseFirestore.instance
-                                  .collection('Explore')
-                                  .doc(data['link'])
-                                  .update({
-                                "downvotes": downvote,
-                                "postPoints":
-                                    max(upvote.length, downvote.length) -
-                                        min(upvote.length, downvote.length)
-                              });
-                            },
-                            child: Container(
-                                width:
-                                    MediaQuery.of(context).size.width / 2 - 20,
-                                child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        FontAwesomeIcons.angleDown,
-                                        color: Colors.red,
-                                        size: 22,
-                                      ),
-                                      SizedBox(width: 4),
-                                      Text("${downvote.length}")
-                                    ])),
-                          )
                         ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    decoration: BoxDecoration(
+                      border: Border.all(width: 2, color: Color(0xffd9d9d9)),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            data['description'],
+                            overflow: TextOverflow.visible,
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Text(
+                                'Link :  ',
+                                //overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              Text(
+                                data['link'],
+                                //overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Divider(
+                            height: 10,
+                            thickness: 1,
+                            color: Colors.grey.shade400,
+                          ),
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Image.network(
+                                data['imageLink'],
+                                fit: BoxFit.fitWidth,
+                              ),
+                            ),
+                          ),
+                          Divider(
+                            height: 10,
+                            thickness: 1,
+                            color: Colors.grey.shade400,
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                'Shared by :  ',
+                                //overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              Text(
+                                data['sharedBy'],
+                                //overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                'Appreciate by :  ',
+                                //overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              ElevatedButton(
+                                onPressed: () => launchUrl(Uri.parse(
+                                    "https://${data["appreciateLink"]}")),
+                                child: SizedBox(
+                                    width: 100,
+                                    height: 25,
+                                    child: Row(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.center,
+                                      children: [
+                                        Text("Visit"),
+                                        SizedBox(width: 10),
+                                        Icon(FontAwesomeIcons.share,
+                                            size: 12),
+                                      ],
+                                    )),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(25),
+                        bottomRight: Radius.circular(25),
+                      ),
+                      color: Color(0xffd9d9d9),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {
+                            upvote.contains(userId)
+                                ? upvote.remove(userId)
+                                : upvote.add(userId);
+                            FirebaseFirestore.instance
+                                .collection('Explore')
+                                .doc(data['link'])
+                                .update({
+                              "upvotes": upvote,
+                              "postPoints":
+                              max(upvote.length, downvote.length) -
+                                  min(upvote.length, downvote.length)
+                            });
+                          },
+                          child: Container(
+                              width:
+                              MediaQuery.of(context).size.width / 2 - 20,
+                              child: Row(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      FontAwesomeIcons.angleUp,
+                                      color: Colors.green,
+                                      size: 22,
+                                    ),
+                                    SizedBox(width: 4),
+                                    Text("${upvote.length}")
+                                  ])),
+                        ),
+                        VerticalDivider(
+                          width: 1,
+                          thickness: 2,
+                          color: Colors.grey.shade400,
+                          indent: 5,
+                          endIndent: 5,
+                        ),
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {
+                            downvote.contains(userId)
+                                ? downvote.remove(userId)
+                                : downvote.add(userId);
+                            FirebaseFirestore.instance
+                                .collection('Explore')
+                                .doc(data['link'])
+                                .update({
+                              "downvotes": downvote,
+                              "postPoints":
+                              max(upvote.length, downvote.length) -
+                                  min(upvote.length, downvote.length)
+                            });
+                          },
+                          child: Container(
+                              width:
+                              MediaQuery.of(context).size.width / 2 - 20,
+                              child: Row(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      FontAwesomeIcons.angleDown,
+                                      color: Colors.red,
+                                      size: 22,
+                                    ),
+                                    SizedBox(width: 4),
+                                    Text("${downvote.length}")
+                                  ])),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            )
-          : SizedBox(
-              width: 0,
-              height: 0,
-            );
-    }).toList());
+            ),
+          )
+              : SizedBox(
+            width: 0,
+            height: 0,
+          );
+        }).toList());
   }
 
   uploadPostSheet(BuildContext context) {
