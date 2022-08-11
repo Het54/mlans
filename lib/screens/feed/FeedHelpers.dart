@@ -18,6 +18,7 @@ import '../../utils/PostOptions.dart';
 import '../feedback_question/Feedback.dart';
 import '../landing_page/landingHelpers.dart';
 import 'package:intl/intl.dart';
+import '../leaderboard/leaderboard.dart';
 import '../leaderboard/leaderboardHelper.dart';
 
 class FeedHelpers with ChangeNotifier {
@@ -1645,34 +1646,91 @@ class leader extends StatefulWidget {
 class _leaderState extends State<leader> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          height:
-              leaderWinnerHeight ? 0 : MediaQuery.of(context).size.height * 0.5,
-          child: leaderboard_winner_data(),
-        ),
-        GestureDetector(
-          onTap: () => setState(() {
-            leaderWinnerHeight = !leaderWinnerHeight;
-          }),
-          child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height * 0.03,
-              //backgroundColor:
-              color: Colors.lightBlue,
-              child: Icon(
-                Icons.menu_outlined,
-                color: Colors.white,
-              )),
-        ),
-      ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child :Row(
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal:5),
+            child: SizedBox(
+              height: 38,
+              width: 164,
+
+              child: FlatButton(
+                color: Colors.grey,
+                onPressed: () =>leaderboard_winner_data(),
+
+                child:  Row(
+                    children:[
+                      Icon(
+                        Icons.batch_prediction,
+                        color: Colors.white,
+                      ),
+                      Text('Winner of week',
+                          overflow: TextOverflow.ellipsis),
+                    ]
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(5, 8, 5, 5),
+            child: SizedBox(
+              height: 38,
+              width: 150,
+              child: FlatButton(
+                  color: Colors.grey,
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: ((context) => leaderboard(
+                                userId: Provider.of<Authentication>(context,
+                                    listen: false)
+                                    .getUser()
+                                    ?.uid))));
+                  },
+                  child: Row(
+                      children : [   Icon(
+                        Icons.leaderboard,
+                        color: Colors.white,
+                      ),
+                        Text(" LeaderBoard")
+                      ] )
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 3),
+            child: SizedBox(
+              height: 38,
+              width: 100,
+              child: FlatButton(
+                  color: Colors.grey,
+                  onPressed: () {},
+                  child: Row(
+                      children : [   Icon(
+                        Icons.pages,
+                        color: Colors.white,
+                      ),
+                        Text("Affirm")
+                      ] )
+              ),
+            ),
+          ),
+
+        ],
+      ),
+
     );
   }
 
   leaderboard_winner_data() {
     CollectionReference data =
         FirebaseFirestore.instance.collection('leaderboardDetails');
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
         child: FutureBuilder<DocumentSnapshot>(
@@ -1813,5 +1871,6 @@ class _leaderState extends State<leader> {
         ),
       ),
     );
+  });
   }
 }

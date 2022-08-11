@@ -26,26 +26,26 @@ class Feed extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 13),
-            child: GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: ((context) => leaderboard(
-                              userId: Provider.of<Authentication>(context,
-                                      listen: false)
-                                  .getUser()
-                                  ?.uid))));
-                },
-                child: Icon(
-                  Icons.leaderboard,
-                  color: Colors.black,
-                )),
-          )
-        ],
+        // actions: [
+        //   Padding(
+        //     padding: const EdgeInsets.only(right: 13),
+        //     child: GestureDetector(
+        //         onTap: () {
+        //           Navigator.push(
+        //               context,
+        //               MaterialPageRoute(
+        //                   builder: ((context) => leaderboard(
+        //                       userId: Provider.of<Authentication>(context,
+        //                               listen: false)
+        //                           .getUser()
+        //                           ?.uid))));
+        //         },
+        //         child: Icon(
+        //           Icons.leaderboard,
+        //           color: Colors.black,
+        //         )),
+        //   )
+        // ],
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blue,
