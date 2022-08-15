@@ -35,6 +35,7 @@ class FeedHelpers with ChangeNotifier {
   int StategycurrentTextLength = 0;
   int i = 1;
   List l = [];
+  List m = [];
   bool? check = false;
 
   uploadStrategySheet(BuildContext context) {
@@ -555,23 +556,70 @@ class FeedHelpers with ChangeNotifier {
             });
   }
 
-  checkpointer(String postid, String type) async {
+  checkpointer(String postid, String type, String postuid) async {
     await FirebaseFirestore.instance
         .collection("posts")
         .doc(postid)
-        .collection("$type")
+        .collection("upvotes")
         .get()
         .then((docSnapshot) => {
               for (int i = 0; i < docSnapshot.docs.length; i++)
-                {l.add(docSnapshot.docs[i].data()['userId'])}
-            });
+                {l.add(docSnapshot.docs[i].data()['userId'])},
+            }); 
+    await FirebaseFirestore.instance
+        .collection("posts")
+        .doc(postid)
+        .collection("downvotes")
+        .get()
+        .then((docSnapshot) => {
+              for (int i = 0; i < docSnapshot.docs.length; i++)
+                {m.add(docSnapshot.docs[i].data()['userId'])},
+            });        
 
     for (int i = 0; i < l.length; i++) {
       if (l[i] == FirebaseAuth.instance.currentUser?.uid) {
         check = true;
+        if(type == "upvotes"){
+          await FirebaseFirestore.instance
+          .collection("posts")
+          .doc(postid)
+          .collection(type)
+          .doc(FirebaseAuth.instance.currentUser?.uid)
+          .delete()
+          .whenComplete(() => {
+            FirebaseFirestore.instance
+                .collection('leaderboard')
+                .doc(postuid)
+                .update({
+              'point': FieldValue.increment(-1),
+            })
+          });
+        }
+      }
+    }
+    for (int i = 0; i < m.length; i++) {
+      if (m[i] == FirebaseAuth.instance.currentUser?.uid) {
+        check = true;
+        if(type == "downvotes"){
+          await FirebaseFirestore.instance
+          .collection("posts")
+          .doc(postid)
+          .collection(type)
+          .doc(FirebaseAuth.instance.currentUser?.uid)
+          .delete()
+          .whenComplete(() => {
+            FirebaseFirestore.instance
+                .collection('leaderboard')
+                .doc(postuid)
+                .update({
+              'point': FieldValue.increment(1),
+            })
+          });
+        }
       }
     }
     l.clear();
+    m.clear();
     return (check);
   }
 
@@ -831,7 +879,7 @@ class FeedHelpers with ChangeNotifier {
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () async {
-                      check = await checkpointer(data['postId'], "upvotes");
+                      check = await checkpointer(data['postId'], "upvotes", data['userId']);
                       if (check == false) {
                         FirebaseFirestore.instance
                             .collection("userData")
@@ -899,7 +947,8 @@ class FeedHelpers with ChangeNotifier {
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () async {
-                      check = await checkpointer(data['postId'], "downvotes");
+                      
+                      check = await checkpointer(data['postId'], "downvotes", data['userId']);
                       if (check == false) {
                         FirebaseFirestore.instance
                             .collection("userData")
