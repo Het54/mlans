@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
+import '../../services/FirebaseOperations.dart';
 import '../../utils/PostOptions.dart';
 
 int userIndex = 0, userPoint = 0;
@@ -352,14 +353,56 @@ customDrawer(BuildContext context, userId, description, link, userPoints, index,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Padding(
+                              padding: EdgeInsets.only(left:185),
+                              child:   GestureDetector(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (ctx) => AlertDialog(
+                                          title: Text("Report"),
+                                          content: TextFormField(
+                                            autofocus: true,
+                                            controller: report,
+                                          ),
+                                          actions: <Widget>[
+                                            FlatButton(
+                                              onPressed: () {
+                                                // Provider.of<FirebaseOperations>(
+                                                //     context,
+                                                //     listen: false)
+                                                //     .reportComment(
+                                                //     "${Provider.of<Authentication>(context, listen: false).getUser()?.uid}",
+                                                //     "${data["postId"]},${data["data"]}",
+                                                //     {
+                                                //       "user": 1,
+                                                //       "report":
+                                                //       report.text
+                                                //     });
+                                                // Navigator.of(ctx)
+                                                //     .pop();
+                                                // report.clear();
+                                              },
+                                              child: Text("SEND"),
+                                            ),
+                                          ]),
+                                    );
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10),
+                                    child: Icon(Icons.more_vert,color: Colors.white,),
+                                  ))
+
+                          ),
+                          Padding(
                             padding: const EdgeInsets.only(
-                                right: 12, left: 12, top: 20, bottom: 10),
+                                right: 12, left: 12, top: 2, bottom: 10),
                             child: link != null && link != ""
                                 ? Text("This week's $index rank holders get help from $product, try by clicking on the visit",
                                 style: TextStyle(color: Colors.white))
                                 : Text("No data updated!",
                                     style: TextStyle(color: Colors.white)),
                           ),
+
                           link != "" && link != null
                               ? ElevatedButton(
                                   onPressed: () => launchurl("https://${link}"),
@@ -380,6 +423,7 @@ customDrawer(BuildContext context, userId, description, link, userPoints, index,
                                       )),
                                 )
                               : SizedBox(height: 0, width: 0),
+
                           Padding(
                             padding: const EdgeInsets.only(
                                 right: 12, left: 12, top: 20, bottom: 10),
@@ -540,7 +584,7 @@ checkpointer(String postid, String type) async {
   l.clear();
   return (check);
 }
-
+TextEditingController report= TextEditingController();
 Widget loadPosts(
     BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot, userId) {
   return ListView(
@@ -570,6 +614,43 @@ Widget loadPosts(
                         style: TextStyle(
                             color: Colors.blue, fontWeight: FontWeight.bold),
                       ),
+                      GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                  title: Text("Report"),
+                                  content: TextFormField(
+                                    autofocus: true,
+                                    controller: report,
+                                  ),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      onPressed: () {
+                                        // Provider.of<FirebaseOperations>(
+                                        //     context,
+                                        //     listen: false)
+                                        //     .reportComment(
+                                        //     "${Provider.of<Authentication>(context, listen: false).getUser()?.uid}",
+                                        //     "${data["postId"]},${data["data"]}",
+                                        //     {
+                                        //       "user": 1,
+                                        //       "report":
+                                        //       report.text
+                                        //     });
+                                        // Navigator.of(ctx)
+                                        //     .pop();
+                                        // report.clear();
+                                      },
+                                      child: Text("SEND"),
+                                    ),
+                                  ]),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Icon(Icons.more_vert),
+                          ))
                     ],
                   ),
                 ),

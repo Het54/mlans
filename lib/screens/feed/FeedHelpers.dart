@@ -6,7 +6,6 @@ import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -31,6 +30,7 @@ class FeedHelpers with ChangeNotifier {
 
   TextEditingController StrategyTitleController = TextEditingController();
   TextEditingController StrategyStepController = TextEditingController();
+ //TextEditingController StrategyTitleController='Strategy' as TextEditingController;
   int currentTextLength = 0;
   int StategycurrentTextLength = 0;
   int i = 1;
@@ -98,6 +98,7 @@ class FeedHelpers with ChangeNotifier {
                               ),
                             )),
                       ),
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -114,7 +115,7 @@ class FeedHelpers with ChangeNotifier {
                               child: Text("Cancel")),
                           ElevatedButton(
                             onPressed: () async {
-                              StrategyTitleController.text.isNotEmpty &&
+                              //StrategyTitleController.text.isNotEmpty &&
                                       StrategyStepController.text.isNotEmpty
                                   ? Provider.of<FirebaseOperations>(context,
                                           listen: false)
@@ -1021,7 +1022,10 @@ class FeedHelpers with ChangeNotifier {
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () => Share.share(
-                      data['content'],
+                    //  data['posts']+"at"+data['content']+
+                      data['content']+
+                          '\n\n Lets become debt-free together with Moneylans \n\n  https://play.google.com/store/apps/details?id=com.company.moneylans' ,
+
                       subject: data['debtType'] +
                           " at " +
                           data['intrestPercentage'] +
@@ -1718,10 +1722,8 @@ class _leaderState extends State<leader> {
               ),
             ),
           ),
-
         ],
       ),
-
     );
   }
 
