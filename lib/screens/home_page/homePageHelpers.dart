@@ -3,7 +3,11 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+bool? page= false;
+
 class homePageHelpers with ChangeNotifier {
+  //get pageController => null;
+  late ScrollController _scrollController;
   Widget bottomNavBar(int index, PageController pageController) {
     return CustomNavigationBar(
       elevation: 20,
@@ -16,16 +20,17 @@ class homePageHelpers with ChangeNotifier {
       strokeColor: Colors.indigo.shade400,
       scaleFactor: 0.5,
       iconSize: 25,
-      onTap: (val) {
-        index = val;
-        pageController.jumpToPage(index);
-        notifyListeners();
-      },
+       onTap: (val) =>ontapped(val, page!, pageController),
+     //    index = val;
+     //    pageController.jumpToPage(index);
+     //    notifyListeners();
+     // },
       backgroundColor: Colors.white,
       items: [
         CustomNavigationBarItem(
           title: Text("Home",style: TextStyle(fontSize: 11),),
-            icon: Icon(EvaIcons.homeOutline)),
+            icon: Icon(EvaIcons.homeOutline),
+              ),
         CustomNavigationBarItem(
             title: Text("Explore",style: TextStyle(fontSize: 11),),
             icon: Icon(Icons.explore_rounded)),
@@ -37,5 +42,16 @@ class homePageHelpers with ChangeNotifier {
             icon: Icon(EvaIcons.personOutline)),
       ],
     );
+  }
+  void ontapped(int val , bool page, PageController pageController){
+    if(page== true){
+      _scrollController.animateTo(0,
+          duration: const Duration(seconds: 3), curve: Curves.linear);
+    }
+    var index = val;
+    pageController.jumpToPage(index);
+    notifyListeners();
+
+    page=true;
   }
 }

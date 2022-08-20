@@ -131,6 +131,8 @@ class _ExploreState extends State<Explore> {
     );
   }
 
+ TextEditingController report= TextEditingController();
+
   loadPosts(BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
     return ListView(
         children: snapshot.data!.docs.map((DocumentSnapshot documentSnapshot) {
@@ -174,6 +176,44 @@ class _ExploreState extends State<Explore> {
                               color: Colors.lightBlue,
                             ),
                           ),
+                          SizedBox(width: 100,),
+                          GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (ctx) => AlertDialog(
+                                      title: Text("Report"),
+                                      content: TextFormField(
+                                        autofocus: true,
+                                        controller: report,
+                                      ),
+                                      actions: <Widget>[
+                                        FlatButton(
+                                          onPressed: () {
+                                            // Provider.of<FirebaseOperations>(
+                                            //     context,
+                                            //     listen: false)
+                                            //     .reportComment(
+                                            //     "${Provider.of<Authentication>(context, listen: false).getUser()?.uid}",
+                                            //     "${data["postId"]},${data["data"]}",
+                                            //     {
+                                            //       "user": 1,
+                                            //       "report":
+                                            //       report.text
+                                            //     });
+                                            // Navigator.of(ctx)
+                                            //     .pop();
+                                            // report.clear();
+                                          },
+                                          child: Text("SEND"),
+                                        ),
+                                      ]),
+                                );
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(10),
+                                child: Icon(Icons.more_vert),
+                              ))
                         ],
                       ),
                     ),
@@ -253,9 +293,9 @@ class _ExploreState extends State<Explore> {
                               ),
                               Text(
                                 data['sharedBy'],
-                                //overflow: TextOverflow.ellipsis,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.black,
                                 ),
