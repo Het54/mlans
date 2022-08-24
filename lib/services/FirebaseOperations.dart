@@ -69,6 +69,18 @@ class FirebaseOperations with ChangeNotifier {
     return FirebaseFirestore.instance.collection('posts').doc(postId).set(data);
   }
 
+  Future uploadAffirmData(BuildContext context, String uid, dynamic data) async {
+    return FirebaseFirestore.instance.collection('Affirm').doc(uid).set(data);
+  }
+
+  Future addAffirmData(BuildContext context, String uid, dynamic data) async {
+    return FirebaseFirestore.instance.collection('Affirm').doc(uid).update(data);
+  }
+
+  Future addAffirmView(String uid, dynamic data) async {
+    return FirebaseFirestore.instance.collection('Affirm').doc(uid).update(data);
+  }
+
   Future uploadPostDataInProfile(
       String uid, String postId, dynamic data) async {
     return FirebaseFirestore.instance

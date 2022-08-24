@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi';
 import 'dart:ui';
+import 'package:Moneylans/screens/affirm/affirm.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -948,7 +949,7 @@ class FeedHelpers with ChangeNotifier {
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () async {
-                      
+
                       check = await checkpointer(data['postId'], "downvotes", data['userId']);
                       if (check == false) {
                         FirebaseFirestore.instance
@@ -1760,7 +1761,12 @@ class _leaderState extends State<leader> {
               width: 100,
               child: FlatButton(
                   color: Colors.grey,
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: ((context) => affirm())));
+                  },
                   child: Row(
                       children : [   Icon(
                         Icons.pages,
