@@ -27,15 +27,22 @@ class firebaseTopList extends StatefulWidget {
 }
 
 class _firebaseTopListState extends State<firebaseTopList> {
+
   @override
   void initState() {
     super.initState();
-
-    Future.delayed(Duration(milliseconds: 300), () {
-      if (userlink == "" || userlink == null)
-        WidgetsBinding.instance.addPostFrameCallback((_) async {
-          await showCustomDialog(context, widget.userId.toString());
-        });
+    FirebaseFirestore.instance
+    .collection("leaderboard")
+    .doc(this.widget.userId)
+    .get()
+    .then((value) => {
+      print(value["index"]),
+        if (userlink == "" || userlink == null) 
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            if(value["index"]<11){
+              await showCustomDialog(context, widget.userId.toString());
+            }
+        })
     });
   }
 
