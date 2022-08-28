@@ -347,7 +347,7 @@ customDrawer(BuildContext context, userId, description, link, userPoints, index,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
-                  height: MediaQuery.of(context).size.height * 0.3,
+                  height: MediaQuery.of(context).size.height * 0.4,
                   width: MediaQuery.of(context).size.width * 0.8,
                   decoration: BoxDecoration(
                       color: Colors.black,
@@ -430,10 +430,17 @@ customDrawer(BuildContext context, userId, description, link, userPoints, index,
                                       )),
                                 )
                               : SizedBox(height: 0, width: 0),
-
                           Padding(
                             padding: const EdgeInsets.only(
                                 right: 12, left: 12, top: 20, bottom: 10),
+                            child: link != null && link != ""
+                                ? Text("Total Points: $userPoints",
+                                    style: TextStyle(color: Colors.white))
+                                : SizedBox(height: 0, width: 0),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                right: 12, left: 12, top: 0, bottom: 10),
                             child: link != null && link != ""
                                 ? Text("Description: $description",
                                     style: TextStyle(color: Colors.white))

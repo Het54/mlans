@@ -52,28 +52,28 @@ class _IntroScreenState extends State<IntroScreen> {
               title: "Home",
               image: Image.asset("assets/images/home.jpg"),
               body:
-              "Find and share strategies to Payoff debt Fast and Easily!",
+              "Find & Share Debt Pay-Off Content That Helps To Pay-Off Debt Fast & Easily",
               decoration: pageDecoration,
             ),
             PageViewModel(
               title: "Leaderboard",
               image: Image.asset("assets/images/leaderboard.jpg"),
               body:
-              "The rank of users based on useful strategies you share, and more useful the strategies, more chances to earn money quickly.",
+              "The Rank Of Users Based On Debt Pay-Off Content Shared, And More Upvote The Content Gets, More Chances To Earn Money Quickly",
               decoration: pageDecoration,
             ),
             PageViewModel(
-              title: "Family",
+              title: "Explore",
               image: Image.asset("assets/images/family.jpg"),
               body:
-              "Payoff debt with family members.",
+              "Find And Refer Tools That Helps In Paying Off Debt",
               decoration: pageDecoration,
             ),
             PageViewModel(
               title: "Debt score",
               image: Image.asset("assets/images/dashboard.png"),
               body:
-              "Check your debt health.",
+              "Check Your Debt Health.",
               decoration: pageDecoration,
             ),
           ],
