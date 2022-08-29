@@ -67,7 +67,7 @@ class MyApp extends StatelessWidget {
         providers: [
           ChangeNotifierProvider(create: (_) => PostOptions()),
           ChangeNotifierProvider(create: (_) => FeedbackHelpers()),
-          ChangeNotifierProvider(create: (_) => FeedHelpers()),
+          //ChangeNotifierProvider(create: (_) => FeedHelpers()),
           ChangeNotifierProvider(create: (_) => OnboardScreenHelpers()),
           ChangeNotifierProvider(create: (_) => LandingHelpers()),
           ChangeNotifierProvider(create: (_) => DebtMeterHelpers()),
