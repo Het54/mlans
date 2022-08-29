@@ -599,8 +599,7 @@ checkpointer(String postid, String type) async {
   return (check);
 }
 TextEditingController report= TextEditingController();
-Widget loadPosts(
-    BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot, userId) {
+Widget loadPosts(BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot, userId) {
   return ListView(
       children: snapshot.data!.docs.map((DocumentSnapshot documentSnapshot) {
     Map<String, dynamic> data =

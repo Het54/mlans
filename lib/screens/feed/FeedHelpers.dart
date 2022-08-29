@@ -1,17 +1,15 @@
 // ignore_for_file: prefer_const_constructors, void_checks
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ffi';
 import 'dart:ui';
-import 'package:Moneylans/screens/affirm/affirm.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:http/http.dart' as http;
+import 'package:share_plus/share_plus.dart';
 import '../../services/Authentication.dart';
 import '../../services/FirebaseOperations.dart';
 import '../../utils/PostOptions.dart';
@@ -21,477 +19,19 @@ import 'package:intl/intl.dart';
 import '../leaderboard/leaderboard.dart';
 import '../leaderboard/leaderboardHelper.dart';
 
-class FeedHelpers with ChangeNotifier {
-  TextEditingController debtController = TextEditingController();
-  TextEditingController tenureController = TextEditingController();
-  TextEditingController goalController = TextEditingController();
-  TextEditingController intrestController = TextEditingController();
-  TextEditingController typeController = TextEditingController();
-  TextEditingController contentController = TextEditingController();
+int activeTag = 0;
 
-  TextEditingController StrategyTitleController = TextEditingController();
-  TextEditingController StrategyStepController = TextEditingController();
- //TextEditingController StrategyTitleController='Strategy' as TextEditingController;
-  int currentTextLength = 0;
-  int StategycurrentTextLength = 0;
-  int i = 1;
+class feedHelper extends StatefulWidget {
+  const feedHelper({Key? key}) : super(key: key);
+
+  @override
+  State<feedHelper> createState() => _feedHelperState();
+}
+
+class _feedHelperState extends State<feedHelper> {
+
   List l = [];
   List m = [];
-  bool? check = false;
-
-  uploadStrategySheet(BuildContext context) {
-    return showModalBottomSheet(
-        isScrollControlled: true,
-        context: context,
-        builder: (BuildContext context) {
-          return Padding(
-            padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 10.0),
-              child: Container(
-                height: MediaQuery.of(context).size.height * 0.6,
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200.withOpacity(0.5),
-                  borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20)),
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    // ignore: prefer_const_literals_to_create_immutables
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 100.0),
-                        child: Divider(
-                          thickness: 4.0,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextFormField(
-                          controller: StrategyTitleController,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            labelText: "Strategy Title",
-                            fillColor: Colors.white,
-                            filled: true,
-                            hintText: "Enter the title of your Strategy...",
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(30)),
-                            width: 400,
-                            child: TextFormField(
-                              controller: StrategyStepController,
-                              minLines: 8,
-                              maxLines: 200,
-                              decoration: InputDecoration(
-                                fillColor: Colors.white,
-                                labelText: "Your Strategy",
-                                filled: true,
-                                hintText: "Enter the strategies...",
-                              ),
-                            )),
-                      ),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          ElevatedButton(
-                              style: ButtonStyle(
-                                  backgroundColor:
-                                      MaterialStateProperty.all(Colors.red)),
-                              onPressed: () {
-                                i = 1;
-                                StrategyTitleController.clear();
-                                StrategyStepController.clear();
-                                Navigator.pop(context);
-                              },
-                              child: Text("Cancel")),
-                          ElevatedButton(
-                            onPressed: () async {
-                              //StrategyTitleController.text.isNotEmpty &&
-                                      StrategyStepController.text.isNotEmpty
-                                  ? Provider.of<FirebaseOperations>(context,
-                                          listen: false)
-                                      .uploadPostData(
-                                          "${StrategyTitleController.text}+${Timestamp.now().toString().substring(18, 28)}",
-                                          {
-                                          'postType': 2,
-                                          'postId':
-                                              "${StrategyTitleController.text}+${Timestamp.now().toString().substring(18, 28)}",
-                                          'edited': false,
-                                          'title': StrategyTitleController.text,
-                                          'content':
-                                              StrategyStepController.text,
-                                          'userId': Provider.of<Authentication>(
-                                                  context,
-                                                  listen: false)
-                                              .getUser()
-                                              ?.uid,
-                                          'time': Timestamp.now(),
-                                          'userEmail':
-                                              Provider.of<Authentication>(
-                                                      context,
-                                                      listen: false)
-                                                  .getUser()
-                                                  ?.email,
-                                        }).whenComplete(() {
-                                      Provider.of<LandingHelpers>(context,
-                                              listen: false)
-                                          .displayToast(
-                                              "Post uploaded successfully!",
-                                              context);
-                                    }).whenComplete(() {
-                                      Navigator.pop(context);
-                                      StrategyTitleController.clear();
-                                      StrategyStepController.clear();
-                                      i = 1;
-                                    }).then((value) {
-                                      FirebaseFirestore.instance
-                                          .collection('leaderboard')
-                                          .doc(Provider.of<Authentication>(
-                                                  context,
-                                                  listen: false)
-                                              .getUser()
-                                              ?.uid)
-                                          .update({
-                                        'point': FieldValue.increment(10),
-                                      });
-                                    })
-                                  : Provider.of<LandingHelpers>(context,
-                                          listen: false)
-                                      .displayToast(
-                                          "Fill all the details!", context);
-                            },
-                            child: Row(
-                              children: const [
-                                Icon(FontAwesomeIcons.share, size: 12),
-                                SizedBox(width: 5),
-                                Text("Share")
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-        });
-  }
-
-  uploadPostSheet(BuildContext context) {
-    return showModalBottomSheet(
-      isScrollControlled: true,
-      context: context,
-      builder: (BuildContext context) {
-        return Padding(
-          padding:
-              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 10.0),
-            child: Container(
-              height: MediaQuery.of(context).size.height * 0.842,
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200.withOpacity(0.5),
-                borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20)),
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  // ignore: prefer_const_literals_to_create_immutables
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 100.0),
-                      child: Divider(
-                        thickness: 4.0,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextFormField(
-                        controller: debtController,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          labelText: "Debt amount",
-                          fillColor: Colors.white,
-                          filled: true,
-                          hintText: "Enter the debt amount...",
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextFormField(
-                        controller: intrestController,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          fillColor: Colors.white,
-                          labelText: "Interest Percentage",
-                          filled: true,
-                          hintText: "Enter the interest percentage...",
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextFormField(
-                        controller: typeController,
-                        decoration: InputDecoration(
-                          fillColor: Colors.white,
-                          filled: true,
-                          labelText: "Debt Type",
-                          hintText: "Enter the debt type...",
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextFormField(
-                        controller: tenureController,
-                        decoration: InputDecoration(
-                          fillColor: Colors.white,
-                          filled: true,
-                          labelText: "Debt Tenure",
-                          hintText: "Enter the time period of debt...",
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextFormField(
-                        controller: goalController,
-                        decoration: InputDecoration(
-                          fillColor: Colors.white,
-                          filled: true,
-                          labelText: "Debt Payoff Goal Date",
-                          hintText: "Enter the goal date...",
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(30)),
-                          width: 400,
-                          child: TextFormField(
-                            onChanged: (String newText) {
-                              if (newText[0] != 'S') {
-                                newText = 'Step $i • ' + newText;
-                                contentController.text = newText;
-                                contentController.selection =
-                                    TextSelection.fromPosition(TextPosition(
-                                        offset: contentController.text.length));
-                              }
-                              if (newText[newText.length - 1] == '\n' &&
-                                  newText.length > currentTextLength) {
-                                i += 1;
-                                contentController.text = newText + 'Step $i • ';
-                                contentController.selection =
-                                    TextSelection.fromPosition(TextPosition(
-                                        offset: contentController.text.length));
-                              }
-                              currentTextLength = contentController.text.length;
-                            },
-                            controller: contentController,
-                            minLines: 8,
-                            maxLines: 200,
-                            decoration: InputDecoration(
-                              fillColor: Colors.white,
-                              labelText: "Steps",
-                              filled: true,
-                              hintText: "Enter the steps...",
-                            ),
-                          )),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ElevatedButton(
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all(Colors.red)),
-                            onPressed: () {
-                              i = 1;
-                              debtController.clear();
-                              intrestController.clear();
-                              tenureController.clear();
-                              typeController.clear();
-                              contentController.clear();
-                              goalController.clear();
-                              Navigator.pop(context);
-                            },
-                            child: Text("Cancel")),
-                        ElevatedButton(
-                          onPressed: () async {
-                            debtController.text.isNotEmpty &&
-                                    intrestController.text.isNotEmpty &&
-                                    typeController.text.isNotEmpty &&
-                                    tenureController.text.isNotEmpty &&
-                                    goalController.text.isNotEmpty &&
-                                    contentController.text.isNotEmpty
-                                ? Provider.of<FirebaseOperations>(context,
-                                        listen: false)
-                                    .uploadPostData(
-                                        "${debtController.text}+${Timestamp.now().toString().substring(18, 28)}",
-                                        {
-                                        'postType': 1,
-                                        'postId':
-                                            "${debtController.text}+${Timestamp.now().toString().substring(18, 28)}",
-                                        'edited': false,
-                                        'debt': debtController.text,
-                                        'intrestPercentage':
-                                            intrestController.text,
-                                        'debtType': typeController.text,
-                                        'timePeriod': tenureController.text,
-                                        'goalDate': goalController.text,
-                                        'content': contentController.text,
-                                        'userId': Provider.of<Authentication>(
-                                                context,
-                                                listen: false)
-                                            .getUser()
-                                            ?.uid,
-                                        'time': Timestamp.now(),
-                                        'userEmail':
-                                            Provider.of<Authentication>(context,
-                                                    listen: false)
-                                                .getUser()
-                                                ?.email,
-                                      }).whenComplete(() {
-                                    Provider.of<LandingHelpers>(context,
-                                            listen: false)
-                                        .displayToast(
-                                            "Post uploaded successfully!",
-                                            context);
-                                  }).whenComplete(() {
-                                    Provider.of<FirebaseOperations>(context,
-                                            listen: false)
-                                        .uploadPostDataInProfile(
-                                            Provider.of<Authentication>(context,
-                                                    listen: false)
-                                                .getUser()!
-                                                .uid,
-                                            "${debtController.text}+${Timestamp.now().toString().substring(18, 28)}",
-                                            {
-                                          'edited': false,
-                                          'debt': debtController.text,
-                                          'intrestPercentage':
-                                              intrestController.text,
-                                          'debtType': typeController.text,
-                                          'timePeriod': tenureController.text,
-                                          'goalDate': goalController.text,
-                                          'content': contentController.text,
-                                          'userId': Provider.of<Authentication>(
-                                                  context,
-                                                  listen: false)
-                                              .getUser()
-                                              ?.uid,
-                                          'time': Timestamp.now(),
-                                          'userEmail':
-                                              Provider.of<Authentication>(
-                                                      context,
-                                                      listen: false)
-                                                  .getUser()
-                                                  ?.email,
-                                        });
-                                  }).whenComplete(() {
-                                    Navigator.pop(context);
-                                    debtController.clear();
-                                    intrestController.clear();
-                                    tenureController.clear();
-                                    typeController.clear();
-                                    contentController.clear();
-                                    goalController.clear();
-                                    i = 1;
-                                  }).then((value) {
-                                    FirebaseFirestore.instance
-                                        .collection('leaderboard')
-                                        .doc(Provider.of<Authentication>(
-                                                context,
-                                                listen: false)
-                                            .getUser()
-                                            ?.uid)
-                                        .update({
-                                      'point': FieldValue.increment(10),
-                                    });
-                                  })
-                                : Provider.of<LandingHelpers>(context,
-                                        listen: false)
-                                    .displayToast(
-                                        "Fill all the details!", context);
-                          },
-                          child: Row(
-                            children: const [
-                              Icon(FontAwesomeIcons.share, size: 12),
-                              SizedBox(width: 5),
-                              Text("Share")
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget feedBody(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2.0),
-        child: Container(
-          child: RefreshIndicator(
-            backgroundColor: Colors.white,
-            color: Colors.blue,
-            onRefresh: () {
-              return Future(() => Future.delayed(Duration(seconds: 1)));
-            },
-            child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('posts')
-                  .orderBy('time', descending: true)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                } else {
-                  return Column(
-                    children: [
-                      leader(),
-                      Expanded(child: loadPosts(context, snapshot)),
-                    ],
-                  );
-                }
-              },
-            ),
-          ),
-          height: MediaQuery.of(context).size.height * 0.82,
-          width: MediaQuery.of(context).size.width,
-        ),
-      ),
-    );
-  }
 
   String createId() {
     String date = DateFormat('yyyy-MM-dd').format(DateTime.now());
@@ -501,8 +41,7 @@ class FeedHelpers with ChangeNotifier {
   }
   String date = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-  sendNotification(
-    String title, String token, String userId, String postId) async {
+  sendNotification(String title, String token, String userId, String postId) async {
     String? helper = createId();
     final String? currentuserid = FirebaseAuth.instance.currentUser?.uid;
     final data = {
@@ -525,37 +64,37 @@ class FeedHelpers with ChangeNotifier {
       "Date - Time": helper,
       "Date": date,
     }).then((value) async => {
-              await FirebaseFirestore.instance
-                  .collection("notifications getter")
-                  .doc(userId)
-                  .collection(userId)
-                  .doc(helper)
-                  .set({
-                helper: helper,
-              }).whenComplete(() async => {
-                        response = await http.post(
-                            Uri.parse('https://fcm.googleapis.com/fcm/send'),
-                            headers: <String, String>{
-                              'Content-Type': 'application/json',
-                              'Authorization':
-                                  'key=AAAADLBdq2Y:APA91bHH0thNUfQqZnQBnb0mqU3VnJG9sz4uGBLeBZEaB1NZUE6BASB2FJMekDnZPPMmijQY6yB4gFlFaL2-SzmBF364khQiMzA9x3keE5YrHY_cYR_Eu3_WO6bCVqkLpePNmCGJ70kG'
-                            },
-                            body: jsonEncode(<String, dynamic>{
-                              'notification': <String, dynamic>{
-                                'title': '$title',
-                                'body':
-                                    'You have received a $title from $currentuserid'
-                              },
-                              'priority': 'high',
-                              'data': data,
-                              'to': '$token'
-                            })),
-                        if (response.statusCode == 200)
-                          {print("Notificatin sent")}
-                        else
-                          {print("Error")}
-                      })
-            });
+      await FirebaseFirestore.instance
+          .collection("notifications getter")
+          .doc(userId)
+          .collection(userId)
+          .doc(helper)
+          .set({
+        helper: helper,
+      }).whenComplete(() async => {
+        response = await http.post(
+            Uri.parse('https://fcm.googleapis.com/fcm/send'),
+            headers: <String, String>{
+              'Content-Type': 'application/json',
+              'Authorization':
+              'key=AAAADLBdq2Y:APA91bHH0thNUfQqZnQBnb0mqU3VnJG9sz4uGBLeBZEaB1NZUE6BASB2FJMekDnZPPMmijQY6yB4gFlFaL2-SzmBF364khQiMzA9x3keE5YrHY_cYR_Eu3_WO6bCVqkLpePNmCGJ70kG'
+            },
+            body: jsonEncode(<String, dynamic>{
+              'notification': <String, dynamic>{
+                'title': '$title',
+                'body':
+                'You have received a $title from $currentuserid'
+              },
+              'priority': 'high',
+              'data': data,
+              'to': '$token'
+            })),
+        if (response.statusCode == 200)
+          {print("Notificatin sent")}
+        else
+          {print("Error")}
+      })
+    });
   }
 
   checkpointer(String postid, String type, String postuid) async {
@@ -565,30 +104,30 @@ class FeedHelpers with ChangeNotifier {
         .collection("upvotes")
         .get()
         .then((docSnapshot) => {
-              for (int i = 0; i < docSnapshot.docs.length; i++)
-                {l.add(docSnapshot.docs[i].data()['userId'])},
-            }); 
+      for (int i = 0; i < docSnapshot.docs.length; i++)
+        {l.add(docSnapshot.docs[i].data()['userId'])},
+    });
     await FirebaseFirestore.instance
         .collection("posts")
         .doc(postid)
         .collection("downvotes")
         .get()
         .then((docSnapshot) => {
-              for (int i = 0; i < docSnapshot.docs.length; i++)
-                {m.add(docSnapshot.docs[i].data()['userId'])},
-            });        
+      for (int i = 0; i < docSnapshot.docs.length; i++)
+        {m.add(docSnapshot.docs[i].data()['userId'])},
+    });
 
     for (int i = 0; i < l.length; i++) {
       if (l[i] == FirebaseAuth.instance.currentUser?.uid) {
         check = true;
         if(type == "upvotes"){
           await FirebaseFirestore.instance
-          .collection("posts")
-          .doc(postid)
-          .collection(type)
-          .doc(FirebaseAuth.instance.currentUser?.uid)
-          .delete()
-          .whenComplete(() => {
+              .collection("posts")
+              .doc(postid)
+              .collection(type)
+              .doc(FirebaseAuth.instance.currentUser?.uid)
+              .delete()
+              .whenComplete(() => {
             FirebaseFirestore.instance
                 .collection('leaderboard')
                 .doc(postuid)
@@ -604,12 +143,12 @@ class FeedHelpers with ChangeNotifier {
         check = true;
         if(type == "downvotes"){
           await FirebaseFirestore.instance
-          .collection("posts")
-          .doc(postid)
-          .collection(type)
-          .doc(FirebaseAuth.instance.currentUser?.uid)
-          .delete()
-          .whenComplete(() => {
+              .collection("posts")
+              .doc(postid)
+              .collection(type)
+              .doc(FirebaseAuth.instance.currentUser?.uid)
+              .delete()
+              .whenComplete(() => {
             FirebaseFirestore.instance
                 .collection('leaderboard')
                 .doc(postuid)
@@ -625,490 +164,7 @@ class FeedHelpers with ChangeNotifier {
     return (check);
   }
 
-  Widget loadPosts(
-      BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-    TextEditingController reportController = TextEditingController();
-    return ListView(
-        children: snapshot.data!.docs.map((DocumentSnapshot documentSnapshot) {
-      Map<String, dynamic> data =
-          documentSnapshot.data()! as Map<String, dynamic>;
-      return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: 40,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(25),
-                  topRight: Radius.circular(25),
-                ),
-                color: Color(0xffd9d9d9),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 22, right: 15),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "${data['userId']}",
-                      style: TextStyle(
-                        color:
-                            Provider.of<Authentication>(context, listen: false)
-                                        .getUser()
-                                        ?.uid ==
-                                    data['userId']
-                                ? Colors.blue
-                                : Colors.black,
-                        fontWeight:
-                            Provider.of<Authentication>(context, listen: false)
-                                        .getUser()
-                                        ?.uid ==
-                                    data['userId']
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                      ),
-                    ),
-                    Provider.of<Authentication>(context, listen: false)
-                                .getUser()
-                                ?.uid ==
-                            data['userId']
-                        ? GestureDetector(
-                            child: Icon(EvaIcons.moreVertical),
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) =>
-                                    data['postType'] == 1
-                                        ? editDeletePostDialog(
-                                            context,
-                                            data['debt'],
-                                            data['content'],
-                                            data['debtType'],
-                                            data['goalDate'],
-                                            data['intrestPercentage'],
-                                            data['timePeriod'],
-                                            data['postId'],
-                                            data['userId'])
-                                        : deleteStrategyDialog(context,
-                                            data['postId'], data['userId']),
-                              );
-                            },
-                          )
-                        : GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (ctx) => AlertDialog(
-                                  title: Text("Report"),
-                                  content: TextFormField(
-                                    autofocus: true,
-                                    controller: reportController,
-                                  ),
-                                  actions: <Widget>[
-                                    FlatButton(
-                                      onPressed: () {
-                                        Provider.of<FirebaseOperations>(context,
-                                                listen: false)
-                                            .reportPost(
-                                                "${Provider.of<Authentication>(context, listen: false).getUser()?.uid}",
-                                                "${data["debt"]}+${data["time"].seconds}",
-                                                {
-                                              "user": 1,
-                                              "report": reportController.text
-                                            });
-                                        Navigator.of(ctx).pop();
-                                        reportController.clear();
-                                      },
-                                      child: Text("Send"),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                            child: Icon(EvaIcons.moreVertical)),
-                  ],
-                ),
-              ),
-            ),
-            data['postType'] == 1
-                ? Container(
-                    width: MediaQuery.of(context).size.width,
-                    decoration: BoxDecoration(
-                      border: Border.all(width: 2, color: Color(0xffd9d9d9)),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text.rich(
-                                  TextSpan(
-                                    children: [
-                                      TextSpan(
-                                          text: 'Debt:  ',
-                                          style: TextStyle(fontSize: 16)),
-                                      TextSpan(
-                                        text: "₹${data['debt']}",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Text.rich(
-                                  TextSpan(
-                                    children: [
-                                      TextSpan(
-                                          text: 'Target:  ',
-                                          style: TextStyle(fontSize: 16)),
-                                      TextSpan(
-                                        text: "${data['goalDate']}",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          Text(
-                            data['debtType'] +
-                                " at " +
-                                data['intrestPercentage'] +
-                                "% interest" +
-                                " for " +
-                                data['timePeriod'],
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w100,
-                              color: Colors.lightBlue,
-                            ),
-                          ),
-                          Divider(
-                            height: MediaQuery.of(context).size.height * 0.02,
-                            thickness: 1,
-                            color: Color(0xff636363),
-                          ),
-                          Container(
-                            width: MediaQuery.of(context).size.width,
-                            child: Text(
-                              data['content'],
-                              style: TextStyle(
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 1),
-                          data['edited']
-                              ? Row(
-                                  children: [
-                                    Text(
-                                      "(Edited)",
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: Colors.grey.shade600,
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : SizedBox(width: 0)
-                        ],
-                      ),
-                    ),
-                  )
-                : Container(
-                    width: MediaQuery.of(context).size.width,
-                    decoration: BoxDecoration(
-                      border: Border.all(width: 2, color: Color(0xffd9d9d9)),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Center(
-                            child: Text(
-                              data['title'],
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.lightBlue,
-                              ),
-                            ),
-                          ),
-                          Divider(
-                            height: MediaQuery.of(context).size.height * 0.02,
-                            thickness: 1,
-                            color: Color(0xff636363),
-                          ),
-                          Text(
-                            data['content'],
-                            //overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w200,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: 40,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(25),
-                  bottomRight: Radius.circular(25),
-                ),
-                color: Color(0xffd9d9d9),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () async {
-                      check = await checkpointer(data['postId'], "upvotes", data['userId']);
-                      if (check == false) {
-                        FirebaseFirestore.instance
-                            .collection("userData")
-                            .doc(data['userId'])
-                            .get()
-                            .then((DocumentSnapshot documentSnapshot) {
-                          if (documentSnapshot.exists) {
-                            print('Document data: ${documentSnapshot.data()}');
-                            var a = documentSnapshot.data();
-                            Map.from(a as Map<String, dynamic>);
-                            String token = a["token"];
-                            sendNotification("Upvote", token ,data['userId'], data['postId']);
-                          }
-                        });
-                        Provider.of<PostOptions>(context, listen: false)
-                            .addUpvote(
-                                context,
-                                data['postId'],
-                                Provider.of<Authentication>(context,
-                                        listen: false)
-                                    .getUser()!
-                                    .uid,
-                                data['userId']);
-                      }
-                      check = false;
-                    },
-                    child: Container(
-                      width: MediaQuery.of(context).size.width / 4 - 10,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            FontAwesomeIcons.angleUp,
-                            color: Colors.green,
-                            size: 22,
-                          ),
-                          SizedBox(width: 4),
-                          StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('posts')
-                                .doc(data['postId'])
-                                .collection('upvotes')
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Center(
-                                    child: SizedBox(
-                                        height: 10,
-                                        width: 10,
-                                        child: CircularProgressIndicator(
-                                            strokeWidth: 1)));
-                              } else {
-                                return Text(
-                                    snapshot.data!.docs.length.toString(),
-                                    style: TextStyle(color: Colors.green));
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () async {
-
-                      check = await checkpointer(data['postId'], "downvotes", data['userId']);
-                      if (check == false) {
-                        FirebaseFirestore.instance
-                            .collection("userData")
-                            .doc(data['userId'])
-                            .get()
-                            .then((DocumentSnapshot documentSnapshot) {
-                          if (documentSnapshot.exists) {
-                            print('Document data: ${documentSnapshot.data()}');
-                            var a = documentSnapshot.data();
-                            Map.from(a as Map<String, dynamic>);
-                            String token = a["token"];
-                            print(token);
-                            sendNotification("Downvote", token, data['userId'], data['postId']);
-                          }
-                        });
-                        Provider.of<PostOptions>(context, listen: false)
-                            .addDownvote(
-                                context,
-                                data['postId'],
-                                Provider.of<Authentication>(context,
-                                        listen: false)
-                                    .getUser()!
-                                    .uid,
-                                data['userId']);
-                      }
-                      check = false;
-                    },
-                    child: Container(
-                      width: MediaQuery.of(context).size.width / 4 - 10,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            FontAwesomeIcons.angleDown,
-                            color: Colors.red,
-                            size: 22,
-                          ),
-                          SizedBox(width: 4),
-                          StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('posts')
-                                .doc(data['postId'])
-                                .collection('downvotes')
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Center(
-                                    child: SizedBox(
-                                  height: 10,
-                                  width: 10,
-                                  child:
-                                      CircularProgressIndicator(strokeWidth: 1),
-                                ));
-                              } else {
-                                return Text(
-                                    snapshot.data!.docs.length.toString(),
-                                    style: TextStyle(color: Colors.red));
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () {
-                      addCommentSheet(
-                          context,
-                          documentSnapshot,
-                          Provider.of<Authentication>(context, listen: false)
-                              .getUser()!
-                              .uid,
-                          data['postId'],
-                          data['userId']);
-                    },
-                    child: Container(
-                      width: MediaQuery.of(context).size.width / 4 - 10,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon(
-                            FontAwesomeIcons.comment,
-                            color: Colors.blue,
-                            size: 22,
-                          ),
-                          SizedBox(width: 4),
-                          StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('posts')
-                                .doc(data['postId'])
-                                .collection('comments')
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Center(
-                                    child: SizedBox(
-                                  height: 10,
-                                  width: 10,
-                                  child:
-                                      CircularProgressIndicator(strokeWidth: 1),
-                                ));
-                              } else {
-                                return Text(
-                                  " ${snapshot.data!.docs.length.toString()}",
-                                  style: TextStyle(color: Colors.blue),
-                                );
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () => Share.share(
-                    //  data['posts']+"at"+data['content']+
-                      data['content']+
-                          '\n\n Lets become debt-free together with Moneylans \n\n  https://play.google.com/store/apps/details?id=com.company.moneylans' ,
-
-                      subject: data['debtType'] +
-                          " at " +
-                          data['intrestPercentage'] +
-                          "% interest" +
-                          " for " +
-                          data['timePeriod'],
-                    ),
-                    child: Container(
-                      width: MediaQuery.of(context).size.width / 4 - 10,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            FontAwesomeIcons.shareAlt,
-                            color: Colors.blue,
-                            size: 22,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-    }).toList());
-  }
-
-  addCommentSheet(BuildContext context, DocumentSnapshot snapshot, String docId,
-      String postId, String userId) {
+  addCommentSheet(BuildContext context, DocumentSnapshot snapshot, String docId, String postId, String userId) {
     TextEditingController commentController = TextEditingController();
     TextEditingController report = TextEditingController();
     return showModalBottomSheet(
@@ -1164,7 +220,7 @@ class FeedHelpers with ChangeNotifier {
 
                               return SizedBox(
                                 height:
-                                    MediaQuery.of(context).size.height * 0.11,
+                                MediaQuery.of(context).size.height * 0.11,
                                 width: MediaQuery.of(context).size.width,
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
@@ -1178,11 +234,11 @@ class FeedHelpers with ChangeNotifier {
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Provider.of<Authentication>(
-                                                          context,
-                                                          listen: false)
-                                                      .getUser()
-                                                      ?.uid ==
-                                                  data['userId']
+                                              context,
+                                              listen: false)
+                                              .getUser()
+                                              ?.uid ==
+                                              data['userId']
                                               ? Colors.blue
                                               : Colors.black,
                                         ),
@@ -1190,7 +246,7 @@ class FeedHelpers with ChangeNotifier {
                                     ),
                                     Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                       // ignore: prefer_const_literals_to_create_immutables
                                       children: [
                                         Row(
@@ -1202,7 +258,7 @@ class FeedHelpers with ChangeNotifier {
                                               ),
                                               SizedBox(width: 4),
                                               Text(data['comments'])
-                                        ]),
+                                            ]),
                                         GestureDetector(
                                             onTap: () {
                                               showDialog(
@@ -1217,15 +273,15 @@ class FeedHelpers with ChangeNotifier {
                                                       FlatButton(
                                                         onPressed: () {
                                                           Provider.of<FirebaseOperations>(
-                                                                  context,
-                                                                  listen: false)
+                                                              context,
+                                                              listen: false)
                                                               .reportComment(
-                                                                  "${Provider.of<Authentication>(context, listen: false).getUser()?.uid}",
-                                                                  "${data["postId"]},${data["data"]}",
-                                                                  {
+                                                              "${Provider.of<Authentication>(context, listen: false).getUser()?.uid}",
+                                                              "${data["postId"]},${data["data"]}",
+                                                              {
                                                                 "user": 1,
                                                                 "report":
-                                                                    report.text
+                                                                report.text
                                                               });
                                                           Navigator.of(ctx)
                                                               .pop();
@@ -1269,7 +325,7 @@ class FeedHelpers with ChangeNotifier {
                               controller: commentController,
                               textCapitalization: TextCapitalization.sentences,
                               decoration:
-                                  InputDecoration(hintText: "Add comment..."),
+                              InputDecoration(hintText: "Add comment..."),
                             ),
                           ),
                         ),
@@ -1293,7 +349,7 @@ class FeedHelpers with ChangeNotifier {
                             });
                             Provider.of<PostOptions>(context, listen: false)
                                 .addComment(context, postId,
-                                    commentController.text, userId);
+                                commentController.text, userId);
                             commentController.clear();
                           },
                           child: Transform.rotate(
@@ -1313,63 +369,54 @@ class FeedHelpers with ChangeNotifier {
   deleteStrategyDialog(BuildContext context, String postId, String userId) {
     return Dialog(
         child: Container(
-      height: MediaQuery.of(context).size.height * 0.1,
-      width: MediaQuery.of(context).size.width * 0.5,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        color: Colors.white,
-      ),
-      child: TextButton(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                content: Text("Would you like to delete the post?"),
-                actions: [
-                  FlatButton(
-                    child: Text("Cancel"),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  FlatButton(
-                    child: Text(
-                      "Delete",
-                      style: TextStyle(color: Colors.red),
-                    ),
-                    onPressed: () {
-                      Provider.of<PostOptions>(context, listen: false)
-                          .deletePost(context, postId, userId)
-                          .whenComplete(() {
-                        Provider.of<LandingHelpers>(context, listen: false)
-                            .displayToast(
+          height: MediaQuery.of(context).size.height * 0.1,
+          width: MediaQuery.of(context).size.width * 0.5,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            color: Colors.white,
+          ),
+          child: TextButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    content: Text("Would you like to delete the post?"),
+                    actions: [
+                      FlatButton(
+                        child: Text("Cancel"),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      FlatButton(
+                        child: Text(
+                          "Delete",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                        onPressed: () {
+                          Provider.of<PostOptions>(context, listen: false)
+                              .deletePost(context, postId, userId)
+                              .whenComplete(() {
+                            Provider.of<LandingHelpers>(context, listen: false)
+                                .displayToast(
                                 "Post deleted successfully!", context);
-                        Navigator.pop(context);
-                        Navigator.pop(context);
-                      });
-                    },
-                  )
-                ],
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                          });
+                        },
+                      )
+                    ],
+                  );
+                },
               );
             },
-          );
-        },
-        child: Text("Delete post"),
-      ),
-    ));
+            child: Text("Delete post"),
+          ),
+        ));
   }
 
-  editDeletePostDialog(
-      BuildContext context,
-      String debt,
-      String content,
-      String debtType,
-      String goalDate,
-      String interestPercentage,
-      String timePeriod,
-      String postId,
-      String userId) {
+  editDeletePostDialog(BuildContext context, String debt, String content, String debtType, String goalDate, String interestPercentage, String timePeriod, String postId, String userId) {
     return Dialog(
       child: Container(
         height: MediaQuery.of(context).size.height * 0.215,
@@ -1418,9 +465,9 @@ class FeedHelpers with ChangeNotifier {
                                 .deletePost(context, postId, userId)
                                 .whenComplete(() {
                               Provider.of<LandingHelpers>(context,
-                                      listen: false)
+                                  listen: false)
                                   .displayToast(
-                                      "Post deleted successfully!", context);
+                                  "Post deleted successfully!", context);
                               Navigator.pop(context);
                               Navigator.pop(context);
                             });
@@ -1441,15 +488,7 @@ class FeedHelpers with ChangeNotifier {
     );
   }
 
-  editPostSheet(
-      BuildContext context,
-      String debt,
-      String content,
-      String debtType,
-      String goalDate,
-      String interestPercentage,
-      String timePeriod,
-      String postId) {
+  editPostSheet(BuildContext context, String debt, String content, String debtType, String goalDate, String interestPercentage, String timePeriod, String postId) {
     TextEditingController debtControl = TextEditingController();
     TextEditingController contentControl = TextEditingController();
     TextEditingController debtTypeControl = TextEditingController();
@@ -1469,7 +508,7 @@ class FeedHelpers with ChangeNotifier {
       builder: (BuildContext context) {
         return Padding(
           padding:
-              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 10.0),
             child: Container(
@@ -1579,7 +618,7 @@ class FeedHelpers with ChangeNotifier {
                         ElevatedButton(
                             style: ButtonStyle(
                                 backgroundColor:
-                                    MaterialStateProperty.all(Colors.red)),
+                                MaterialStateProperty.all(Colors.red)),
                             onPressed: () {
                               Navigator.pop(context);
                             },
@@ -1587,11 +626,11 @@ class FeedHelpers with ChangeNotifier {
                         ElevatedButton(
                           onPressed: () async {
                             Provider.of<FirebaseOperations>(context,
-                                    listen: false)
+                                listen: false)
                                 .updatePostData(postId, {
                               'debt': debtControl.text,
                               'intrestPercentage':
-                                  interestPercentageControl.text,
+                              interestPercentageControl.text,
                               'debtType': debtTypeControl.text,
                               'timePeriod': timePeriodControl.text,
                               'goalDate': goalDateControl.text,
@@ -1599,9 +638,9 @@ class FeedHelpers with ChangeNotifier {
                               'edited': true
                             }).whenComplete(() {
                               Provider.of<LandingHelpers>(context,
-                                      listen: false)
+                                  listen: false)
                                   .displayToast(
-                                      "Post updated successfully!", context);
+                                  "Post updated successfully!", context);
                             }).whenComplete(() {
                               Navigator.pop(context);
                               Navigator.pop(context);
@@ -1686,94 +725,99 @@ class FeedHelpers with ChangeNotifier {
       ),
     );
   }
-}
 
-bool leaderWinnerHeight = true;
+  bool leaderWinnerHeight = true;
+  List items = ["All", "Plan", "Strategy", "Affirm"];
 
-class leader extends StatefulWidget {
-  const leader({Key? key}) : super(key: key);
-
-  @override
-  State<leader> createState() => _leaderState();
-}
-
-class _leaderState extends State<leader> {
-  @override
-  Widget build(BuildContext context) {
+  Widget leader() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child :Row(
+      child : Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Padding(
             padding: EdgeInsets.symmetric(horizontal:5),
-            child: SizedBox(
-              height: 38,
-              width: 164,
-
-              child: FlatButton(
-                color: Colors.grey,
-                onPressed: () =>leaderboard_winner_data(),
-
-                child:  Row(
-                    children:[
-                      Icon(
+            child: FlatButton(
+              color: Colors.grey,
+              onPressed: () => leaderboard_winner_data(),
+              child:  Row(
+                  children:[
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(
                         Icons.batch_prediction,
                         color: Colors.white,
                       ),
-                      Text('Winner of week',
-                          overflow: TextOverflow.ellipsis),
-                    ]
-                ),
+                    ),
+                    Text('Winner of week',
+                        overflow: TextOverflow.ellipsis),
+                  ]
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(5, 8, 5, 5),
-            child: SizedBox(
-              height: 38,
-              width: 150,
-              child: FlatButton(
-                  color: Colors.grey,
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: ((context) => leaderboard(
-                                userId: Provider.of<Authentication>(context,
-                                    listen: false)
-                                    .getUser()
-                                    ?.uid))));
-                  },
-                  child: Row(
-                      children : [   Icon(
+            child: FlatButton(
+                color: Colors.grey,
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: ((context) => leaderboard(
+                              userId: Provider.of<Authentication>(context,
+                                  listen: false)
+                                  .getUser()
+                                  ?.uid))));
+                },
+                child: Row(
+                    children : [   Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(
                         Icons.leaderboard,
                         color: Colors.white,
                       ),
-                        Text(" LeaderBoard")
-                      ] )
-              ),
+                    ),
+                      Text("LeaderBoard")
+                    ] )
             ),
           ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 3),
-            child: SizedBox(
-              height: 38,
-              width: 100,
-              child: FlatButton(
-                  color: Colors.grey,
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: ((context) => affirm())));
-                  },
-                  child: Row(
-                      children : [   Icon(
-                        Icons.pages,
-                        color: Colors.white,
-                      ),
-                        Text("Affirm")
-                      ] )
+          Container(
+            height: 35,
+            child: ListView.builder(
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              itemCount: items.length,
+              itemBuilder: (BuildContext context, int index) => Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        activeTag = index;
+                      });
+                    },
+                    child: Container(
+                      width: 100,
+                      child: Center(
+                          child: Text(
+                            "${items[index]}",
+                            style: TextStyle(color: Colors.black),
+                          )), //Color(0xFFFF2323)
+                      decoration: BoxDecoration(
+                          color:
+                          activeTag == index ? Color(0xffd9d9d9) : Colors.white,
+                          border: Border.all(
+                              width: 1.5,
+                              color: activeTag == index
+                                  ? Colors.white
+                                  : Color(0xffd9d9d9)),
+                          borderRadius: BorderRadius.all(Radius.circular(30.0))),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 5,
+                  )
+                ],
               ),
             ),
           ),
@@ -1784,150 +828,926 @@ class _leaderState extends State<leader> {
 
   leaderboard_winner_data() {
     CollectionReference data =
-        FirebaseFirestore.instance.collection('leaderboardDetails');
-    return showDialog(
-        context: context,
-        builder: (BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: FutureBuilder<DocumentSnapshot>(
-          future: data.doc("Detail").get(),
-          builder:
-              (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-            if (snapshot.hasError) {
-              return Text("Something went wrong",
-                  style: TextStyle(fontSize: 10));
-            }
-            if (snapshot.hasData && !snapshot.data!.exists) {
-              return Text("Document does not exist",
-                  style: TextStyle(fontSize: 10));
-            }
-            if (snapshot.connectionState == ConnectionState.done) {
-              Map<String, dynamic> data =
-                  snapshot.data!.data() as Map<String, dynamic>;
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(25),
-                          topRight: Radius.circular(25),
-                        ),
-                        color: Color(0xffd9d9d9),
+    FirebaseFirestore.instance.collection('leaderboardDetails');
+    return showDialog(context: context, builder: (BuildContext context) {
+      return FutureBuilder<DocumentSnapshot>(
+        future: data.doc("Detail").get(),
+        builder:
+            (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+          if (snapshot.hasError) {
+            return Text("Something went wrong",
+                style: TextStyle(fontSize: 10));
+          }
+          if (snapshot.hasData && !snapshot.data!.exists) {
+            return Text("Document does not exist",
+                style: TextStyle(fontSize: 10));
+          }
+          if (snapshot.connectionState == ConnectionState.done) {
+            Map<String, dynamic> data =
+            snapshot.data!.data() as Map<String, dynamic>;
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(25),
+                        topRight: Radius.circular(25),
                       ),
-                      child: Center(
-                          child: Text(
-                        data['userId'],
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w600),
-                      )),
+                      color: Color(0xffd9d9d9),
                     ),
-                    Container(
-                      height: MediaQuery.of(context).size.height * 0.3,
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                        border: Border.all(width: 2, color: Color(0xffd9d9d9)),
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(25),
-                          bottomRight: Radius.circular(25),
-                        ),
+                    child: Center(
+                        child: Text(
+                          data['userId'],
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w600),
+                        )),
+                  ),
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.3,
+                    width: MediaQuery.of(context).size.width,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(width: 4, color: Color(0xffd9d9d9)),
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(25),
+                        bottomRight: Radius.circular(25),
                       ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                right: 15, left: 15, top: 5, bottom: 10),
-                            child: Text.rich(
-                              TextSpan(
-                            text:
-                                "This week's 1st rank holders get help from ",
-                            children: <TextSpan>[
-                              TextSpan(
-                                  text: data['product'],
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold)),
-                              TextSpan(
-                                text: ', try by clicking on the visit',
-                              ),
-                            ],
-                              ),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              right: 15, left: 15, top: 5, bottom: 10),
+                          child: Text.rich(
+                            TextSpan(
+                              text:
+                              "This week's 1st rank holders get help from ",
+                              children: <TextSpan>[
+                                TextSpan(
+                                    text: data['product'],
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold)),
+                                TextSpan(
+                                  text: ', try by clicking on the visit',
+                                ),
+                              ],
                             ),
                           ),
-                          SizedBox(
-                            height: 10,
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        ElevatedButton(
+                          onPressed: () =>
+                              launchurl("https://${data["Link"]}"),
+                          child: SizedBox(
+                              width: 100,
+                              height: 25,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text("Visit"),
+                                  SizedBox(width: 10),
+                                  Icon(FontAwesomeIcons.share, size: 12),
+                                ],
+                              )),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              right: 15, left: 15, top: 5, bottom: 10),
+                          child: Text.rich(
+                            TextSpan(
+                              text: "Description: ",
+                              children: <TextSpan>[
+                                TextSpan(
+                                    text: data['Description'],
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold)),
+                              ],
+                            ),
                           ),
-                          ElevatedButton(
-                            onPressed: () =>
-                                launchurl("https://${data["Link"]}"),
-                            child: SizedBox(
-                                width: 100,
-                                height: 25,
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text("Visit"),
-                                    SizedBox(width: 10),
-                                    Icon(FontAwesomeIcons.share, size: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => feedBody(
+                                context, data['userId'], data['point'] * 10),
+                          ),
+                        );
+                      },
+                      child: Text("View Strategies"),
+                      style: ButtonStyle(
+                        backgroundColor:
+                        MaterialStateProperty.all(Colors.black),
+                      )),
+                ],
+              ),
+            );
+          }
+          return SizedBox();
+        },
+      );
+    });
+  }
+
+  Widget loadPosts(BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+    TextEditingController reportController = TextEditingController();
+    return ListView(
+        children: snapshot.data!.docs.map((DocumentSnapshot documentSnapshot) {
+          Map<String, dynamic> data =
+          documentSnapshot.data()! as Map<String, dynamic>;
+          return activeTag == 0 || items[activeTag] == data["postType"] ? Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(25),
+                      topRight: Radius.circular(25),
+                    ),
+                    color: Color(0xffd9d9d9),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 22, right: 15),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "${data['userId']}",
+                          style: TextStyle(
+                            color:
+                            Provider.of<Authentication>(context, listen: false)
+                                .getUser()
+                                ?.uid ==
+                                data['userId']
+                                ? Colors.blue
+                                : Colors.black,
+                            fontWeight:
+                            Provider.of<Authentication>(context, listen: false)
+                                .getUser()
+                                ?.uid ==
+                                data['userId']
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                          ),
+                        ),
+                        Provider.of<Authentication>(context, listen: false)
+                            .getUser()
+                            ?.uid ==
+                            data['userId']
+                            ? GestureDetector(
+                          child: Icon(EvaIcons.moreVertical),
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) =>
+                              data['postType'] == "Plan"
+                                  ? editDeletePostDialog(
+                                  context,
+                                  data['debt'],
+                                  data['content'],
+                                  data['debtType'],
+                                  data['goalDate'],
+                                  data['intrestPercentage'],
+                                  data['timePeriod'],
+                                  data['postId'],
+                                  data['userId'])
+                                  : deleteStrategyDialog(context,
+                                  data['postId'], data['userId']),
+                            );
+                          },
+                        )
+                            : GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: Text("Report"),
+                                  content: TextFormField(
+                                    autofocus: true,
+                                    controller: reportController,
+                                  ),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      onPressed: () {
+                                        Provider.of<FirebaseOperations>(context,
+                                            listen: false)
+                                            .reportPost(
+                                            "${Provider.of<Authentication>(context, listen: false).getUser()?.uid}",
+                                            "${data["debt"]}+${data["time"].seconds}",
+                                            {
+                                              "user": 1,
+                                              "report": reportController.text
+                                            });
+                                        Navigator.of(ctx).pop();
+                                        reportController.clear();
+                                      },
+                                      child: Text("Send"),
+                                    ),
                                   ],
-                                )),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                right: 15, left: 15, top: 5, bottom: 10),
-                            child: Text.rich(
-                              TextSpan(
-                                text: "Description: ",
-                                children: <TextSpan>[
-                                  TextSpan(
-                                      text: data['Description'],
+                                ),
+                              );
+                            },
+                            child: Icon(EvaIcons.moreVertical)),
+                      ],
+                    ),
+                  ),
+                ),
+                data['postType'] == "Plan"
+                    ? Container(
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 2, color: Color(0xffd9d9d9)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text.rich(
+                                TextSpan(
+                                  children: [
+                                    TextSpan(
+                                        text: 'Debt:  ',
+                                        style: TextStyle(fontSize: 16)),
+                                    TextSpan(
+                                      text: "₹${data['debt']}",
                                       style: TextStyle(
-                                          fontWeight: FontWeight.bold)),
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Text.rich(
+                                TextSpan(
+                                  children: [
+                                    TextSpan(
+                                        text: 'Target:  ',
+                                        style: TextStyle(fontSize: 16)),
+                                    TextSpan(
+                                      text: "${data['goalDate']}",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          data['debtType'] +
+                              " at " +
+                              data['intrestPercentage'] +
+                              "% interest" +
+                              " for " +
+                              data['timePeriod'],
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w100,
+                            color: Colors.lightBlue,
+                          ),
+                        ),
+                        Divider(
+                          height: MediaQuery.of(context).size.height * 0.02,
+                          thickness: 1,
+                          color: Color(0xff636363),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          child: Text(
+                            data['content'],
+                            style: TextStyle(
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 1),
+                        data['edited']
+                            ? Row(
+                          children: [
+                            Text(
+                              "(Edited)",
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                          ],
+                        )
+                            : SizedBox(width: 0)
+                      ],
+                    ),
+                  ),
+                )
+                      : Container(
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 2, color: Color(0xffd9d9d9)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Container(
+                            height: 35,
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              scrollDirection: Axis.horizontal,
+                              itemCount: data["title"].length,
+                              itemBuilder: (BuildContext context, int index) => Row(
+                                children: [
+                                  Container(
+                                    width: 100,
+                                    child: Center(
+                                        child: Text(
+                                          "${data["title"][index]}",
+                                          style: TextStyle(color: Colors.black),
+                                        )), //Color(0xFFFF2323)
+                                    decoration: BoxDecoration(
+                                        color: Color(0xffd9d9d9),
+                                        border: Border.all(
+                                            width: 1.5,
+                                            color: Color(0xffd9d9d9)),
+                                        borderRadius: BorderRadius.all(Radius.circular(30.0))),
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  )
                                 ],
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                        Divider(
+                          height: MediaQuery.of(context).size.height * 0.02,
+                          thickness: 1,
+                          color: Color(0xff636363),
+                        ),
+                        Text(
+                          data['content'],
+                          //overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w200,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => feedBody(
-                                  context, data['userId'], data['point'] * 10),
-                            ),
-                          );
-                        },
-                        child: Text("View Strategies"),
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.black),
-                        )),
-                  ],
+                  ),
                 ),
-              );
-            }
-            return SizedBox();
-          },
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(25),
+                      bottomRight: Radius.circular(25),
+                    ),
+                    color: Color(0xffd9d9d9),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () async {
+                          check = await checkpointer(data['postId'], "upvotes", data['userId']);
+                          if (check == false) {
+                            FirebaseFirestore.instance
+                                .collection("userData")
+                                .doc(data['userId'])
+                                .get()
+                                .then((DocumentSnapshot documentSnapshot) {
+                              if (documentSnapshot.exists) {
+                                print('Document data: ${documentSnapshot.data()}');
+                                var a = documentSnapshot.data();
+                                Map.from(a as Map<String, dynamic>);
+                                String token = a["token"];
+                                sendNotification("Upvote", token ,data['userId'], data['postId']);
+                              }
+                            });
+                            Provider.of<PostOptions>(context, listen: false)
+                                .addUpvote(
+                                context,
+                                data['postId'],
+                                Provider.of<Authentication>(context,
+                                    listen: false)
+                                    .getUser()!
+                                    .uid,
+                                data['userId']);
+                          }
+                          check = false;
+                        },
+                        child: Container(
+                          width: MediaQuery.of(context).size.width / 4 - 10,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                FontAwesomeIcons.angleUp,
+                                color: Colors.green,
+                                size: 22,
+                              ),
+                              SizedBox(width: 4),
+                              StreamBuilder<QuerySnapshot>(
+                                stream: FirebaseFirestore.instance
+                                    .collection('posts')
+                                    .doc(data['postId'])
+                                    .collection('upvotes')
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return Center(
+                                        child: SizedBox(
+                                            height: 10,
+                                            width: 10,
+                                            child: CircularProgressIndicator(
+                                                strokeWidth: 1)));
+                                  } else {
+                                    return Text(
+                                        snapshot.data!.docs.length.toString(),
+                                        style: TextStyle(color: Colors.green));
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () async {
+
+                          check = await checkpointer(data['postId'], "downvotes", data['userId']);
+                          if (check == false) {
+                            FirebaseFirestore.instance
+                                .collection("userData")
+                                .doc(data['userId'])
+                                .get()
+                                .then((DocumentSnapshot documentSnapshot) {
+                              if (documentSnapshot.exists) {
+                                print('Document data: ${documentSnapshot.data()}');
+                                var a = documentSnapshot.data();
+                                Map.from(a as Map<String, dynamic>);
+                                String token = a["token"];
+                                print(token);
+                                sendNotification("Downvote", token, data['userId'], data['postId']);
+                              }
+                            });
+                            Provider.of<PostOptions>(context, listen: false)
+                                .addDownvote(
+                                context,
+                                data['postId'],
+                                Provider.of<Authentication>(context,
+                                    listen: false)
+                                    .getUser()!
+                                    .uid,
+                                data['userId']);
+                          }
+                          check = false;
+                        },
+                        child: Container(
+                          width: MediaQuery.of(context).size.width / 4 - 10,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                FontAwesomeIcons.angleDown,
+                                color: Colors.red,
+                                size: 22,
+                              ),
+                              SizedBox(width: 4),
+                              StreamBuilder<QuerySnapshot>(
+                                stream: FirebaseFirestore.instance
+                                    .collection('posts')
+                                    .doc(data['postId'])
+                                    .collection('downvotes')
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return Center(
+                                        child: SizedBox(
+                                          height: 10,
+                                          width: 10,
+                                          child:
+                                          CircularProgressIndicator(strokeWidth: 1),
+                                        ));
+                                  } else {
+                                    return Text(
+                                        snapshot.data!.docs.length.toString(),
+                                        style: TextStyle(color: Colors.red));
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () {
+                          addCommentSheet(
+                              context,
+                              documentSnapshot,
+                              Provider.of<Authentication>(context, listen: false)
+                                  .getUser()!
+                                  .uid,
+                              data['postId'],
+                              data['userId']);
+                        },
+                        child: Container(
+                          width: MediaQuery.of(context).size.width / 4 - 10,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Icon(
+                                FontAwesomeIcons.comment,
+                                color: Colors.blue,
+                                size: 22,
+                              ),
+                              SizedBox(width: 4),
+                              StreamBuilder<QuerySnapshot>(
+                                stream: FirebaseFirestore.instance
+                                    .collection('posts')
+                                    .doc(data['postId'])
+                                    .collection('comments')
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return Center(
+                                        child: SizedBox(
+                                          height: 10,
+                                          width: 10,
+                                          child:
+                                          CircularProgressIndicator(strokeWidth: 1),
+                                        ));
+                                  } else {
+                                    return Text(
+                                      " ${snapshot.data!.docs.length.toString()}",
+                                      style: TextStyle(color: Colors.blue),
+                                    );
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => Share.share(
+                          //  data['posts']+"at"+data['content']+
+                          data['content']+
+                              '\n\n Lets become debt-free together with Moneylans \n\n  https://play.google.com/store/apps/details?id=com.company.moneylans' ,
+
+                          subject: data['debtType'] +
+                              " at " +
+                              data['intrestPercentage'] +
+                              "% interest" +
+                              " for " +
+                              data['timePeriod'],
+                        ),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width / 4 - 10,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                FontAwesomeIcons.shareAlt,
+                                color: Colors.blue,
+                                size: 22,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ) : SizedBox();
+        }).toList());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2.0),
+        child: Container(
+          child: RefreshIndicator(
+            backgroundColor: Colors.white,
+            color: Colors.blue,
+            onRefresh: () {
+              return Future(() => Future.delayed(Duration(seconds: 1)));
+            },
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('posts')
+                  .orderBy('time', descending: true)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else {
+                  return Column(
+                    children: [
+                      leader(),
+                      Expanded(child: loadPosts(context, snapshot)),
+                    ],
+                  );
+                }
+              },
+            ),
+          ),
+          height: MediaQuery.of(context).size.height * 0.82,
+          width: MediaQuery.of(context).size.width,
         ),
       ),
     );
-  });
+  }
+}
+
+
+
+class mybottomsheet extends StatefulWidget {
+  const mybottomsheet({Key? key}) : super(key: key);
+
+  @override
+  State<mybottomsheet> createState() => _mybottomsheetState();
+}
+class _mybottomsheetState extends State<mybottomsheet> {
+  TextEditingController StrategyStepController = TextEditingController();
+  int i = 1, temp = 2;
+  List tags = [];
+  List items = ["Advice", "Earning", "Question"];
+  List Strategytypes = ["Strategy", "Affirm"];
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding:
+      EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 10.0),
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.5,
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+            color: Colors.grey.shade200.withOpacity(0.5),
+            borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20)),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 100.0),
+                  child: Divider(
+                    thickness: 4.0,
+                    color: Colors.white,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Container(
+                    height: 35,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 2,
+                      itemBuilder: (BuildContext context, int index) => Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                temp = index + 2;
+                              });
+                            },
+                            child: Container(
+                              width: MediaQuery.of(context).size.width / 2 - 20,
+                              child: Center(
+                                  child: Text(
+                                    "${Strategytypes[index]}",
+                                    style: TextStyle(color: Colors.black),
+                                  )),
+                              decoration: BoxDecoration(
+                                  color: index == temp-2 ? Color(0xffd9d9d9) : Colors.white,
+                                  border: Border.all(
+                                      width: 1.5,
+                                      color: index == temp-2
+                                          ? Colors.white
+                                          : Color(0xffd9d9d9)),
+                                  borderRadius: BorderRadius.all(Radius.circular(30.0))),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 5,
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                  child: Divider(
+                    thickness: 2,
+                    color: Colors.white,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Container(
+                    height: 35,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      itemCount: items.length,
+                      itemBuilder: (BuildContext context, int index) => Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                if (tags.contains(items[index]))
+                                  tags.remove(items[index]);
+                                else
+                                  tags.add(items[index]);
+                              });
+                            },
+                            child: Container(
+                              width: 100,
+                              child: Center(
+                                  child: Text(
+                                    "${items[index]}",
+                                    style: TextStyle(color: Colors.black),
+                                  )),
+                              decoration: BoxDecoration(
+                                  color:
+                                  tags.contains(items[index]) ? Color(0xffd9d9d9) : Colors.white,
+                                  border: Border.all(
+                                      width: 1.5,
+                                      color: tags.contains(items[index])
+                                          ? Colors.white
+                                          : Color(0xffd9d9d9)),
+                                  borderRadius: BorderRadius.all(Radius.circular(30.0))),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 5,
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30)),
+                      width: 400,
+                      child: TextFormField(
+                        controller: StrategyStepController,
+                        minLines: 8,
+                        maxLines: 200,
+                        decoration: InputDecoration(
+                          fillColor: Colors.white,
+                          labelText: temp == 2 ? "Your Strategy" : "Your Affirm",
+                          filled: true,
+                          hintText: "Enter the strategies...",
+                        ),
+                      )),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                        style: ButtonStyle(
+                            backgroundColor:
+                            MaterialStateProperty.all(Colors.red)),
+                        onPressed: () {
+                          i = 1;
+                          tags.clear();
+                          StrategyStepController.clear();
+                          Navigator.pop(context);
+                        },
+                        child: Text("Cancel")),
+                    ElevatedButton(
+                      onPressed: () async {
+                        StrategyStepController.text.isNotEmpty && tags.isNotEmpty
+                            ? Provider.of<FirebaseOperations>(context,
+                            listen: false)
+                            .uploadPostData(
+                            "${StrategyStepController.text.substring(0, 6)}+${Timestamp.now().toString().substring(18, 28)}",
+                            {
+                              'postType': temp==1 ? "Plan" : temp==2 ? "Strategy" : "Affirm",
+                              'postId': "${StrategyStepController.text.substring(0, 6)}+${Timestamp.now().toString().substring(18, 28)}",
+                              'edited': false,
+                              'title': tags,
+                              'content':
+                              StrategyStepController.text,
+                              'userId': Provider.of<Authentication>(
+                                  context,
+                                  listen: false)
+                                  .getUser()
+                                  ?.uid,
+                              'time': Timestamp.now(),
+                              'userEmail': Provider.of<Authentication>(
+                                  context,
+                                  listen: false)
+                                  .getUser()
+                                  ?.email,
+                            }).whenComplete(() {
+                          Provider.of<LandingHelpers>(context,
+                              listen: false)
+                              .displayToast(
+                              "Post uploaded successfully!",
+                              context);
+                        }).whenComplete(() {
+                          Navigator.pop(context);
+                          tags.clear();
+                          StrategyStepController.clear();
+                          i = 1;
+                        }).then((value) {
+                          FirebaseFirestore.instance
+                              .collection('leaderboard')
+                              .doc(Provider.of<Authentication>(
+                              context,
+                              listen: false)
+                              .getUser()
+                              ?.uid)
+                              .update({
+                            'point': FieldValue.increment(10),
+                          });
+                        })
+                            : tags.isEmpty ?
+                                Provider.of<LandingHelpers>(context, listen: false)
+                                    .displayToast("Select atleast  1 Tag", context)
+                            : Provider.of<LandingHelpers>(context, listen: false)
+                                    .displayToast("Fill all the details!", context);
+                      },
+                      child: Row(
+                        children: const [
+                          Icon(FontAwesomeIcons.share, size: 12),
+                          SizedBox(width: 5),
+                          Text("Share")
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

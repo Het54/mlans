@@ -165,7 +165,7 @@ class _ExploreState extends State<Explore> {
                     child: Padding(
                       padding: EdgeInsets.only(left: 22, right: 15),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             data['title'],
@@ -176,7 +176,6 @@ class _ExploreState extends State<Explore> {
                               color: Colors.lightBlue,
                             ),
                           ),
-                          SizedBox(width: 100,),
                           GestureDetector(
                               onTap: () {
                                 showDialog(
@@ -525,7 +524,7 @@ class _mybottomsheetState extends State<mybottomsheet> {
                     child: ListView.builder(
                       shrinkWrap: true,
                       scrollDirection: Axis.horizontal,
-                      itemCount: 6,
+                      itemCount: 5,
                       itemBuilder: (BuildContext context, int index) => Row(
                         children: [
                           GestureDetector(

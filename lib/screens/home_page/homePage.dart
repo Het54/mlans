@@ -1,3 +1,4 @@
+import 'package:Moneylans/screens/feed/Feed.dart';
 import 'package:Moneylans/screens/notification/notification_screen.dart';
 import 'package:Moneylans/screens/onboard_screen/OnboardScreen.dart';
 import 'package:Moneylans/screens/profile/ProfileHelpers.dart';
@@ -10,7 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/Authentication.dart';
 import '../explore/explore.dart';
-import '../feed/Feed.dart';
 import '../profile/Profile.dart';
 import 'homePageHelpers.dart';
 
