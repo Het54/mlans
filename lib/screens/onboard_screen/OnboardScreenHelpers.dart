@@ -86,10 +86,14 @@ class OnboardScreenHelpers with ChangeNotifier {
   }
 
   premiumOnboard(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [],
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+          ],
+        ),
       ),
     );
   }
