@@ -1230,13 +1230,13 @@ Widget leaderList(
           .set({'index': index}, SetOptions(merge: true));
         if (data["userId"] == userId) {
           userIndex = index;
-          userPoint = data["point"] * 10;
+          userPoint = data["point"];
         };
         return Padding(
           padding: const EdgeInsets.only(right: 8, left: 8, top: 5, bottom: 5),
           child: GestureDetector(
             onTap: () =>
-                customDrawer(context, data["userId"], data["description"], data["link"], data["point"] * 10, data["index"], data["Product"]),
+                customDrawer(context, data["userId"], data["description"], data["link"], data["point"], data["index"], data["Product"]),
             child: Container(
               decoration: BoxDecoration(
                   color: index == 1
@@ -1304,7 +1304,7 @@ Widget leaderList(
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(right: 20),
-                    child: Text("${data["point"] * 10}",
+                    child: Text("${data["point"]}",
                         style: TextStyle(
                             fontSize: 20,
                             color: Colors.black,
