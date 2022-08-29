@@ -620,12 +620,15 @@ Widget loadPosts(BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot, us
                     color: Color(0xffd9d9d9),
                   ),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "${data['userId']}",
-                        style: TextStyle(
-                            color: Colors.blue, fontWeight: FontWeight.bold),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 25),
+                        child: Text(
+                          "${data['userId']}",
+                          style: TextStyle(
+                              color: Colors.blue, fontWeight: FontWeight.bold),
+                        ),
                       ),
                       GestureDetector(
                           onTap: () {
@@ -640,20 +643,7 @@ Widget loadPosts(BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot, us
                                   actions: <Widget>[
                                     FlatButton(
                                       onPressed: () {
-                                        // Provider.of<FirebaseOperations>(
-                                        //     context,
-                                        //     listen: false)
-                                        //     .reportComment(
-                                        //     "${Provider.of<Authentication>(context, listen: false).getUser()?.uid}",
-                                        //     "${data["postId"]},${data["data"]}",
-                                        //     {
-                                        //       "user": 1,
-                                        //       "report":
-                                        //       report.text
-                                        //     });
-                                        // Navigator.of(ctx)
-                                        //     .pop();
-                                        // report.clear();
+                                        Navigator.pop(context);
                                       },
                                       child: Text("SEND"),
                                     ),
@@ -667,7 +657,7 @@ Widget loadPosts(BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot, us
                     ],
                   ),
                 ),
-                data['postType'] == 1
+                data['postType'] == "Plan"
                     ? Container(
                         width: MediaQuery.of(context).size.width,
                         decoration: BoxDecoration(
@@ -764,47 +754,65 @@ Widget loadPosts(BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot, us
                         ),
                       )
                     : Container(
-                        width: MediaQuery.of(context).size.width,
-                        decoration: BoxDecoration(
-                          border:
-                              Border.all(width: 2, color: Color(0xffd9d9d9)),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Center(
-                                child: Text(
-                                  data['title'],
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.lightBlue,
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 2, color: Color(0xffd9d9d9)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Container(
+                            height: 35,
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              scrollDirection: Axis.horizontal,
+                              itemCount: data["title"].length,
+                              itemBuilder: (BuildContext context, int index) => Row(
+                                children: [
+                                  Container(
+                                    width: 100,
+                                    child: Center(
+                                        child: Text(
+                                          "${data["title"][index]}",
+                                          style: TextStyle(color: Colors.black),
+                                        )), //Color(0xFFFF2323)
+                                    decoration: BoxDecoration(
+                                        color: Color(0xffd9d9d9),
+                                        border: Border.all(
+                                            width: 1.5,
+                                            color: Color(0xffd9d9d9)),
+                                        borderRadius: BorderRadius.all(Radius.circular(30.0))),
                                   ),
-                                ),
+                                  SizedBox(
+                                    width: 5,
+                                  )
+                                ],
                               ),
-                              Divider(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.02,
-                                thickness: 1,
-                                color: Color(0xff636363),
-                              ),
-                              Text(
-                                data['content'],
-                                //overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w200,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
+                        Divider(
+                          height: MediaQuery.of(context).size.height * 0.02,
+                          thickness: 1,
+                          color: Color(0xff636363),
+                        ),
+                        Text(
+                          data['content'],
+                          //overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w200,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 Container(
                   width: MediaQuery.of(context).size.width,
                   height: 40,

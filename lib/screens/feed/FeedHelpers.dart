@@ -1454,7 +1454,7 @@ class _feedHelperState extends State<feedHelper> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
-                                FontAwesomeIcons.shareAlt,
+                                Icons.share,
                                 color: Colors.blue,
                                 size: 22,
                               ),
