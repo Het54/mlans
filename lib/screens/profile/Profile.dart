@@ -4,6 +4,7 @@ import 'package:Moneylans/screens/debt_meter/DebtMeter.dart';
 import 'package:Moneylans/screens/landing_page/landingHelpers.dart';
 import 'package:Moneylans/screens/landing_page/landingServices.dart';
 import 'package:Moneylans/screens/landing_page/landingUtils.dart';
+import 'package:Moneylans/screens/onboard_screen/OnboardScreen.dart';
 import 'package:Moneylans/screens/profile/ProfileHelpers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -478,6 +479,10 @@ class profileBio extends StatelessWidget {
             ),
           ),
         ),
+        ElevatedButton(onPressed: (){
+          Navigator.push(context, MaterialPageRoute(builder: (context) => OnboardScreen()));
+        }, 
+        child: Text("Premium Membership")),
         SizedBox(height: 10),
         Stack(
           children: [
