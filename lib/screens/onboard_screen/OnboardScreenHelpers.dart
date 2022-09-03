@@ -49,7 +49,7 @@ class OnboardScreenHelpers with ChangeNotifier {
             height: MediaQuery
                 .of(context)
                 .size
-                .height * 0.2,
+                .height * 0.35,
             width: MediaQuery
                 .of(context)
                 .size
@@ -65,7 +65,7 @@ class OnboardScreenHelpers with ChangeNotifier {
                     style: TextStyle(color: Colors.black)),
                 Text("to access this feature :(",
                     style: TextStyle(color: Colors.black)),
-                SizedBox(height: 5),
+                SizedBox(height: 10),
                 ElevatedButton(
                   child: Text("Join Premium Club"),
                   onPressed: () {
@@ -76,7 +76,12 @@ class OnboardScreenHelpers with ChangeNotifier {
                       ),
                     );
                   },
-                )
+                ),
+                SizedBox(height: 10),
+                Text("Premium Member Out Of Top 3 Is Declared",
+                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                Text("Winner Of The Week On The Home Screen",
+                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
               ],
             ),
           ),
